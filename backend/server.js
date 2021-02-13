@@ -497,7 +497,10 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
 				  result.data.data.User[0] === undefined && 
 				  result.data.data.User[0].pan_card === undefined &&
 				  result.data.data.User[0] === ""  &&
-				  result.data.data.User[0].pan_card === ""
+				  result.data.data.User[0].pan_card === "" &&
+			          typeof result === undefined &&
+			          result === undefined &&
+			          result.data === undefined
 				) {
                    resdata= {
                        status:400,
