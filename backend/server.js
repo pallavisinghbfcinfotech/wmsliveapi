@@ -477,12 +477,21 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                       
 })
 
-  app.post("/api/getschemelist", function (req, res) {
+    app.post("/api/getschemelist", function (req, res) {
         var resdata="";
-           Axios.get('https://prodigyfinallive.herokuapp.com/getUserDetails',
-           {data:{ email:req.body.email}}
+          if(req.body.email === "" || req.body.email === "undefined" || req.body === ''){
+            resdata= {
+                status:400,
+                message:'Data not found',            
+           }
+           res.json(resdata) 
+           return resdata;
+          }else{
+
+          Axios.get("https://prodigyfinallive.herokuapp.com/users/"+req.body.email
+
              ).then(function(result) {
-               if(result.data.data  === undefined && req.body.email == ''){
+               if(result.data.data === undefined && result.data.data === '' && req.body.email === ''){
                    resdata= {
                        status:400,
                        message:'Data not found',            
@@ -490,27 +499,19 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                   res.json(resdata) 
                   return resdata;
                }else{          
-                if (
-				  result.data.data === undefined &&
-				  result.data.data === "" &&
-				  result.data.message === "Bank details not found " && 
-				  result.data.data.User[0] === undefined && 
-				  result.data.data.User[0].pan_card === undefined &&
-				  result.data.data.User[0] === ""  &&
-				  result.data.data.User[0].pan_card === "" &&
-			          typeof result === undefined &&
-			          typeof result.data.data.User[0].pan_card === undefined &&
-			          result === undefined &&
-			          result.data === undefined
-				) {
+              if(
+                result.data.data === undefined &&
+                result.data.data === "" && 
+                result.data.data.pan_card === "" 
+                ){
                    resdata= {
-                       status:400,
+                       status:402,
                        message:'Data not found',            
                   }
                   res.json(resdata) 
                   return resdata;
                }else{
-               var pan =  result.data.data.User[0].pan_card;
+               var pan =  result.data.data.pan_card;
                 var transc = mongoose.model('trans_cams', transcams, 'trans_cams');
                 var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
                 var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
@@ -535,7 +536,8 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                             { $project: {  _id: 0 } }
                         ],
                         as: "products"
-                        }},{ $unwind: "$products"},
+                        }},
+                        { $unwind: "$products"},
                         {$project :{ _id:0 , products:"$products" } },
                    ]
                 const pipeline1=[  //trans_karvy
@@ -582,8 +584,20 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                     
                 }   
             }
-           });
+           }) .catch(function (err) {
+            //console.log('ERROR: ', err)
+            resdata= {
+                status:400,
+                message:'Data not Found',            
+           }
+           res.json(resdata)  
+           return resdata 
+          })
+
+        }
+   
            })
+    
 
 app.get("/api/getfoliolist", function (req, res) {
     Axios.get('https://prodigyfinallive.herokuapp.com/getUserDetails',
