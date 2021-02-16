@@ -247,7 +247,7 @@ app.post("/api/getfoliodetail", function (req, res) {
                                     }
                                   let merged3 =  newdata3.map((items, j) => Object.assign({}, items, newdata33[j]));
                                   let merged1 =  newdata1.map((items, j) => Object.assign({}, items, newdata11[j]));
-                                    var datacon = merged3.concat(newdata.concat(merged1.concat(newdata2)));
+                                    var datacon = merged3.concat(merged1.concat(newdata2));
                                     datacon = datacon
                                         .map(JSON.stringify)
                                         .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
