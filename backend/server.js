@@ -284,15 +284,16 @@ app.post("/api/getamclist", function(req, res) {
     const pipeline = [
       //folio_cams
       { $match: { PAN_NO: pan } },
-      { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE: "$AMC_CODE" } } },
+      { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE: "$AMC_CODE" , SCH_NAME:"$SCH_NAME" } } },
       {
         $project: {
           _id: 0,
           folio: "$_id.FOLIOCHK",
-          amc_code: "$_id.AMC_CODE"
+          amc_code: "$_id.AMC_CODE",
+          scheme:"$_id.SCH_NAME"
         }
       },
-      {$sort: {amc_code: 1}}
+      {$sort: {scheme: 1}}
     ];
     // 	const pipeline3 = [ //folio_karvy
     //             {"$match" : {PAN:pan}},
@@ -302,26 +303,28 @@ app.post("/api/getamclist", function(req, res) {
     const pipeline1 = [
       //trans_cams
       { $match: { PAN: pan } },
-      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE: "$AMC_CODE" } } },
+      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE: "$AMC_CODE" , SCHEME:"$SCHEME" } } },
       {
         $project: {
           _id: 0,
           folio: "$_id.FOLIO_NO",
-          amc_code: "$_id.AMC_CODE"
+          amc_code: "$_id.AMC_CODE",
+          scheme:"$_id.SCHEME"
         }
-      }, {$sort: {amc_code: 1}}
+      }, {$sort: {scheme: 1}}
     ];
     const pipeline2 = [
       //trans_karvy
       { $match: { PAN1: pan } },
-      { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND: "$TD_FUND" } } },
+      { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND: "$TD_FUND" , FUNDDESC:"$FUNDDESC"} } },
       {
         $project: {
           _id: 0,
           folio: "$_id.TD_ACNO",
-          amc_code: "$_id.TD_FUND"
+          amc_code: "$_id.TD_FUND",
+          scheme:"$_id.FUNDDESC"
         }
-      }, {$sort: {amc_code: 1}}
+      }, {$sort: {scheme: 1}}
     ];
     folioc.aggregate(pipeline, (err, newdata) => {
       transc.aggregate(pipeline1, (err, newdata1) => {
@@ -351,8 +354,8 @@ app.post("/api/getamclist", function(req, res) {
             }) // check if there is any occurence of the item in whole array
             .reverse()
             .map(JSON.parse);
+            datacon.sort((a, b) => (a.scheme > b.scheme) ? 1 : -1)
           resdata.data = datacon;
-          //console.log("res="+JSON.stringify(resdata))
           res.json(resdata);
           return resdata;
         });
@@ -360,6 +363,7 @@ app.post("/api/getamclist", function(req, res) {
     });
                   }
 });
+
 
   
 // app.post("/api/gettaxsavinguserwise", function (req, res) {
