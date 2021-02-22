@@ -461,7 +461,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
-               resdata.data = datacon
+               resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                res.json(resdata)
                return resdata
             });
@@ -505,7 +505,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
-               resdata.data = datacon
+                resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                res.json(resdata)
                return resdata
             });
@@ -610,7 +610,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                      .reverse().map(JSON.parse) ;
-                                     resdata.data = datacon
+                                      resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                                      res.json(resdata)
                                      return resdata
                                     });
@@ -655,7 +655,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                           datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                                          .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                                          .reverse().map(JSON.parse) ;
-                                                         resdata.data = datacon
+                                                          resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                                                          res.json(resdata)
                                                          console.log(newdata2)
                                                          return resdata
@@ -761,7 +761,7 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                      resdata.data = datacon
+                       resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                       res.json(resdata)
                       return resdata
                    });
@@ -771,17 +771,20 @@ app.post("/api/getdividenduserwise", function (req, res) {
             const pipeline = [  ///trans_cams
                 {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",SCHEME:"$_id.SCHEME",TRXN_NATURE:"$_id.TRXN_NATUR", FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, year1:{$year:('$_id.TRADDATE')}, year2:{$year:('$_id.TRADDATE')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { PAN: pan },{ $or: [ {year1: yer } ,{year2: secyer } ] } ] } }
+                {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { PAN: pan },{ $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
+		{$sort : { TRADDATE : -1}}
               ]
               const pipeline1 = [  ///trans_karvy
                 {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",SCHEME:"$_id.FUNDDESC",TRXN_NATURE:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, year1:{$year:('$_id.TD_TRDT')}, year2:{$year:('$_id.TD_TRDT')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Div/} , { PAN: pan }, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } }
+                {$match :   { $and: [ { TRXN_NATURE:/Div/} , { PAN: pan }, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
+		{$sort : { TRADDATE : -1}}
                 ]
                 const pipeline2 = [  ///trans_franklin
                 {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INVESTOR_2",PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",TRXN_NATURE:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, year1:{$year:('$_id.TRXN_DATE')}, year2:{$year:('$_id.TRXN_DATE')}  }},
-                {$match :   { $and: [  { $or: [ {TRXN_NATURE: /DIR/ } ,{TRXN_NATURE: /DP/ } ] },{ PAN: pan } ,{$or: [ {year1: yer } ,{year2: secyer } ] } ] } }
+                {$match :   { $and: [  { $or: [ {TRXN_NATURE: /DIR/ } ,{TRXN_NATURE: /DP/ } ] },{ PAN: pan } ,{$or: [ {year1: yer } ,{year2: secyer } ] } ] } },
+	        {$sort : { TRADDATE : -1}}
                 ]
                 transf.aggregate(pipeline2, (err, newdata) => {
                     transc.aggregate(pipeline, (err, newdata1) => {
@@ -802,7 +805,7 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                      resdata.data = datacon
+                       resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                       res.json(resdata)
                       return resdata
                    });
@@ -911,8 +914,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                      datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                     .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                     .reverse().map(JSON.parse) ;
-                                     resdata.data = datacon
-                                     console.log("name=",datacon)
+                                    resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                                     res.json(resdata)
                                     return resdata
                                });
@@ -958,8 +960,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                              datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                             .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                             .reverse().map(JSON.parse) ;
-                                             resdata.data = datacon
-                                             console.log("pan=",datacon)
+                                             resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
                                             res.json(resdata)
                                             return resdata
                                        });
