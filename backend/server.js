@@ -461,7 +461,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
-               resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+               resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                res.json(resdata)
                return resdata
             });
@@ -505,7 +505,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
-                resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                res.json(resdata)
                return resdata
             });
@@ -610,7 +610,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                      .reverse().map(JSON.parse) ;
-                                      resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                                      resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                                      res.json(resdata)
                                      return resdata
                                     });
@@ -655,7 +655,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                           datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                                          .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                                          .reverse().map(JSON.parse) ;
-                                                          resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                                                          resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                                                          res.json(resdata)
                                                          console.log(newdata2)
                                                          return resdata
@@ -761,7 +761,7 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                       resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                       resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                       res.json(resdata)
                       return resdata
                    });
@@ -805,7 +805,7 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                       resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                       resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                       res.json(resdata)
                       return resdata
                    });
@@ -914,7 +914,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                      datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                     .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                     .reverse().map(JSON.parse) ;
-                                    resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                                    resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                                     res.json(resdata)
                                     return resdata
                                });
@@ -960,7 +960,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                              datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                             .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                             .reverse().map(JSON.parse) ;
-                                             resdata.data = datacon.sort((a, b) => (a.TRADDATE > b.TRADDATE) ? 1 : -1)
+                                             resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                                             res.json(resdata)
                                             return resdata
                                        });
