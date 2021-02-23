@@ -1033,7 +1033,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                            datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                            .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                            .reverse().map(JSON.parse) ;
-                            resdata.data = datacon
+                            resdata.data = datacon.sort((a, b) => (a.products.PRODUCT_LONG_NAME > b.products.PRODUCT_LONG_NAME) ? 1 : -1);
                            res.json(resdata)  
                            return resdata    
                                    
