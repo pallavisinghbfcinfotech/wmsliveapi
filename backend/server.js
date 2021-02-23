@@ -657,7 +657,6 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                          .reverse().map(JSON.parse) ;
                                                           resdata.data = datacon.sort((a, b) => (a.TRADDATE < b.TRADDATE) ? 1 : -1)
                                                          res.json(resdata)
-                                                         console.log(newdata2)
                                                          return resdata
                                                         });
                                                    });
