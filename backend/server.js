@@ -460,6 +460,18 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
+               
+               for(var i=0; i<datacon.length; i++){
+                if(datacon[i]['TRXN_NATURE'] === "Redemption"){
+                    datacon[i]['TRXN_NATURE'] = "RED";
+                }if(datacon[i]['TRXN_NATURE'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic-NSE.*/)|| datacon[i]['TRXN_NATURE'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic (ECS).*/)){
+                    datacon[i]['TRXN_NATURE'] = "SIP";
+                }if(Math.sign(datacon[i]['AMOUNT']) === -1 ){
+                    datacon[i]['TRXN_NATURE'] = "SIPR";
+                }if(datacon[i]['TRXN_NATURE'].match(/Systematic - From.*/)){
+                    datacon[i]['TRXN_NATURE'] = "STP";
+                }
+            }
                resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                res.json(resdata)
                return resdata
@@ -504,7 +516,18 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                .reverse().map(JSON.parse) ;
-                resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+               for(var i=0; i<datacon.length; i++){
+                if(datacon[i]['TRXN_NATURE'] === "Redemption"){
+                    datacon[i]['TRXN_NATURE'] = "RED";
+                }if(datacon[i]['TRXN_NATURE'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic-NSE.*/)|| datacon[i]['TRXN_NATURE'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATURE'].match(/Systematic (ECS).*/)){
+                    datacon[i]['TRXN_NATURE'] = "SIP";
+                }if(Math.sign(datacon[i]['AMOUNT']) === -1 ){
+                    datacon[i]['TRXN_NATURE'] = "SIPR";
+                }if(datacon[i]['TRXN_NATURE'].match(/Systematic - From.*/)){
+                    datacon[i]['TRXN_NATURE'] = "STP";
+                }
+            }
+               resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                res.json(resdata)
                return resdata
             });
@@ -609,7 +632,18 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                      .reverse().map(JSON.parse) ;
-                                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+                                     for(var i=0; i<datacon.length; i++){
+                                        if(datacon[i]['TRXN_NATUR'].match(/Systematic.*/) ){
+                                            datacon[i]['TRXN_NATUR'] = "SIP";
+                                        }
+                                        if( (Math.sign(datacon[i]['AMOUNT']) === -1) ){
+                                            datacon[i]['TRXN_NATUR'] = "SIPR";
+                                        }
+                                        if(datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)){
+                                            datacon[i]['TRXN_NATUR'] = "STP";
+                                        }
+                                    }
+                                     resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                                      res.json(resdata)
                                      return resdata
                                     });
@@ -654,7 +688,18 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                           datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                                          .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                                          .reverse().map(JSON.parse) ;
-                                                          resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+                                                         for(var i=0; i<datacon.length; i++){
+                                                            if(datacon[i]['TRXN_NATUR'].match(/Systematic.*/) ){
+                                                                datacon[i]['TRXN_NATUR'] = "SIP";
+                                                            }
+                                                            if( (Math.sign(datacon[i]['AMOUNT']) === -1) ){
+                                                                datacon[i]['TRXN_NATUR'] = "SIPR";
+                                                            }
+                                                            if(datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)){
+                                                                datacon[i]['TRXN_NATUR'] = "STP";
+                                                            }
+                                                        }
+                                                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                                                          res.json(resdata)
                                                          return resdata
                                                         });
@@ -662,6 +707,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                 });
                         }
 })
+
 
 //  app.post("/api/getdividenduserwise", function (req, res) {
 //     var yer = parseInt(req.body.fromyear);
@@ -712,7 +758,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 //       });
 //  });
 
-app.post("/api/getdividenduserwise", function (req, res) {
+ app.post("/api/getdividenduserwise", function (req, res) {
     var yer = parseInt(req.body.fromyear);
     var secyer = parseInt(req.body.toyear);
     var pan = req.body.pan;
@@ -759,7 +805,14 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                       resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+                      for(var i=0; i<datacon.length; i++){
+                        if(datacon[i]['TRXN_NATURE'] === "Gross Dividend"){
+                            datacon[i]['TRXN_NATURE'] = "Dividend Payout";
+                        }if(datacon[i]['TRXN_NATURE'].match(/Div. Rei.*/)){
+                            datacon[i]['TRXN_NATURE'] = "Div. Reinv.";
+                        }
+                    }
+                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                       res.json(resdata)
                       return resdata
                    });
@@ -770,19 +823,19 @@ app.post("/api/getdividenduserwise", function (req, res) {
                 {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",SCHEME:"$_id.SCHEME",TRXN_NATURE:"$_id.TRXN_NATUR", FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, year1:{$year:('$_id.TRADDATE')}, year2:{$year:('$_id.TRADDATE')}  }},
                 {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { PAN: pan },{ $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-		{$sort : { TRADDATE : -1}}
-              ]
+                {$sort : { TRADDATE : -1}}
+            ]
               const pipeline1 = [  ///trans_karvy
                 {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",SCHEME:"$_id.FUNDDESC",TRXN_NATURE:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, year1:{$year:('$_id.TD_TRDT')}, year2:{$year:('$_id.TD_TRDT')}  }},
                 {$match :   { $and: [ { TRXN_NATURE:/Div/} , { PAN: pan }, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-		{$sort : { TRADDATE : -1}}
+                {$sort : { TRADDATE : -1}}
                 ]
                 const pipeline2 = [  ///trans_franklin
                 {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
                 {$project : {_id:0, INVNAME:"$_id.INVESTOR_2",PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",TRXN_NATURE:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, year1:{$year:('$_id.TRXN_DATE')}, year2:{$year:('$_id.TRXN_DATE')}  }},
                 {$match :   { $and: [  { $or: [ {TRXN_NATURE: /DIR/ } ,{TRXN_NATURE: /DP/ } ] },{ PAN: pan } ,{$or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-	        {$sort : { TRADDATE : -1}}
+                {$sort : { TRADDATE : -1}}
                 ]
                 transf.aggregate(pipeline2, (err, newdata) => {
                     transc.aggregate(pipeline, (err, newdata1) => {
@@ -803,6 +856,13 @@ app.post("/api/getdividenduserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
+                      for(var i=0; i<datacon.length; i++){
+                        if(datacon[i]['TRXN_NATURE'] === "Gross Dividend"){
+                            datacon[i]['TRXN_NATURE'] = "Dividend Payout";
+                        }if(datacon[i]['TRXN_NATURE'].match(/Div. Rei.*/)){
+                            datacon[i]['TRXN_NATURE'] = "Div. Reinv.";
+                        }
+                    }
                       resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                       res.json(resdata)
                       return resdata
@@ -812,7 +872,6 @@ app.post("/api/getdividenduserwise", function (req, res) {
         }
           
  });
-
 
 //   app.post("/api/gettransactionuserwise", function (req, res) {
 //     var mon = parseInt(req.body.month);
@@ -912,8 +971,19 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                      datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                     .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                     .reverse().map(JSON.parse) ;
+                                    for(var i=0; i<datacon.length; i++){
+                                        if(datacon[i]['TRXN_NATUR'] === "Redemption"){
+                                            datacon[i]['TRXN_NATUR'] = "RED";
+                                        }if(datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/)|| datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)){
+                                            datacon[i]['TRXN_NATUR'] = "SIP";
+                                        }if(Math.sign(datacon[i]['AMOUNT']) === -1){
+                                            datacon[i]['TRXN_NATUR'] = "SIPR";
+                                        }if(datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)){
+                                            datacon[i]['TRXN_NATUR'] = "STP";
+                                        }
+                                    }
                                     resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
-                                    res.json(resdata)
+                                     res.json(resdata)
                                     return resdata
                                });
                             });
@@ -958,7 +1028,18 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                              datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                                             .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                                             .reverse().map(JSON.parse) ;
-                                             resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+                                            for(var i=0; i<datacon.length; i++){
+                                                if(datacon[i]['TRXN_NATUR'] === "Redemption"){
+                                                    datacon[i]['TRXN_NATUR'] = "RED";
+                                                }if(datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/)|| datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)){
+                                                    datacon[i]['TRXN_NATUR'] = "SIP";
+                                                }if(Math.sign(datacon[i]['AMOUNT']) === -1){
+                                                    datacon[i]['TRXN_NATUR'] = "SIPR";
+                                                }if(datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)){
+                                                    datacon[i]['TRXN_NATUR'] = "STP";
+                                                }
+                                            }
+                                            resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                                             res.json(resdata)
                                             return resdata
                                        });
@@ -967,6 +1048,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
             }
                       
 })
+
 
    app.post("/api/getschemelist", function (req, res) {
         var pan = req.body.pan;;
