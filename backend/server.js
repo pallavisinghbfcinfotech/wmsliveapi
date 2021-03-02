@@ -481,55 +481,6 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
     }
  });
 
-//   app.post("/api/getsipstpuserwise", function (req, res) {
-//     var mon = parseInt(req.body.month);
-//     var yer = parseInt(req.body.year);
-//     var name = req.body.pan;
-//          const pipeline = [  ///trans_cams
-//             {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",TRXN_NATUR:"$TRXN_NATUR",INV_NAME:"$INV_NAME",FOLIO_NO:"$FOLIO_NO",SCHEME:"$SCHEME",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
-//             {$project : {_id:0,INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",TRXN_NATUR:"$_id.TRXN_NATUR",INV_NAME:"$_id.INV_NAME",FOLIO_NO:"$_id.FOLIO_NO",SCHEME:"$_id.SCHEME",AMOUNT:"$_id.AMOUNT",TRADDATE:"$_id.TRADDATE", month:{$month:('$_id.TRADDATE')}, year:{$year:('$_id.TRADDATE')}  }},
-//             {$match :   { $and: [  { month: mon }, { year: yer },{PAN:name} , {TRXN_NATUR:/Systematic/}, {TRXN_NATUR:{ $not: /^Systematic - From.*/ }} ] }}
-//             ]
-//         const pipeline1 = [  ///trans_karvy
-//             {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",TRDESC:"$TRDESC",INVNAME:"$INVNAME",TD_ACNO:"$TD_ACNO",FUNDDESC:"$FUNDDESC",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
-//             {$project : {_id:0,INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",TRXN_NATUR:"$_id.TRDESC",INV_NAME:"$_id.INVNAME",FOLIO_NO:"$_id.TD_ACNO",SCHEME:"$_id.FUNDDESC",AMOUNT:"$_id.TD_AMT",TRADDATE:"$_id.TD_TRDT", month:{$month:('$_id.TD_TRDT')}, year:{$year:('$_id.TD_TRDT')}  }},
-//             {$match :   { $and: [  { month: mon }, { year: yer },{PAN:name} , {TRXN_NATUR:/Systematic/}, {TRXN_NATUR:{ $not: /^Systematic - From.*/ }} ] }}
-//             ]
-//         const pipeline2 = [  ///trans_franklin
-//             {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",SCHEME_NA1:"$SCHEME_NA1",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
-//             {$project : {_id:0,INVNAME:"$INVESTOR_2",PAN:"$_id.IT_PAN_NO1",TRXN_NATUR:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",SCHEME:"$_id.SCHEME_NA1",AMOUNT:"$_id.AMOUNT",TRADDATE:"$_id.TRXN_DATE", month:{$month:('$_id.TRXN_DATE')}, year:{$year:('$_id.TRXN_DATE')}  }},
-//             {$match :   { $and: [  { month: mon }, { year: yer },{PAN:name} , {TRXN_NATUR:/Systematic/}, {TRXN_NATUR:{ $not: /^Systematic - From.*/ }} ] }}
-//             ]
-//                  var transc = mongoose.model('trans_cams', transcams, 'trans_cams');
-//                  var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
-//                  var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
-//                 transc.aggregate(pipeline, (err, newdata) => {
-//                      transk.aggregate(pipeline1, (err, newdata1) => {
-//                          transf.aggregate(pipeline2, (err, newdata2) => {
-//                            if(newdata2.length != 0 || newdata1.length != 0 || newdata.length != 0){    
-//                                     resdata= {
-//                                         status:200,
-//                                         message:'Successfull',
-//                                         data:  newdata2 
-//                                       }
-//                                    }else{
-//                                         resdata= {
-//                                         status:400,
-//                                         message:'Data not found',            
-//                                       }
-//                                     }
-//                                       var datacon = newdata2.concat(newdata1.concat(newdata))
-//                                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-//                                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-//                                      .reverse().map(JSON.parse) ;
-//                                      resdata.data = datacon
-//                                      res.json(resdata)
-//                                      return resdata
-//                                     });
-//                                });
-//                             });
-// })
-
 app.post("/api/getsipstpuserwise", function (req, res) {
     var mon = parseInt(req.body.month);
     var yer = parseInt(req.body.year);
@@ -650,140 +601,34 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                         }
 })
 
-
-//  app.post("/api/getdividenduserwise", function (req, res) {
-//     var yer = parseInt(req.body.fromyear);
-//     var secyer = parseInt(req.body.toyear);
-//     var pan = req.body.pan;
-//     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
-//     var transc = mongoose.model('trans_cams', transcams, 'trans_cams');
-//     var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
-//          const pipeline = [  ///trans_cams
-//             {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
-//             {$project : {_id:0, INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",SCHEME:"$_id.SCHEME",TRXN_NATURE:"$_id.TRXN_NATUR", FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:"$_id.TRADDATE", year1:{$year:('$_id.TRADDATE')}, year2:{$year:('$_id.TRADDATE')}  }},
-//             {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { PAN:pan}, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } }
-//           ]
-//           const pipeline1 = [  ///trans_karvy
-//             {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
-//             {$project : {_id:0, INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",SCHEME:"$_id.FUNDDESC",TRXN_NATURE:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT",TRADDATE:"$_id.TD_TRDT", year1:{$year:('$_id.TD_TRDT')}, year2:{$year:('$_id.TD_TRDT')}  }},
-//             {$match :   { $and: [ { TRXN_NATURE:/Div/} ,{ PAN:pan},  { $or: [ {year1: yer } ,{year2: secyer } ] } ] } }
-//             ]
-//             const pipeline2 = [  ///trans_franklin
-//             {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
-//             {$project : {_id:0, INVNAME:"$_id.INVESTOR_2",PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",TRXN_NATURE:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:"$_id.TRXN_DATE", year1:{$year:('$_id.TRXN_DATE')}, year2:{$year:('$_id.TRXN_DATE')}  }},
-//             {$match :   { $and: [  { TRXN_NATURE:/Dividend/} ,{ PAN:pan},{$or: [ {year1: yer } ,{year2: secyer } ] } ] } }
-//             ]
-//             transf.aggregate(pipeline2, (err, newdata) => {
-//              transc.aggregate(pipeline, (err, newdata1) => {
-//               transk.aggregate(pipeline1, (err, newdata2) => {
-//             if( newdata2.length != 0 || newdata1.length != 0 || newdata.length != 0){
-//                 resdata= {
-//                     status:200,
-//                     message:'Successfull',
-//                     data:  newdata2 
-//                   }
-//                 }else{
-//                     resdata= {
-//                     status:400,
-//                     message:'Data not found',            
-//                   }
-//                 }
-//                 var datacon = newdata2.concat(newdata1.concat(newdata))
-//                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-//                .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-//                .reverse().map(JSON.parse) ;
-//                resdata.data = datacon
-//                res.json(resdata)
-//                return resdata
-//             });
-//         });
-//       });
-//  });
-
- app.post("/api/getdividenduserwise", function (req, res) {
-    var yer = parseInt(req.body.fromyear);
-    var secyer = parseInt(req.body.toyear);
-    var pan = req.body.pan;
-    //var name = req.body.name;
-    if(req.body.pan===null || req.body.pan === ''){
-            const pipeline = [  ///trans_cams
-                {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",SCHEME:"$_id.SCHEME",TRXN_NATURE:"$_id.TRXN_NATUR", FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, year1:{$year:('$_id.TRADDATE')}, year2:{$year:('$_id.TRADDATE')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { INVNAME: req.body.name  },{ $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
-           
+app.post("/api/getdividend", function (req, res) {
+    var yer = req.body.fromyear;
+    var secyer =req.body.toyear;
+           const pipeline = [  ///trans_cams                                                     
+                {$match :   { $and: [ { TRXN_NATUR:/Div/} ,{ PAN: req.body.pan }, {TRADDATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+                {$group :   {_id : {SCHEME:"$SCHEME",INV_NAME:"$INV_NAME"} , AMOUNT:{$sum:"$AMOUNT"}}},
+                {$project :   {_id:0,SCHEME:"$_id.SCHEME",INVNAME:"$_id.INV_NAME" , AMOUNT:{$sum:"$AMOUNT"} } }, 
             ]
             const pipeline1 = [  ///trans_karvy
-                {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",SCHEME:"$_id.FUNDDESC",TRXN_NATURE:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, year1:{$year:('$_id.TD_TRDT')}, year2:{$year:('$_id.TD_TRDT')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Div/} , { INVNAME: req.body.name  }, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
-                ]
-                const pipeline2 = [  ///trans_franklin
-                {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INVESTOR_2",PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",TRXN_NATURE:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, year1:{$year:('$_id.TRXN_DATE')}, year2:{$year:('$_id.TRXN_DATE')}  }},
-                {$match :   { $and: [  { $or: [ {TRXN_NATURE: /DIR/ } ,{TRXN_NATURE: /DP/ } ] }, { INVNAME: req.body.name  },{ PAN: pan  },{$or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
-                ]
-                transf.aggregate(pipeline2, (err, newdata) => {
-                    transc.aggregate(pipeline, (err, newdata1) => {
-                     transk.aggregate(pipeline1, (err, newdata2) => {
-                   if( newdata2.length != 0 || newdata1.length != 0 || newdata.length != 0){
-                       resdata= {
-                           status:200,
-                           message:'Successfull',
-                           data:  newdata2 
-                         }
-                       }else{
-                           resdata= {
-                           status:400,
-                           message:'Data not found',            
-                         }
-                       }
-                       var datacon = newdata2.concat(newdata1.concat(newdata))
-                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-                      .reverse().map(JSON.parse) ;
-                      for(var i=0; i<datacon.length; i++){
-                        if(datacon[i]['TRXN_NATURE'] === "Gross Dividend"){
-                            datacon[i]['TRXN_NATURE'] = "Dividend Payout";
-                        }if(datacon[i]['TRXN_NATURE'].match(/Div. Rei.*/)){
-                            datacon[i]['TRXN_NATURE'] = "Div. Reinv.";
-                        }
-                    }
-                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
-                      res.json(resdata)
-                      return resdata
-                   });
-               });
-             });
-        }else{
-            const pipeline = [  ///trans_cams
-                {$group :   {_id : {INV_NAME:"$INV_NAME",PAN:"$PAN",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE:"$TRADDATE"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INV_NAME",PAN:"$_id.PAN",SCHEME:"$_id.SCHEME",TRXN_NATURE:"$_id.TRXN_NATUR", FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, year1:{$year:('$_id.TRADDATE')}, year2:{$year:('$_id.TRADDATE')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Dividend/} , { PAN: pan },{ $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
+                {$match :   { $and: [ { TRDESC:/Div/} ,{ PAN1: req.body.pan }, {TD_TRDT:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+                {$group :   {_id : {FUNDDESC:"$FUNDDESC",INVNAME:"$INVNAME"} , AMOUNT:{$sum:"$TD_AMT"}}},
+                {$project :   {_id:0,SCHEME:"$_id.FUNDDESC",INVNAME:"$_id.INVNAME" , AMOUNT:{$sum:"$TD_AMT"} } }, 
             ]
-              const pipeline1 = [  ///trans_karvy
-                {$group :   {_id : {INVNAME:"$INVNAME",PAN1:"$PAN1",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT:"$TD_TRDT"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INVNAME",PAN:"$_id.PAN1",SCHEME:"$_id.FUNDDESC",TRXN_NATURE:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, year1:{$year:('$_id.TD_TRDT')}, year2:{$year:('$_id.TD_TRDT')}  }},
-                {$match :   { $and: [ { TRXN_NATURE:/Div/} , { PAN: pan }, { $or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
-                ]
-                const pipeline2 = [  ///trans_franklin
-                {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",IT_PAN_NO1:"$IT_PAN_NO1",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE:"$TRXN_DATE"}}}, 
-                {$project : {_id:0, INVNAME:"$_id.INVESTOR_2",PAN:"$_id.IT_PAN_NO1",SCHEME:"$_id.SCHEME_NA1",TRXN_NATURE:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT",TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, year1:{$year:('$_id.TRXN_DATE')}, year2:{$year:('$_id.TRXN_DATE')}  }},
-                {$match :   { $and: [  { $or: [ {TRXN_NATURE: /DIR/ } ,{TRXN_NATURE: /DP/ } ] },{ PAN: pan } ,{$or: [ {year1: yer } ,{year2: secyer } ] } ] } },
-                {$sort : { TRADDATE : -1}}
-                ]
-                transf.aggregate(pipeline2, (err, newdata) => {
-                    transc.aggregate(pipeline, (err, newdata1) => {
-                     transk.aggregate(pipeline1, (err, newdata2) => {
-                   if( newdata2.length != 0 || newdata1.length != 0 || newdata.length != 0){
+            const pipeline2 = [  ///trans_franklin
+                {$match :   { $and: [ { TRXN_TYPE:/Div/} ,{ IT_PAN_NO1: req.body.pan }, {TRXN_DATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+                {$group :   {_id : {SCHEME_NA1:"$SCHEME_NA1",INVESTOR_2:"$INVESTOR_2"} , AMOUNT:{$sum:"$AMOUNT"}}},
+                {$project :   {_id:0,SCHEME:"$_id.SCHEME_NA1",INVNAME:"$_id.INVESTOR_2" , AMOUNT:{$sum:"$AMOUNT"} } }, 
+                
+            ]
+               
+                     transc.aggregate(pipeline, (err, newdata) => {
+                      transk.aggregate(pipeline1, (err, newdata1) => {
+                        transf.aggregate(pipeline2, (err, newdata2) => {
+                    if(  newdata != 0 || newdata1 != 0 || newdata2 != 0){
                        resdata= {
                            status:200,
                            message:'Successfull',
-                           data:  newdata2 
+                           data:  newdata
                          }
                        }else{
                            resdata= {
@@ -795,20 +640,13 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                      for(var i=0; i<datacon.length; i++){
-                        if(datacon[i]['TRXN_NATURE'] === "Gross Dividend"){
-                            datacon[i]['TRXN_NATURE'] = "Dividend Payout";
-                        }if(datacon[i]['TRXN_NATURE'].match(/Div. Rei.*/)){
-                            datacon[i]['TRXN_NATURE'] = "Div. Reinv.";
-                        }
-                    }
-                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
-                      res.json(resdata)
+                     resdata.data = datacon;
+                    res.json(resdata)
                       return resdata
                    });
                });
              });
-        }
+        
           
  });
 
