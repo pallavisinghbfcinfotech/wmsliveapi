@@ -6,13 +6,13 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 var Schema = mongoose.Schema;
 import Axios from 'axios'
- 
+ import moment from 'moment';
 dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
-import moment from 'moment';
 
-//moment.suppressDeprecationWarnings = true;
+
+moment.suppressDeprecationWarnings = true;
 
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 
