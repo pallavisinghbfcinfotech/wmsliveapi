@@ -10,7 +10,7 @@ import Axios from 'axios'
 dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
-const moment = require('moment');
+import moment from 'moment';
 
 //moment.suppressDeprecationWarnings = true;
 
