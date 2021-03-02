@@ -10,7 +10,9 @@ import Axios from 'axios'
 dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
- 
+const moment = require('moment');
+
+moment.suppressDeprecationWarnings = true;
 
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 
