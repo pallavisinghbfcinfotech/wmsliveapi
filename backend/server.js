@@ -12,7 +12,7 @@ dotenv.config();
 const mongodbUrl= config.MONGODB_URL;
 
 
-moment.suppressDeprecationWarnings = true;
+//moment.suppressDeprecationWarnings = true;
 
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 
@@ -630,7 +630,7 @@ app.post("/api/getdividend", function (req, res) {
                        resdata= {
                            status:200,
                            message:'Successfull',
-                           data:  newdata
+                           data:  newdata2
                          }
                        }else{
                            resdata= {
