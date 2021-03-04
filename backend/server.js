@@ -460,7 +460,14 @@ app.post("/api/getamclist", function(req, res) {
             }) // check if there is any occurence of the item in whole array
             .reverse()
             .map(JSON.parse);
-          resdata.data = datacon.sort((a, b) => (a.scheme > b.scheme) ? 1 : -1);
+           resdata.data = datacon.sort((a, b) => (a.scheme > b.scheme) ? 1 : -1);
+            for(var i=0; i<datacon.length; i++){
+                //console.log(datacon[i]['amc_code']);
+                if(datacon[i]['amc_code'] != "" &&  datacon[i]['folio'] != "" &&  datacon[i]['scheme'] != ""){
+                  resdata.data = datacon[i];
+                 
+                }
+            }
           res.json(resdata);
           return resdata;
         });
