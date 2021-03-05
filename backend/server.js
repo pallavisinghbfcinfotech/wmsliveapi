@@ -49,6 +49,46 @@ const navcams = new Schema({
 }, { versionKey: false });
 
 
+const productdata = new Schema({
+    id: { type: String },
+    product_master_diffgr_id: { type: String },
+    msdata_rowOrder: { type: String },
+    AMC_CODE: { type: String },
+    PRODUCT_CODE: { type: String },
+    PRODUCT_LONG_NAME: { type: String },
+    SYSTEMATIC_FREQUENCIES:{ type: String },
+    SIP_DATES: { type: String },
+    STP_DATES: { type: String },
+    SWP_DATES: { type: String },
+    PURCHASE_ALLOWED: { type: String },
+    SWITCH_ALLOWED: { type: String },
+    REDEMPTION_ALLOWED: { type: String },
+    SIP_ALLOWED: { type: String },
+    STP_ALLOWED: { type: String },
+    SWP_ALLOWED: { type: String },
+    REINVEST_TAG: { type: String },
+    PRODUCT_CATEGORY: { type: String },
+    ISIN: { type: String },
+    LAST_MODIFIED_DATE: { type: String },
+    ACTIVE_FLAG: { type: String },
+    ASSET_CLASS: { type: String },
+    SUB_FUND_CODE: { type: String },
+    PLAN_TYPE: { type: String },
+    INSURANCE_ENABLED: { type: String },
+    RTACODE: { type: String },
+    NFO_ENABLED: { type: String },
+    NFO_CLOSE_DATE: { type: String },
+    NFO_SIP_EFFECTIVE_DATE: { type: String },
+    ALLOW_FREEDOM_SIP: { type: String },
+    ALLOW_FREEDOM_SWP: { type: String },
+    ALLOW_DONOR: { type: String },
+    ALLOW_PAUSE_SIP: { type: String },
+    ALLOW_PAUSE_SIP_FREQ: { type: String },
+    PAUSE_SIP_MIN_MONTH: { type: String },
+    PAUSE_SIP_MAX_MONTH: { type: String },
+    PAUSE_SIP_GAP_PERIOD: { type: String },
+}, { versionKey: false });
+
 const foliocams = new Schema({
     AMC_CODE: { type: String },
     FOLIOCHK: { type: String },
@@ -69,7 +109,6 @@ const foliocams = new Schema({
 }, { versionKey: false });
 
 
-
 const foliokarvy = new Schema({
     FUNDDESC: { type: String },
     ACNO: { type: String },
@@ -80,10 +119,12 @@ const foliokarvy = new Schema({
     BNAME: { type: String },
     PANGNO: { type: String },
     NOMINEE: { type: String },
+    PRCODE: { type: String},
+    FUND: { type : String},
+    BNKACTYPE : { type: String},
 }, { versionKey: false });
 
 const foliofranklin = new Schema({
-    BRANCH_N12: { type: String },
     BANK_CODE: { type: String },
     IFSC_CODE: { type: String },
     NEFT_CODE: { type: String },
@@ -98,6 +139,12 @@ const foliofranklin = new Schema({
     F_NAME: { type: String },
     PHONE_RES: { type: String },
     PANNO1: { type: String },
+    COMP_CODE : { type: String },
+    AC_TYPE : { type: String },
+    KYC_ID :{ type: String },
+    HOLDING_T6 : { type: String },
+    PBANK_NAME : { type: String },
+    PERSONAL_9 : { type: String },
 }, { versionKey: false });
 
 const transcams = new Schema({
@@ -139,7 +186,10 @@ const transkarvy = new Schema({
     TD_UNITS: { type: Number},
     SCHEMEISIN:{ type: String},
     TD_FUND:{ type: String},
+    TD_TRTYPE: { type : String},
+    NEWUNQNO: {type : String},
 }, { versionKey: false });
+
 
 const transfranklin = new Schema({
     COMP_CODE: { type: String },
@@ -149,16 +199,23 @@ const transfranklin = new Schema({
     TRXN_TYPE: { type: String },
     TRXN_NO: { type: String },
     INVESTOR_2: { type: String },
-    TRXN_DATE: { type: Date },
-    NAV: { type: String },
+    TRXN_DATE: { type: Date},
+    NAV: { type: Number },
     POP: { type: String },
     UNITS: { type: Number },
     AMOUNT: { type: Number },
-    JOINT_NAM1: { type: String },
     ADDRESS1: { type: String },
     IT_PAN_NO1: { type: String },
-    IT_PAN_NO2: { type: String },
+    ISIN: { type: String },
+    JOINT_NAM1: { type: String },
+    JOINT_NAM2: { type: String },
+    PLAN_TYPE: { type: String },
+    NOMINEE1: { type: String },
+    ACCOUNT_16: { type: String },
+    PBANK_NAME: { type: String },
+    PERSONAL23: { type: String},
 }, { versionKey: false });
+
 
   var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
   var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
@@ -320,11 +377,11 @@ app.post("/api/getfoliodetail", function (req, res) {
                     ] 
                     const pipeline2=[  //trans_franklin
                         {$match : {"FOLIO_NO":req.body.folio,"ISIN":req.body.isin}}, 
-                        {$group :{_id : {INVESTOR_2:"$INVESTOR_2",ISIN:"$ISIN",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",ACCOUNT_16:"$ACCOUNT_16",JOINT_NAM2:"$JOINT_NAM2",JOINT_NAM1:"$JOINT_NAM1",cnav:"$nav.NetAssetValue"},UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"} }},
-                        {$group :{_id:{ INVESTOR_2:"$_id.INVESTOR_2",ISIN:"$_id.ISIN",NOMINEE1:"$_id.NOMINEE1",PBANK_NAME:"$_id.PBANK_NAME",ACCOUNT_16:"$_id.ACCOUNT_16",JOINT_NAM2:"$_id.JOINT_NAM2",JOINT_NAM1:"$_id.JOINT_NAM1",cnav:"$nav.NetAssetValue"}, UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }},
+                        {$group :{_id : {INVESTOR_2:"$INVESTOR_2",ISIN:"$ISIN",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",PERSONAL23:"$PERSONAL23",JOINT_NAM2:"$JOINT_NAM2",JOINT_NAM1:"$JOINT_NAM1",cnav:"$nav.NetAssetValue"},UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"} }},
+                        {$group :{_id:{ INVESTOR_2:"$_id.INVESTOR_2",ISIN:"$_id.ISIN",NOMINEE1:"$_id.NOMINEE1",PBANK_NAME:"$_id.PBANK_NAME",PERSONAL23:"$_id.PERSONAL23",JOINT_NAM2:"$_id.JOINT_NAM2",JOINT_NAM1:"$_id.JOINT_NAM1",cnav:"$nav.NetAssetValue"}, UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }},
                         {$lookup: { from: 'cams_nav',localField: '_id.ISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
                         { $unwind: "$nav"},
-                        {$project:  {_id:0, INVNAME:"$_id.INVESTOR_2",SCHEMEISIN:"$_id.ISIN",NOMINEE:"$_id.NOMINEE1",BANK_NAME:"$_id.PBANK_NAME",AC_NO:"$_id.ACCOUNT_16",JTNAME2:"$_id.JOINT_NAM2",JTNAME1:"$_id.JOINT_NAM1", cnav:"$nav.NetAssetValue",navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }   , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
+                        {$project:  {_id:0, INVNAME:"$_id.INVESTOR_2",SCHEMEISIN:"$_id.ISIN",NOMINEE:"$_id.NOMINEE1",BANK_NAME:"$_id.PBANK_NAME",AC_NO:"$_id.PERSONAL23",JTNAME2:"$_id.JOINT_NAM2",JTNAME1:"$_id.JOINT_NAM1", cnav:"$nav.NetAssetValue",navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }   , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
                 ] 
                 var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
                     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
