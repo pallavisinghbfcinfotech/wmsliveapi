@@ -777,6 +777,9 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 app.post("/api/getdividend", function (req, res) {
     var yer = req.body.fromyear;
     var secyer =req.body.toyear;
+    yer = yer+"-04-01";
+    secyer = secyer+"-03-31"
+
            const pipeline = [  ///trans_cams                                                     
                 {$match :   { $and: [ { TRXN_NATUR:/Div/} ,{ PAN: req.body.pan }, {TRADDATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 {$group :   {_id : {SCHEME:"$SCHEME",INV_NAME:"$INV_NAME"} , AMOUNT:{$sum:"$AMOUNT"}}},
@@ -813,19 +816,19 @@ app.post("/api/getdividend", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                     resdata.data = datacon;
+                       resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
                     res.json(resdata)
                       return resdata
                    });
                });
-             });
-        
-          
+             });        
  });
 
 app.post("/api/getdividendscheme", function (req, res) {
     var yer = req.body.fromyear;
     var secyer =req.body.toyear;
+	  yer = yer+"-04-01";
+    secyer = secyer+"-03-31"
             const pipeline = [  ///trans_cams                                                     
                 {$match :   { $and: [ { TRXN_NATUR:/Div/} ,{ SCHEME: req.body.scheme },{ PAN: req.body.pan }, {TRADDATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 {$group :   {_id : {INV_NAME:"$INV_NAME",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE: "$TRADDATE"  }}}, 
