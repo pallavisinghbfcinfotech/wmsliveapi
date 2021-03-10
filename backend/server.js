@@ -775,7 +775,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 })
 
 app.post("/api/getdividend", function (req, res) {
-    var yer = req.body.fromyear;
+    var yer = req.body.froyear;
     var secyer =req.body.toyear;
     yer = yer+"-04-01";
     secyer = secyer+"-03-31"
