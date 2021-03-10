@@ -822,7 +822,15 @@ app.post("/api/getdividend", function (req, res) {
                    });
                });
              });        
- });
+ }).catch(function (err) {
+                //console.log('ERROR: ', err)
+                resdata= {
+                    status:400,
+                    message:'Data not Found',            
+            }
+            res.json(resdata)  
+            return resdata 
+            });
 
 app.post("/api/getdividendscheme", function (req, res) {
     var yer = req.body.fromyear;
