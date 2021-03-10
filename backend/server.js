@@ -775,6 +775,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 })
 
 app.post("/api/getdividend", function (req, res) {
+	try{
     var yer = req.body.froyear;
     var secyer =req.body.toyear;
     yer = yer+"-04-01";
@@ -829,7 +830,16 @@ app.post("/api/getdividend", function (req, res) {
             }
             res.json(resdata)  
             return resdata 
-            })        
+            })  
+	}.catch(function (err) {
+                            //console.log('ERROR: ', err)
+                            resdata= {
+                                status:400,
+                                message:'Data not Found',            
+                        }
+                        res.json(resdata)  
+                        return resdata 
+                        })   
  });
 
 app.post("/api/getdividendscheme", function (req, res) {
