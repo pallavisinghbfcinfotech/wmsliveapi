@@ -822,15 +822,7 @@ app.post("/api/getdividend", function (req, res) {
                       return resdata
                    });
                });
-             }).catch(function (err) {
-                //console.log('ERROR: ', err)
-                resdata= {
-                    status:400,
-                    message:'Data not Found',            
-            }
-            res.json(resdata)  
-            return resdata 
-            })  
+             })
 	
  });
 
