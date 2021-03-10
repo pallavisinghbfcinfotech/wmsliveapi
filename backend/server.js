@@ -775,7 +775,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 })
 
 app.post("/api/getdividend", function (req, res) {
-	
+	try {
     var yer = req.body.froyear;
     var secyer =req.body.toyear;
     yer = yer+"-04-01";
@@ -823,6 +823,9 @@ app.post("/api/getdividend", function (req, res) {
                    });
                });
              })
+		} catch (err) {
+        console.log(err);
+      }
 	
  });
 
