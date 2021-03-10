@@ -821,8 +821,7 @@ app.post("/api/getdividend", function (req, res) {
                       return resdata
                    });
                });
-             });        
- }).catch(function (err) {
+             }).catch(function (err) {
                 //console.log('ERROR: ', err)
                 resdata= {
                     status:400,
@@ -830,7 +829,8 @@ app.post("/api/getdividend", function (req, res) {
             }
             res.json(resdata)  
             return resdata 
-            });
+            })        
+ });
 
 app.post("/api/getdividendscheme", function (req, res) {
     var yer = req.body.fromyear;
