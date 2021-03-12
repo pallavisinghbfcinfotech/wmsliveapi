@@ -516,12 +516,12 @@ app.post("/api/getamclist", function(req, res) {
            
             for(var i=0; i<datacon.length; i++){
                 //console.log(datacon[i]['amc_code']);
-                if(datacon[i]['amc_code'] != "" &&  datacon[i]['folio'] != "" &&  datacon[i]['scheme'] != ""){
+                if(datacon[i]['amc_code'] != "" &&  datacon[i]['folio'] != "" ){
                   resdata.data = datacon[i];
                  
                 }
             }
-		resdata.data = datacon.sort((a, b) => (a.scheme > b.scheme) ? 1 : -1);
+		resdata.data = datacon.sort((a, b) => (a.amc_code > b.amc_code) ? 1 : -1);
           res.json(resdata);
           return resdata;
         });
