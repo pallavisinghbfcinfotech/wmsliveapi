@@ -329,6 +329,7 @@ const transfranklin = new Schema({
 // }) 
 
 app.post("/api/getfoliodetail", function (req, res) {     
+	try{
                     const pipeline3 = [  //trans_cams
                         {$match : {"FOLIO_NO":req.body.folio,"AMC_CODE":req.body.amc_code,"PRODCODE":req.body.prodcode}}, 
                         {$group : {_id : {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO", AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} } ,UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"}  }}},
@@ -431,10 +432,14 @@ app.post("/api/getfoliodetail", function (req, res) {
                             });
                         });
                     })
+		 } catch (err) {
+                    console.log(err)
+                }
 }) 
 
 
 app.post("/api/getamclist", function(req, res) { 
+	try{
     if(req.body.pan === "" || req.body.pan === undefined || req.body === "" || req.body.pan === null){
                     resdata= {
                         status:400,
@@ -444,33 +449,34 @@ app.post("/api/getamclist", function(req, res) {
                    return resdata;
                   }else{
                     var pan = req.body.pan;
-    const pipeline = [
-      //folio_cams
-      { $match: { PAN_NO: pan } },
-      { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE: "$AMC_CODE"  } } },
+
+     const pipeline = [
+      //trans_franklin
+      { $match: { IT_PAN_NO1: pan } },
+      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME_CO0: "$SCHEME_CO0"  } } },
       {
         $project: {
           _id: 0,
-          folio: "$_id.FOLIOCHK",
-          amc_code: "$_id.AMC_CODE",
-        //  scheme:"$_id.SCH_NAME"
-        }
+          folio: "$_id.FOLIO_NO",
+          amc_code: "$_id.SCHEME_CO0",
+        }       
       },
-      {$sort: {amc_code: 1}}
+      {$sort: {amc_code: 1}},
+    
     ];
 
     const pipeline1 = [
       //trans_cams
       { $match: { PAN: pan } },
-      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE: "$AMC_CODE"  } } },
+      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE: "$AMC_CODE" } } },
       {
         $project: {
           _id: 0,
           folio: "$_id.FOLIO_NO",
           amc_code: "$_id.AMC_CODE",
-         // scheme:"$_id.SCHEME"
         }
-      }, {$sort: {amc_code: 1}}
+      },
+       {$sort: {amc_code: 1}}
     ];
     const pipeline2 = [
       //trans_karvy
@@ -481,11 +487,11 @@ app.post("/api/getamclist", function(req, res) {
           _id: 0,
           folio: "$_id.TD_ACNO",
           amc_code: "$_id.TD_FUND",
-        //  scheme:"$_id.FUNDDESC"
         }
-      }, {$sort: {amc_code: 1}}
+      },
+       {$sort: {amc_code: 1}}
     ];
-    folioc.aggregate(pipeline, (err, newdata) => {
+    transf.aggregate(pipeline, (err, newdata) => {
       transc.aggregate(pipeline1, (err, newdata1) => {
         transk.aggregate(pipeline2, (err, newdata2) => {
           if (
@@ -516,8 +522,9 @@ app.post("/api/getamclist", function(req, res) {
            
             for(var i=0; i<datacon.length; i++){
                 //console.log(datacon[i]['amc_code']);
-                if(datacon[i]['amc_code'] != "" &&  datacon[i]['folio'] != "" ){
-                  resdata.data = datacon[i];
+                if(datacon[i]['amc_code'] != "" &&  datacon[i]['folio'] != "" &&  datacon[i]['scheme'] != "" ){
+                  
+                    resdata.data = datacon[i];
                  
                 }
             }
@@ -528,10 +535,15 @@ app.post("/api/getamclist", function(req, res) {
       });
     });
                   }
+                } catch (err) {
+                    console.log(err)
+                }
 });
 
 
+
 app.post("/api/gettaxsavinguserwise", function (req, res) {
+	try{
     var yer = parseInt(req.body.fromyear);
     var secyer = parseInt(req.body.toyear);
     var pan = req.body.pan;
@@ -648,9 +660,13 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
         });
      });  
     }
+	 } catch (err) {
+                    console.log(err)
+                }
  });
 
 app.post("/api/getsipstpuserwise", function (req, res) {
+	try{
     var mon = parseInt(req.body.month);
     var yer = parseInt(req.body.year);
 
@@ -768,6 +784,9 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                    });
                                                 });
                         }
+		 } catch (err) {
+                    console.log(err)
+                }
 })
 
 app.post("/api/getdividend", function (req, res) {
@@ -819,13 +838,14 @@ app.post("/api/getdividend", function (req, res) {
                    });
                });
              })
-		} catch (err) {
-        console.log(err);
-      }
+		 } catch (err) {
+                    console.log(err)
+                }
 	
  });
 
 app.post("/api/getdividendscheme", function (req, res) {
+	try{
     var yer = req.body.fromyear;
     var secyer =req.body.toyear;
 	  yer = yer+"-04-01";
@@ -880,7 +900,10 @@ app.post("/api/getdividendscheme", function (req, res) {
                       return resdata
                    });
                });
-             });        
+             });      
+		 } catch (err) {
+                    console.log(err)
+                }
  });
 
 //   app.post("/api/gettransactionuserwise", function (req, res) {
@@ -934,6 +957,7 @@ app.post("/api/getdividendscheme", function (req, res) {
 // })
 
 app.post("/api/gettransactionuserwise", function (req, res) {
+	try{
     var mon = parseInt(req.body.month);
     var yer = parseInt(req.body.year);
     if(req.body.pan == '' || req.body.pan == "" || req.body.pan == undefined ||  req.body.pan == "Please Provide" || req.body.pan == null ){
@@ -1053,11 +1077,15 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                     });
                         });
             }
+		 } catch (err) {
+                    console.log(err)
+                }
                       
 })
 
 
    app.post("/api/getschemelist", function (req, res) {
+	   try{
         var pan = req.body.pan;;
         const pipeline = [
                 {$match : {PAN:pan}},
@@ -1125,7 +1153,9 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                });
   
              });   
-            
+             } catch (err) {
+                    console.log(err)
+                }
         })  
 
 app.get("/api/getfoliolist", function (req, res) {
