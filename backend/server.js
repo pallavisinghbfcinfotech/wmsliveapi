@@ -832,7 +832,7 @@ app.post("/api/getdividend", function (req, res) {
                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                       .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                       .reverse().map(JSON.parse) ;
-                       resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
+				resdata.data = datacon;
                     res.json(resdata)
                       return resdata
                    });
