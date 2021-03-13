@@ -453,12 +453,12 @@ app.post("/api/getamclist", function(req, res) {
      const pipeline = [
       //trans_franklin
       { $match: { IT_PAN_NO1: pan } },
-      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME_CO0: "$SCHEME_CO0"  } } },
+      { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE: "$COMP_CODE"  } } },
       {
         $project: {
           _id: 0,
           folio: "$_id.FOLIO_NO",
-          amc_code: "$_id.SCHEME_CO0",
+          amc_code: "$_id.COMP_CODE",
         }       
       },
       {$sort: {amc_code: 1}},
