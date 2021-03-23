@@ -224,8 +224,8 @@ const transfranklin = new Schema({
   var foliok = mongoose.model('folio_karvy', foliokarvy, 'folio_karvy');  
   var foliof = mongoose.model('folio_franklin', foliofranklin, 'folio_franklin');
   var camsn = mongoose.model('cams_nav', navcams, 'cams_nav');  
-  var resdata="";
-  var data="";
+  var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
+var i=0;var resdata="";
 
 // app.post("/api/getfoliodetail", function (req, res) {     
 //                     const pipeline3 = [  //trans_cams
