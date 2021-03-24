@@ -503,6 +503,8 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             status: 400,
             message: 'Data not found',
         }
+	     res.json(resdata)
+             return resdata
     }
 } catch (err) {
     console.log(err)
@@ -647,6 +649,8 @@ app.post("/api/getdividendscheme", function (req, res) {
         status: 400,
         message: 'Data not found',
     }
+	 res.json(resdata)
+         return resdata
 }
 } catch (err) {
     console.log(err)
@@ -707,6 +711,8 @@ app.post("/api/getdividend", function (req, res) {
         status: 400,
         message: 'Data not found',
     }
+	 res.json(resdata)
+         return resdata
 }
 } catch (err) {
     console.log(err)
@@ -781,6 +787,8 @@ app.post("/api/gettransactionuserwise", function (req, res) {
             status: 400,
             message: 'Data not found',
         }
+	     res.json(resdata)
+             return resdata
     }
 } catch (err) {
     console.log(err)
