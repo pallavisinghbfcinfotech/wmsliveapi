@@ -583,122 +583,136 @@ app.post("/api/getsipstpuserwise", function (req, res) {
     console.log(err)
 }
 })
-app.post("/api/getdividend", function (req, res) {
-	try {
-    var yer = req.body.froyear;
-    var secyer =req.body.toyear;
-    yer = yer+"-04-01";
-    secyer = secyer+"-03-31"
-
-           const pipeline = [  ///trans_cams                                                     
-                {$match :   { $and: [ { TRXN_NATUR:/Div/} ,{ PAN: req.body.pan }, {TRADDATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {SCHEME:"$SCHEME",INV_NAME:"$INV_NAME"} , AMOUNT:{$sum:"$AMOUNT"}}},
-                {$project :   {_id:0,SCHEME:"$_id.SCHEME",INVNAME:"$_id.INV_NAME" , AMOUNT:{$sum:"$AMOUNT"} } }, 
-            ]
-            const pipeline1 = [  ///trans_karvy
-                {$match :   { $and: [ { TRDESC:/Div/} ,{ PAN1: req.body.pan }, {TD_TRDT:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {FUNDDESC:"$FUNDDESC",INVNAME:"$INVNAME"} , AMOUNT:{$sum:"$TD_AMT"}}},
-                {$project :   {_id:0,SCHEME:"$_id.FUNDDESC",INVNAME:"$_id.INVNAME" , AMOUNT:{$sum:"$TD_AMT"} } }, 
-            ]
-            const pipeline2 = [  ///trans_franklin
-                {$match :   { $and: [ { TRXN_TYPE:/Div/} ,{ IT_PAN_NO1: req.body.pan }, {TRXN_DATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {SCHEME_NA1:"$SCHEME_NA1",INVESTOR_2:"$INVESTOR_2"} , AMOUNT:{$sum:"$AMOUNT"}}},
-                {$project :   {_id:0,SCHEME:"$_id.SCHEME_NA1",INVNAME:"$_id.INVESTOR_2" , AMOUNT:{$sum:"$AMOUNT"} } }, 
-                
-            ]
-               
-                     transc.aggregate(pipeline, (err, newdata) => {
-                      transk.aggregate(pipeline1, (err, newdata1) => {
-                        transf.aggregate(pipeline2, (err, newdata2) => {
-                    if(  newdata != 0 || newdata1 != 0 || newdata2 != 0){
-                       resdata= {
-                           status:200,
-                           message:'Successfull',
-                           data:  newdata2
-                         }
-                       }else{
-                           resdata= {
-                           status:400,
-                           message:'Data not found',            
-                         }
-                       }
-                       var datacon = newdata2.concat(newdata1.concat(newdata))
-                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-                      .reverse().map(JSON.parse) ;
-				resdata.data = datacon;
-                    res.json(resdata)
-                      return resdata
-                   });
-               });
-             })
-		 } catch (err) {
-                    console.log(err)
-                }
-	
- });
 
 app.post("/api/getdividendscheme", function (req, res) {
-	try{
+    try{
     var yer = req.body.fromyear;
-    var secyer =req.body.toyear;
-	  yer = yer+"-04-01";
-    secyer = secyer+"-03-31"
-            const pipeline = [  ///trans_cams                                                     
-                {$match :   { $and: [ { TRXN_NATUR:/Div/} ,{ SCHEME: req.body.scheme },{ PAN: req.body.pan }, {TRADDATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {INV_NAME:"$INV_NAME",SCHEME:"$SCHEME",TRXN_NATUR:"$TRXN_NATUR",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRADDATE: "$TRADDATE"  }}}, 
-                {$project : {_id:0,INVNAME:"$_id.INV_NAME" ,SCHEME:"$_id.SCHEME", TRXN_NATUR:"$_id.TRXN_NATUR",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT" , TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }  } }, 
-            ]
-            const pipeline1 = [  ///trans_karvy
-                {$match :   { $and: [ { TRDESC:/Div/} ,{ FUNDDESC: req.body.scheme },{ PAN1: req.body.pan }, {TD_TRDT:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {INVNAME:"$INVNAME",FUNDDESC:"$FUNDDESC",TRDESC:"$TRDESC",TD_ACNO:"$TD_ACNO",TD_AMT:"$TD_AMT",TD_TRDT: "$TD_TRDT"  }}}, 
-                {$project : {_id:0,INVNAME:"$_id.INVNAME" ,SCHEME:"$_id.FUNDDESC",TRXN_NATUR:"$_id.TRDESC",FOLIO_NO:"$_id.TD_ACNO",AMOUNT:"$_id.TD_AMT" , TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }  } }, 
-            ]
-            const pipeline2 = [  ///trans_franklin
-                {$match :   { $and: [ { TRXN_TYPE:/Div/} ,{ SCHEME_NA1: req.body.scheme },{ IT_PAN_NO1: req.body.pan }, {TRXN_DATE:{ $gte:new Date(moment(yer).format("YYYY-MM-DD")), $lt:new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-                {$group :   {_id : {INVESTOR_2:"$INVESTOR_2",SCHEME_NA1:"$SCHEME_NA1",TRXN_TYPE:"$TRXN_TYPE",FOLIO_NO:"$FOLIO_NO",AMOUNT:"$AMOUNT",TRXN_DATE: "$TRXN_DATE"  }}}, 
-                {$project : {_id:0,INVNAME:"$_id.INVESTOR_2" ,SCHEME:"$_id.SCHEME_NA1",TRXN_NATUR:"$_id.TRXN_TYPE",FOLIO_NO:"$_id.FOLIO_NO",AMOUNT:"$_id.AMOUNT" , TRADDATE:{ $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }  } },               
-            ]
-               
-                     transc.aggregate(pipeline, (err, newdata) => {
-                      transk.aggregate(pipeline1, (err, newdata1) => {
-                        transf.aggregate(pipeline2, (err, newdata2) => {
-                    if(  newdata != 0 || newdata1 != 0 || newdata2 != 0){
-                       resdata= {
-                           status:200,
-                           message:'Successfull',
-                           data:  newdata2
-                         }
-                       }else{
-                           resdata= {
-                           status:400,
-                           message:'Data not found',            
-                         }
-                       }
-                        var datacon = newdata2.concat(newdata1.concat(newdata))
-                       datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                      .filter(function(item, index, arr){ return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-                      .reverse().map(JSON.parse) ;
-                      for(var i=0; i<datacon.length; i++){
-                        if(datacon[i]['TRXN_NATUR'] === "Gross Dividend"){
-                            datacon[i]['TRXN_NATUR'] = "Dividend Payout";
-                        }if(datacon[i]['TRXN_NATUR'].match(/Div. Rei.*/) || datacon[i]['TRXN_NATUR'].match(/Dividend Reinvest*/)){
-                            datacon[i]['TRXN_NATUR'] = "Div. Reinv.";
-                        }if(datacon[i]['TRXN_NATUR'].match(/Dividend Paid*/)){
-                            datacon[i]['TRXN_NATUR'] = "Div. Paid";
-                        }
+    var secyer = req.body.toyear;
+    yer = yer + "-04-01";
+    secyer = secyer + "-03-31"
+    if(req.body.pan != "" && req.body.name != ""){
+    const pipeline = [  ///trans_cams                                                     
+        { $match: { $and: [{ TRXN_NATUR: /Div/ }, { SCHEME: req.body.scheme },{ INV_NAME: {$regex : `^${req.body.name}.*` , $options: 'i' } }, { PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { INV_NAME: "$INV_NAME", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
+        { $project: { _id: 0, INVNAME: "$_id.INV_NAME", SCHEME: "$_id.SCHEME", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } } } },
+    ]
+    const pipeline1 = [  ///trans_karvy
+        { $match: { $and: [{ TRDESC: /Div/ }, { FUNDDESC: req.body.scheme },{ INVNAME: {$regex : `^${req.body.name}.*` , $options: 'i' } } , { PAN1: req.body.pan }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { INVNAME: "$INVNAME", FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
+        { $project: { _id: 0, INVNAME: "$_id.INVNAME", SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
+    ]
+    const pipeline2 = [  ///trans_franklin
+        { $match: { $and: [{ TRXN_TYPE: /Div/ }, { SCHEME_NA1: req.body.scheme },{ INVESTOR_2: {$regex : `^${req.body.name}.*` , $options: 'i' } }, { IT_PAN_NO1: req.body.pan }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { INVESTOR_2: "$INVESTOR_2", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
+        { $project: { _id: 0, INVNAME: "$_id.INVESTOR_2", SCHEME: "$_id.SCHEME_NA1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } } } },
+    ]
+
+    transc.aggregate(pipeline, (err, camsdata) => {
+        transk.aggregate(pipeline1, (err, karvydata) => {
+            transf.aggregate(pipeline2, (err, frankdata) => {
+                if (camsdata != 0 || karvydata != 0 || frankdata != 0) {
+                    resdata = {
+                        status: 200,
+                        message: 'Successfull',
+                        data: frankdata
                     }
-                      resdata.data = datacon;
-                        resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime() )
-                    res.json(resdata)
-                      return resdata
-                   });
-               });
-             });      
-		 } catch (err) {
-                    console.log(err)
+                } else {
+                    resdata = {
+                        status: 400,
+                        message: 'Data not found',
+                    }
                 }
- });
+                var datacon = frankdata.concat(karvydata.concat(camsdata))
+                datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                    .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                    .reverse().map(JSON.parse);
+                for (var i = 0; i < datacon.length; i++) {
+                    if (datacon[i]['TRXN_NATUR'] === "Gross Dividend") {
+                        datacon[i]['TRXN_NATUR'] = "Dividend Payout";
+                    } if (datacon[i]['TRXN_NATUR'].match(/Div. Rei.*/) || datacon[i]['TRXN_NATUR'].match(/Dividend Reinvest*/)) {
+                        datacon[i]['TRXN_NATUR'] = "Div. Reinv.";
+                    } if (datacon[i]['TRXN_NATUR'].match(/Dividend Paid*/)) {
+                        datacon[i]['TRXN_NATUR'] = "Div. Paid";
+                    }
+                }
+                resdata.data = datacon;
+                resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime())
+                res.json(resdata)
+                return resdata
+            });
+        });
+    });
+}else{
+    resdata = {
+        status: 400,
+        message: 'Data not found',
+    }
+}
+} catch (err) {
+    console.log(err)
+}
+});
+
+app.post("/api/getdividend", function (req, res) {
+    try{
+    var yer = req.body.fromyear;
+    var secyer = req.body.toyear;
+    yer = yer + "-04-01";
+    secyer = secyer + "-03-31"
+   if(req.body.pan != "" && req.body.name != ""){
+    const pipeline = [  ///trans_cams                                                     
+        { $match: { $and: [{ TRXN_NATUR: /Div/ }, { PAN: req.body.pan }, { INV_NAME: {$regex : `^${req.body.name}.*` , $options: 'i' } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { SCHEME: "$SCHEME", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        { $project: { _id: 0, SCHEME: "$_id.SCHEME", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT" } } },
+    ]
+    const pipeline1 = [  ///trans_karvy
+        { $match: { $and: [{ TRDESC: /Div/ }, { PAN1: req.body.pan },{ INVNAME: {$regex : `^${req.body.name}.*` , $options: 'i' } }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { FUNDDESC: "$FUNDDESC", INVNAME: "$INVNAME" }, AMOUNT: { $sum: "$TD_AMT" } } },
+        { $project: { _id: 0, SCHEME: "$_id.FUNDDESC", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
+    ]
+    const pipeline2 = [  ///trans_franklin
+        { $match: { $and: [{ TRXN_TYPE: /Div/ }, { IT_PAN_NO1: req.body.pan },{ INVESTOR_2: {$regex : `^${req.body.name}.*` , $options: 'i' } }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+        { $group: { _id: { SCHEME_NA1: "$SCHEME_NA1", INVESTOR_2: "$INVESTOR_2" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        { $project: { _id: 0, SCHEME: "$_id.SCHEME_NA1", INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT" } } },
+
+    ]
+
+    transc.aggregate(pipeline, (err, newdata) => {
+        transk.aggregate(pipeline1, (err, newdata1) => {
+            transf.aggregate(pipeline2, (err, newdata2) => {
+                if (newdata != 0 || newdata1 != 0 || newdata2 != 0) {
+                    resdata = {
+                        status: 200,
+                        message: 'Successfull',
+                        data: newdata2
+                    }
+                } else {
+                    resdata = {
+                        status: 400,
+                        message: 'Data not found',
+                    }
+                }
+                var datacon = newdata2.concat(newdata1.concat(newdata))
+                datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                    .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                    .reverse().map(JSON.parse);
+                resdata.data = datacon;
+                res.json(resdata)
+                return resdata
+            });
+        });
+    })
+}else{
+    resdata = {
+        status: 400,
+        message: 'Data not found',
+    }
+}
+} catch (err) {
+    console.log(err)
+}
+});
+
 
 
 app.post("/api/gettransactionuserwise", function (req, res) {
