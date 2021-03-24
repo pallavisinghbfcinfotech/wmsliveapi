@@ -798,7 +798,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
     var transc = mongoose.model('trans_cams', transcams, 'trans_cams');
     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy');
     var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');
-    if (req.body.pan === null || req.body.pan === '' || req.body.pan === "Please Provide" || req.body.pan === "Not An Assessee") {
+    if (req.body.name != "" && req.body.pan == "" || req.body.pan === "Please Provide" || req.body.pan === "Not An Assessee") {
         const pipeline = [  ///trans_cams
             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR",  FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0, INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR",  FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
@@ -854,23 +854,23 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                 });
             });
         });
-    } else {
+    } else if(req.body.pan != "" && req.body.name != ""){
         const pipeline = [  ///trans_cams
             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT",TAX_STATUS:"$TAX_STATUS" ,TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0, INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR",  FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT" ,TAX_STATUS:"$_id.TAX_STATUS", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan }, { TRXN_NATUR: /Systematic/ },{TAX_STATUS:"Individual"}] } },
+            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan }, { INVNAME: {$regex : `^${req.body.name}.*` , $options: 'si' } } , { TRXN_NATUR: /Systematic/ } ] } },
             { $sort: { TRADDATE: -1 } }
         ]
         const pipeline1 = [  ///trans_karvy
             { $group: { _id: { INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC",  TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT",STATUS:"$STATUS", TD_TRDT: "$TD_TRDT" } } },
             { $project: { _id: 0, INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC",STATUS:"$_id.STATUS" ,AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan }, { TRXN_NATUR: /Systematic/ },{STATUS:"INDIVIDUAL"}] } },
+            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan } ,{ INVNAME: {$regex : `^${req.body.name}.*` , $options: 'si' } } , { TRXN_NATUR: /Systematic/ }  ] } },
             { $sort: { TRADDATE: -1 } }
         ]
         const pipeline2 = [  ///trans_franklin
             { $group: { _id: { INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1",SOCIAL_S18:"$SOCIAL_S18", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
             { $project: { _id: 0, INVNAME: "$INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1",SOCIAL_S18:"$_id.SOCIAL_S18", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan }, { TRXN_NATUR: "SIP" },{SOCIAL_S18:"Individual"}        ] } },
+            { $match: { $and: [{ month: mon }, { year: yer }, { PAN: pan } , { INVNAME: {$regex : `^${req.body.name}.*` , $options: 'si' } }    ] } },
             { $sort: { TRADDATE: -1 } }
         ]
 
@@ -910,13 +910,18 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                 });
             });
         });
+    }else{
+        resdata = {
+            status: 400,
+            message: 'Data not found',
+        }
+        res.json(resdata)
+         return resdata
     }
 } catch (err) {
     console.log(err)
 }
 })
-
-
 app.post("/api/getdividend", function (req, res) {
 	try {
     var yer = req.body.froyear;
