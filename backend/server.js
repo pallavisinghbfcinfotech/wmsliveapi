@@ -229,8 +229,9 @@ var i=0;var resdata="";
 
 app.post("/api/getfoliodetail", function (req, res) {     
 	try{
+		 var prodcode = req.body.amc_code+req.body.prodcode;
                     const pipeline3 = [  //trans_cams
-                        {$match : {"FOLIO_NO":req.body.folio,"AMC_CODE":req.body.amc_code,"PRODCODE":req.body.prodcode}}, 
+                        {$match : {"FOLIO_NO":req.body.folio,"AMC_CODE":req.body.amc_code,"PRODCODE":prodcode}}, 
                         {$group : {_id : {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO", AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} } ,UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"}  }}},
                         {$lookup:
                         {
