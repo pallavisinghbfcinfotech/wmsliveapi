@@ -672,7 +672,7 @@ app.post("/api/getdividend", function (req, res) {
     ]
     const pipeline1 = [  ///trans_karvy
         { $match: { $and: [{ TRDESC: /Div/ }, { PAN1: req.body.pan },{ INVNAME: {$regex : `^${req.body.name}.*` , $options: 'i' } }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-        { $group: { _id: { FUNDDESC: "$FUNDDESC", INVNAME: "$INVNAME" }, $TD_AMT: { $sum: "$TD_AMT" } } },
+        { $group: { _id: { FUNDDESC: "$FUNDDESC", INVNAME: "$INVNAME" }, TD_AMT: { $sum: "$TD_AMT" } } },
         { $project: { _id: 0, SCHEME: "$_id.FUNDDESC", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
     ]
     const pipeline2 = [  ///trans_franklin
