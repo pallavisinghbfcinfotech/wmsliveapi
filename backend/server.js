@@ -226,7 +226,7 @@ const transfranklin = new Schema({
   var camsn = mongoose.model('cams_nav', navcams, 'cams_nav');  
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var resdata="";
-
+var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 app.post("/api/getfoliodetail", function (req, res) {     
 	try{
 		 var prodcode = req.body.amc_code+req.body.prodcode;
