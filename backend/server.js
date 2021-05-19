@@ -225,8 +225,102 @@ const transfranklin = new Schema({
   var foliof = mongoose.model('folio_franklin', foliofranklin, 'folio_franklin');
   var camsn = mongoose.model('cams_nav', navcams, 'cams_nav');  
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
-var i=0;var resdata="";
+var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
+
+app.post("/api/PANVerification", function (req, res) {
+    var panexist = "";
+    try {
+        if (req.body.pan === "" || req.body.pan === undefined || req.body === "" || req.body.pan === null) {
+            resdata = {
+                status: 400,
+                message: 'Data not found',
+            }
+            res.json(resdata)
+            return resdata;
+        } else {
+            foliok.find({ PANGNO: req.body.pan },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
+                folioc.find({ PAN_NO: req.body.pan },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
+                    foliof.find({ PANNO1: req.body.pan },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
+                    if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
+                        resdata = {
+                            status: 200,
+                            message: 'Successful',
+                            data:foliofranklindata,
+                        }
+                        datacon = foliokarvydata.concat(foliocamsdata.concat(foliofranklindata));
+                        datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                        .reverse().map(JSON.parse);
+                        resdata.data = datacon.filter((v,i,a)=>a.findIndex(t=>(t.label === v.label && t.value===v.value))===i)
+                        //console.log(JSON.stringify(resdata.data));
+                         console.log(datacon.length);
+                         for(var j=0;j<datacon.length;j++){
+                          //  console.log(datacon[j].length);
+                         var transporter = nodemailer.createTransport({
+                            host: 'mail.bfccapital.com',
+                            port: 465,
+                            secure: true, 
+                            auth: {
+                              user: "customersupport@bfccapital.com",
+                              pass: "customersupport@123"
+                            } 
+                            // host: "smtp.mailtrap.io",
+                            // port: 2525,
+                            // auth: {
+                            //   user: "b6454d63275054",
+                            //   pass: "287121db1a4cb7"
+                            // }
+                            // host: 'smtp.gmail.com',
+                            // port: 465,
+                            // secure: true,
+//                             auth: {
+//                             user: 'pallavisinghbfcinfotech@gmail.com',
+//                             pass: 'singhpallavi@123'
+//                             }
+                          }); 
+                          transporter.verify(function (error, success) {
+                            if (error) {
+                              console.log("Error");
+                            } else {
+                              console.log("Server is ready to take our messages!");
+                            }
+                          });
+  
+                        let mailOptions = {
+                            from: "customersupport@bfccapital.com",
+                            to: "pallavisinghbfcinfotech@gmail.com",
+                            cc: "pallavi.singh428@gmail.com",
+                            subject: "Congratulations! your IIN has been successfully activated",
+                            html: "Dear  Pallavi ,<br><br>Your KYC (fffffgrfgr) has been completed. Please proceed with IIN & Mandate registration.<br><br>App Link:<br> https://play.google.com/store/apps/details?id=tvs.com.bfc&hl=en_IN&gl=US<br><br>Website Link:<br> https://bfccapital.com"
+                          }
+                          transporter.sendMail(mailOptions, function (error, info) {
+                            if (error) {
+                              console.log(error);
+                            } else {
+                              console.log('Email sent: ' + info.response);
+                            }
+                          });
+                        }
+                        res.json(resdata)
+                        return resdata;
+                    }else{
+                        resdata = {
+                            status: 300,
+                            message: 'Data not found',
+                        }
+                        res.json(resdata)
+                        return resdata;
+                    }
+                 });
+            });
+       });           
+        }
+    } catch (err) {
+        console.log(err)
+    }
+});
+
 app.post("/api/getfoliodetail", function (req, res) {     
 	try{
 		 var prodcode = req.body.amc_code+req.body.prodcode;
