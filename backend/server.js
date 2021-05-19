@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
  import path from 'path';
 import bodyParser from 'body-parser';
 var Schema = mongoose.Schema;
+import nodemailer = from 'nodemailer';
 import Axios from 'axios'
  import moment from 'moment';
 dotenv.config();
