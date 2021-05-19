@@ -4,10 +4,10 @@ import dotenv from 'dotenv';
  import mongoose from 'mongoose';
  import path from 'path';
 import bodyParser from 'body-parser';
-var Schema = mongoose.Schema;
-import nodemailer = from 'nodemailer';
+import nodemailer from 'nodemailer';
 import Axios from 'axios'
  import moment from 'moment';
+var Schema = mongoose.Schema;
 dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
