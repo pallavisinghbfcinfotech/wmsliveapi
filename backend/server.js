@@ -221,6 +221,12 @@ const transfranklin = new Schema({
     PERSONAL23: { type: String},
 }, { versionKey: false });
 
+		const members = new Schema({
+                        memberPan: { type: String },
+                        adminPan: { type: String },
+                        memberRelation: { type: String },
+                        OTP: { type: String },
+                    }, { versionKey: false });
 
   var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
   var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
@@ -229,6 +235,7 @@ const transfranklin = new Schema({
   var foliok = mongoose.model('folio_karvy', foliokarvy, 'folio_karvy');  
   var foliof = mongoose.model('folio_franklin', foliofranklin, 'folio_franklin');
   var camsn = mongoose.model('cams_nav', navcams, 'cams_nav');  
+  var family = mongoose.model('familymember', members, 'familymember');
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
@@ -337,14 +344,8 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                  var memberPan = localStorage.getItem('memberPan'); 
                  if(OTP === req.body.otp && memberPan === req.body.memberPan)  {
                     console.log(OTP) 
-                    const members = new Schema({
-                        memberPan: { type: String },
-                        adminPan: { type: String },
-                        memberRelation: { type: String },
-                        OTP: { type: String },
-                       // Date: { type: Date },
-                    }, { versionKey: false });
-                    var family = mongoose.model('familymember', members, 'familymember');
+                    
+                    
                     try {
                      //   for (i = 0; i < req.body.length; i++) {
                             var mod = new family({memberPan:memberPan,OTP:OTP,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
