@@ -253,11 +253,10 @@ app.post("/api/PANVerification", function (req, res) {
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                         .reverse().map(JSON.parse);
-                        resdata.data = datacon.filter((v,i,a)=>a.findIndex(t=>(t.label === v.label && t.value===v.value))===i)
-                        //console.log(JSON.stringify(resdata.data));
-                         console.log(datacon.length);
-                         for(var j=0;j<datacon.length;j++){
-                          //  console.log(datacon[j].length);
+                        resdata.data  = datacon.filter((v,i,a)=>a.findIndex(t=>(t.label === v.label && t.value===v.value))===i)
+                        for(var j=0;j<resdata.data.length;j++){
+                            console.log(resdata.data[j].EMAIL);
+                            var toemail = resdata.data[j].EMAIL;
                          var transporter = nodemailer.createTransport({
                             host: 'mail.bfccapital.com',
                             port: 465,
@@ -290,10 +289,10 @@ app.post("/api/PANVerification", function (req, res) {
   
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
-                            to: "pallavisinghbfcinfotech@gmail.com",
-                            cc: "pallavi.singh428@gmail.com",
-                            subject: "Congratulations! your IIN has been successfully activated",
-                            html: "Dear  Pallavi ,<br><br>Your KYC (fffffgrfgr) has been completed. Please proceed with IIN & Mandate registration.<br><br>App Link:<br> https://play.google.com/store/apps/details?id=tvs.com.bfc&hl=en_IN&gl=US<br><br>Website Link:<br> https://bfccapital.com"
+                            to: toemail,
+                            cc: "pallavisinghbfcinfotech@gmail.com",
+                            subject: "PAN Verification",
+                            html: "Dear  Pallavi ,<br><br>Your otp is"
                           }
                           transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
