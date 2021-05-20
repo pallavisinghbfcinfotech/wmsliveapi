@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
  import path from 'path';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
-import LocalStorage from ('node-localstorage').LocalStorage;
+import LocalStorage from 'node-localstorage'.LocalStorage;
 localStorage = new LocalStorage('./scratch');
 import Axios from 'axios'
  import moment from 'moment';
