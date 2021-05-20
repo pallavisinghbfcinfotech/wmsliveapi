@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
  import path from 'path';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
+import LocalStorage from ('node-localstorage').LocalStorage;
+localStorage = new LocalStorage('./scratch');
 import Axios from 'axios'
  import moment from 'moment';
 var Schema = mongoose.Schema;
@@ -232,7 +234,7 @@ var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 app.post("/api/PANVerification", function (req, res) {
     var panexist = "";
     try {
-        if (req.body.pan === "" || req.body.pan === undefined || req.body === "" || req.body.pan === null) {
+        if (req.body.memberPan  === "" || req.body.memberPan  === null) {
             resdata = {
                 status: 400,
                 message: 'Data not found',
@@ -240,44 +242,40 @@ app.post("/api/PANVerification", function (req, res) {
             res.json(resdata)
             return resdata;
         } else {
-            foliok.find({ PANGNO: req.body.pan },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
-                folioc.find({ PAN_NO: req.body.pan },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
-                    foliof.find({ PANNO1: req.body.pan },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
+            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
+                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
+                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
                     if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
                         resdata = {
                             status: 200,
                             message: 'Successful',
                             data:foliofranklindata,
                         }
+                        
                         datacon = foliokarvydata.concat(foliocamsdata.concat(foliofranklindata));
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                         .reverse().map(JSON.parse);
                         resdata.data  = datacon.filter((v,i,a)=>a.findIndex(t=>(t.label === v.label && t.value===v.value))===i)
+                        var digits = '0123456789';
+                        let OTP = '';
+                        for (let k = 0; k < 6; k++ ) {
+                            OTP += digits[Math.floor(Math.random() * 10)];
+                        }
+                        
+                        localStorage.setItem('otp', OTP);
+                        localStorage.setItem('memberPan', req.body.memberPan );
+                        
                         for(var j=0;j<resdata.data.length;j++){
-                            console.log(resdata.data[j].EMAIL);
-                            var toemail = resdata.data[j].EMAIL;
-                         var transporter = nodemailer.createTransport({
+                            var toemail = resdata.data[i].EMAIL;
+                         var transporter = nodemailer.createTransport({ 
                             host: 'mail.bfccapital.com',
                             port: 465,
                             secure: true, 
                             auth: {
                               user: "customersupport@bfccapital.com",
                               pass: "customersupport@123"
-                            } 
-                            // host: "smtp.mailtrap.io",
-                            // port: 2525,
-                            // auth: {
-                            //   user: "b6454d63275054",
-                            //   pass: "287121db1a4cb7"
-                            // }
-                            // host: 'smtp.gmail.com',
-                            // port: 465,
-                            // secure: true,
-//                             auth: {
-//                             user: 'pallavisinghbfcinfotech@gmail.com',
-//                             pass: 'singhpallavi@123'
-//                             }
+                            }
                           }); 
                           transporter.verify(function (error, success) {
                             if (error) {
@@ -290,10 +288,11 @@ app.post("/api/PANVerification", function (req, res) {
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
                             to: toemail,
-                            cc: "pallavisinghbfcinfotech@gmail.com",
+                            cc: "pallavi.singh428@gmail.com",
                             subject: "PAN Verification",
-                            html: "Dear  Pallavi ,<br><br>Your otp is"
+                            html: "Dear  "+toemail+" ,<br><br>Your otp is "+ OTP
                           }
+                          console.log(OTP);
                           transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
                               console.log(error);
@@ -315,6 +314,76 @@ app.post("/api/PANVerification", function (req, res) {
                  });
             });
        });           
+        }
+    } catch (err) {
+        console.log(err)
+    }
+});
+
+app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
+    try {
+        if (req.body.adminPan === "" && req.body.memberPan === "" && req.body.memberRelation === "" && req.body.otp === "") {
+            resdata = {
+                status: 400,
+                message: 'Data not found',
+            }
+            res.json(resdata)
+            return resdata;
+        } else {
+                 var OTP = localStorage.getItem('otp');
+                 var memberPan = localStorage.getItem('memberPan'); 
+                 if(OTP === req.body.otp && memberPan === req.body.memberPan)  {
+                    console.log(OTP) 
+                    const members = new Schema({
+                        memberPan: { type: String },
+                        adminPan: { type: String },
+                        memberRelation: { type: String },
+                        OTP: { type: String },
+                        Date: { type: Date },
+                    }, { versionKey: false });
+                    var family = mongoose.model('familymember', members, 'familymember');
+                    try {
+                     //   for (i = 0; i < req.body.length; i++) {
+                            var mod = new family({memberPan:memberPan,OTP:OTP,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
+                            family.find({ memberPan: req.body.memberPan  },{_id:0}, function (err, memberdata) {
+                                if(memberdata !=""){
+                                    resdata = {
+                                        status: 400,
+                                        message: 'Member Pan Already Exists',
+                                    }
+                                    res.json(resdata)
+                                    return resdata;
+                                }else{
+                                    mod.save(function (err, data) {
+                                        if (err) {
+                                            console.log(err);
+                                        }
+                                        else {
+                                            console.log("insert successfully");
+                                        }
+                                    });
+                                    resdata = {
+                                        status: 200,
+                                        message: 'insert successfully',
+                                    }
+                                    res.json(resdata)
+                                    return resdata;
+                                }
+                            });
+                            
+                       // }
+                    } catch (err) {
+                        console.log(err)
+                    }
+                 }else{
+                    resdata = {
+                        status: 400,
+                        message: 'OTP or Member Pan not match',
+                    }
+                    res.json(resdata)
+                    return resdata;
+                 }
+                  
         }
     } catch (err) {
         console.log(err)
