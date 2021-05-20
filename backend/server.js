@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
 import LocalStorage from 'node-localstorage';
-localStorage = new LocalStorage('./scratch');
+localStorage = (LocalStorage) LocalStorage('./scratch');
 import Axios from 'axios'
  import moment from 'moment';
 var Schema = mongoose.Schema;
