@@ -332,6 +332,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
             res.json(resdata)
             return resdata;
         } else {
+		var memberdata="";
                  var OTP = localStorage.getItem('otp');
                  var memberPan = localStorage.getItem('memberPan'); 
                  if(OTP === req.body.otp && memberPan === req.body.memberPan)  {
@@ -341,7 +342,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                         adminPan: { type: String },
                         memberRelation: { type: String },
                         OTP: { type: String },
-                        Date: { type: Date },
+                       // Date: { type: Date },
                     }, { versionKey: false });
                     var family = mongoose.model('familymember', members, 'familymember');
                     try {
