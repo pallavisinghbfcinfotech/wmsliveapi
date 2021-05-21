@@ -5,9 +5,6 @@ import dotenv from 'dotenv';
  import path from 'path';
 import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
-// //import LocalStorage from 'node-localstorage';
-// import {LocalStorage} from 'node-localstorage'
-// var localStorage = new LocalStorage('./scratch');
 import localStorage from 'localStorage'
 import Axios from 'axios'
  import moment from 'moment';
@@ -16,12 +13,7 @@ dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
 
-
-//moment.suppressDeprecationWarnings = true;
-
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
-
-
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
 	useUnifiedTopology: true,
@@ -221,12 +213,11 @@ const transfranklin = new Schema({
     PERSONAL23: { type: String},
 }, { versionKey: false });
 
-		const members = new Schema({
-                        memberPan: { type: String },
-                        adminPan: { type: String },
-                        memberRelation: { type: String },
-                        OTP: { type: String },
-                    }, { versionKey: false });
+const members = new Schema({
+     memberPan: { type: String },
+     adminPan: { type: String },
+     memberRelation: { type: String },
+ }, { versionKey: false });
 
   var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
   var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
@@ -241,16 +232,24 @@ var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofrank
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 
 app.post("/api/PANVerification", function (req, res) {
-    var panexist = "";
     try {
-        if (req.body.memberPan  === "" || req.body.memberPan  === null) {
+        if(req.body.memberPan === "" ) {
             resdata = {
                 status: 400,
-                message: 'Data not found',
+                message: 'Please enter pan',
             }
             res.json(resdata)
             return resdata;
         } else {
+            let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+            if(!regex.test(req.body.memberPan)) {
+                resdata = {
+                    status: 400,
+                    message: 'Please enter valid pan',
+                }
+                res.json(resdata)
+                return resdata;
+            }else{
             foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
                 folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
                     foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
@@ -276,14 +275,14 @@ app.post("/api/PANVerification", function (req, res) {
                         localStorage.setItem('memberPan', req.body.memberPan );
                         
                         for(var j=0;j<resdata.data.length;j++){
+                            console.log(resdata.data[i].EMAIL);
                             var toemail = resdata.data[i].EMAIL;
                          var transporter = nodemailer.createTransport({ 
-                            host: 'mail.bfccapital.com',
-                            port: 465,
-                            secure: true, 
+                            host: "smtp.mailtrap.io",
+                            port: 2525,
                             auth: {
-                              user: "customersupport@bfccapital.com",
-                              pass: "customersupport@123"
+                              user: "b6454d63275054",
+                              pass: "287121db1a4cb7"
                             }
                           }); 
                           transporter.verify(function (error, success) {
@@ -297,7 +296,7 @@ app.post("/api/PANVerification", function (req, res) {
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
                             to: toemail,
-                            cc: "pallavi.singh428@gmail.com",
+                            cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "PAN Verification",
                             html: "Dear  "+toemail+" ,<br><br>Your otp is "+ OTP
                           }
@@ -314,7 +313,7 @@ app.post("/api/PANVerification", function (req, res) {
                         return resdata;
                     }else{
                         resdata = {
-                            status: 300,
+                            status: 400,
                             message: 'Data not found',
                         }
                         res.json(resdata)
@@ -324,6 +323,7 @@ app.post("/api/PANVerification", function (req, res) {
             });
        });           
         }
+    }
     } catch (err) {
         console.log(err)
     }
@@ -331,29 +331,61 @@ app.post("/api/PANVerification", function (req, res) {
 
 app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
     try {
-        if (req.body.adminPan === "" && req.body.memberPan === "" && req.body.memberRelation === "" && req.body.otp === "") {
+        if(req.body.adminPan === "") {
             resdata = {
                 status: 400,
-                message: 'Data not found',
+                message: 'Please enter admin pan',
             }
-            res.json(resdata)
+            res.json(resdata);
             return resdata;
-        } else {
-		var memberdata="";
+        }else if(req.body.memberPan === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter member pan',
+            }
+            res.json(resdata);
+        }else if(req.body.memberRelation === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter member relation',
+            }
+            res.json(resdata);
+            return resdata;
+        }else if(req.body.otp === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter otp',
+            }
+            res.json(resdata);
+            return resdata;
+        }else {
+            var memberdata="";
                  var OTP = localStorage.getItem('otp');
                  var memberPan = localStorage.getItem('memberPan'); 
-                 if(OTP === req.body.otp && memberPan === req.body.memberPan)  {
-                    console.log(OTP) 
+                 if(memberPan!= req.body.memberPan){
+                    resdata = {
+                        status: 400,
+                        message: 'Member Pan not match',
+                    }
+                    res.json(resdata);
+                    return resdata;
                     
-                    
+                }if(OTP!= req.body.otp){
+                    resdata = {
+                        status: 400,
+                        message: 'OTP not match',
+                    }
+                    res.json(resdata);
+                    return resdata;
+                }else{
                     try {
                      //   for (i = 0; i < req.body.length; i++) {
-                            var mod = new family({memberPan:memberPan,OTP:OTP,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
-                            family.find({ memberPan: req.body.memberPan  },{_id:0}, function (err, memberdata) {
+                            var mod = new family({memberPan:memberPan,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
+                            family.find({ memberPan: req.body.memberPan , adminPan:req.body.adminPan },{_id:0}, function (err, memberdata) {
                                 if(memberdata !=""){
                                     resdata = {
                                         status: 400,
-                                        message: 'Member Pan Already Exists',
+                                        message: 'Member Pan & Admin Pan Already Exists',
                                     }
                                     res.json(resdata)
                                     return resdata;
@@ -374,25 +406,18 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                                     return resdata;
                                 }
                             });
-                            
-                       // }
                     } catch (err) {
                         console.log(err)
                     }
-                 }else{
-                    resdata = {
-                        status: 400,
-                        message: 'OTP or Member Pan not match',
-                    }
-                    res.json(resdata)
-                    return resdata;
                  }
                   
         }
+        
     } catch (err) {
         console.log(err)
     }
 });
+
 
 app.post("/api/getfoliodetail", function (req, res) {     
 	try{
