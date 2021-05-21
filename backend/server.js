@@ -230,6 +230,7 @@ const members = new Schema({
   var data="";var karvydata="";var camsdata="";var frankdata="";var datacon="";
 var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
+var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
 app.post("/api/PANVerification", function (req, res) {
     try {
@@ -259,12 +260,11 @@ app.post("/api/PANVerification", function (req, res) {
                             message: 'Successful',
                             data:foliofranklindata,
                         }
-                        
                         datacon = foliokarvydata.concat(foliocamsdata.concat(foliofranklindata));
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                         .reverse().map(JSON.parse);
-                        resdata.data  = datacon.filter((v,i,a)=>a.findIndex(t=>(t.label === v.label && t.value===v.value))===i)
+                        resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
                         var digits = '0123456789';
                         let OTP = '';
                         for (let k = 0; k < 6; k++ ) {
@@ -273,16 +273,15 @@ app.post("/api/PANVerification", function (req, res) {
                         
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
-                        
                         for(var j=0;j<resdata.data.length;j++){
-                            console.log(resdata.data[i].EMAIL);
-                            var toemail = resdata.data[i].EMAIL;
+                            var toemail = resdata.data[j];
                          var transporter = nodemailer.createTransport({ 
-                            host: "smtp.mailtrap.io",
-                            port: 2525,
+                            host: 'mail.bfccapital.com',
+                            port: 465,
+                            secure: true, 
                             auth: {
-                              user: "b6454d63275054",
-                              pass: "287121db1a4cb7"
+                              user: "customersupport@bfccapital.com",
+                              pass: "customersupport@123"
                             }
                           }); 
                           transporter.verify(function (error, success) {
@@ -379,7 +378,6 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                     return resdata;
                 }else{
                     try {
-                     //   for (i = 0; i < req.body.length; i++) {
                             var mod = new family({memberPan:memberPan,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
                             family.find({ memberPan: req.body.memberPan , adminPan:req.body.adminPan },{_id:0}, function (err, memberdata) {
                                 if(memberdata !=""){
