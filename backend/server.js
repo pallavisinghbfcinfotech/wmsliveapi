@@ -214,10 +214,10 @@ const transfranklin = new Schema({
 }, { versionKey: false });
 
 const members = new Schema({
-     memberPan: { type: String },
-     adminPan: { type: String },
-     memberRelation: { type: String },
- }, { versionKey: false });
+    memberPan: { type: String },
+    adminPan: { type: String },
+    memberRelation: { type: String },
+}, { versionKey: false });
 
   var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
   var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
@@ -276,13 +276,13 @@ app.post("/api/PANVerification", function (req, res) {
                         for(var j=0;j<resdata.data.length;j++){
                             var toemail = resdata.data[j];
                          var transporter = nodemailer.createTransport({ 
-                            host: 'mail.bfccapital.com',
-                            port: 465,
-                            secure: true, 
-                            auth: {
-                              user: "customersupport@bfccapital.com",
-                              pass: "customersupport@123"
-                            }
+                             host: 'mail.bfccapital.com',
+                             port: 465,
+                             secure: true, 
+				    auth: {
+				      user: "customersupport@bfccapital.com",
+				      pass: "customersupport@123"
+				    }
                           }); 
                           transporter.verify(function (error, success) {
                             if (error) {
@@ -295,7 +295,7 @@ app.post("/api/PANVerification", function (req, res) {
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
                             to: toemail,
-                            cc: "pallavisinghbfcinfotech@gmail.com",
+                          //  cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "PAN Verification",
                             html: "Dear  "+toemail+" ,<br><br>Your otp is "+ OTP
                           }
@@ -378,6 +378,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                     return resdata;
                 }else{
                     try {
+                     //   for (i = 0; i < req.body.length; i++) {
                             var mod = new family({memberPan:memberPan,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
                             family.find({ memberPan: req.body.memberPan , adminPan:req.body.adminPan },{_id:0}, function (err, memberdata) {
                                 if(memberdata !=""){
@@ -393,12 +394,12 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                                             console.log(err);
                                         }
                                         else {
-                                            console.log("insert successfully");
+                                            console.log("Insert successfully");
                                         }
                                     });
                                     resdata = {
                                         status: 200,
-                                        message: 'insert successfully',
+                                        message: 'Insert successfully',
                                     }
                                     res.json(resdata)
                                     return resdata;
@@ -407,8 +408,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                     } catch (err) {
                         console.log(err)
                     }
-                 }
-                  
+                 }            
         }
         
     } catch (err) {
