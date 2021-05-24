@@ -284,11 +284,12 @@ app.post("/api/PANVerification", function (req, res) {
                         for(var j=0;j<resdata.data.length;j++){
                             var toemail = resdata.data[j].EMAIL;
                          var transporter = nodemailer.createTransport({ 
-                            host: "smtp.mailtrap.io",
-                            port: 2525,
+                           host: 'mail.bfccapital.com',
+                            port: 465,
+                            secure: true, 
                             auth: {
-                              user: "b6454d63275054",
-                              pass: "287121db1a4cb7"
+                              user: "customersupport@bfccapital.com",
+                              pass: "customersupport@123"
                             }
                           }); 
                           transporter.verify(function (error, success) {
