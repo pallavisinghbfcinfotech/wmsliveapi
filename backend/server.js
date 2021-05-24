@@ -251,9 +251,9 @@ app.post("/api/PANVerification", function (req, res) {
                 res.json(resdata);
                 return resdata;
             }else{
-            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1,ACNO:1}, function (err, foliokarvydata) {
-                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1,AC_NO:1}, function (err, foliocamsdata) {
-                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1,PHONE_RES:1}, function (err, foliofranklindata) {
+            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
+                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
+                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
                     if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
                         resdata = {
                             status: 200,
@@ -272,13 +272,13 @@ app.post("/api/PANVerification", function (req, res) {
                         
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
-                        for(j=0;j<datacon.length;j++){
-                            var phone =datacon[j].ACNO;
-                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleUnicodeApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno="+phone+"&Msg=Your Mf Prodigy OTP to verify registration is "+OTP+". Please do not share this OTP with anyone to ensure the account's security.&TemplateID=1207161520359590832&EntityID=1201160224111799498",
-                                ).then(function (result) {
-                                    console.log('SMS send successfully');
-                                });
-                        }
+//                         for(j=0;j<datacon.length;j++){
+//                             var phone =datacon[j].ACNO;
+//                                     Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleUnicodeApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno="+phone+"&Msg=Your Mf Prodigy OTP to verify registration is "+OTP+". Please do not share this OTP with anyone to ensure the account's security.&TemplateID=1207161520359590832&EntityID=1201160224111799498",
+//                                 ).then(function (result) {
+//                                     console.log('SMS send successfully');
+//                                 });
+//                         }
                        resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
                         
                         for(var j=0;j<resdata.data.length;j++){
