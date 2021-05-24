@@ -303,7 +303,7 @@ app.post("/api/PANVerification", function (req, res) {
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
                             to: toemail,
-                            //cc: "pallavisinghbfcinfotech@gmail.com",
+                            cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "PAN Verification",
                             html: "Dear Investor,<br><br>Your Family Member has initiated to link you Folio(s) to group your folio under the Family Portfolio or by sharing the OTP ("+OTP+") with your family member."
                             +"The weblink OTP will expire in 1 day if not accessed.<br><br> By accepting this request, your family member can view your mapped folios and also initiate transaction"
