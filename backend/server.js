@@ -934,9 +934,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                 if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)) {
                                                     datacon[i]['TRXN_NATUR'] = "STP";
                                                 }
-                                            }                 
-                                       
-                                        resdata.data = datacon;                   
+                                            }                                   
                                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime())
                                          res.json(resdata)
                                          return resdata;                                       
@@ -944,7 +942,6 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                 });
                             });
                         });   
-         
                 }else{
                     resdata = {
                         status: 200,
