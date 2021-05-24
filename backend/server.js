@@ -248,12 +248,12 @@ app.post("/api/PANVerification", function (req, res) {
                     status: 400,
                     message: 'Please enter valid pan',
                 }
-                res.json(resdata)
+                res.json(resdata);
                 return resdata;
             }else{
-            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
-                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
-                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
+            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1,ACNO:1}, function (err, foliokarvydata) {
+                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1,AC_NO:1}, function (err, foliocamsdata) {
+                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1,PHONE_RES:1}, function (err, foliofranklindata) {
                     if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
                         resdata = {
                             status: 200,
@@ -264,7 +264,6 @@ app.post("/api/PANVerification", function (req, res) {
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                         .reverse().map(JSON.parse);
-                        resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
                         var digits = '0123456789';
                         let OTP = '';
                         for (let k = 0; k < 6; k++ ) {
@@ -273,16 +272,24 @@ app.post("/api/PANVerification", function (req, res) {
                         
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
+                        for(j=0;j<datacon.length;j++){
+                            var phone =datacon[j].ACNO;
+                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleUnicodeApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno="+phone+"&Msg=Your Mf Prodigy OTP to verify registration is "+OTP+". Please do not share this OTP with anyone to ensure the account's security.&TemplateID=1207161520359590832&EntityID=1201160224111799498",
+                                ).then(function (result) {
+                                    console.log('SMS send successfully');
+                                });
+                        }
+                       resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
+                        
                         for(var j=0;j<resdata.data.length;j++){
-                            var toemail = resdata.data[j];
+                            var toemail = resdata.data[j].EMAIL;
                          var transporter = nodemailer.createTransport({ 
-                             host: 'mail.bfccapital.com',
-                             port: 465,
-                             secure: true, 
-				    auth: {
-				      user: "customersupport@bfccapital.com",
-				      pass: "customersupport@123"
-				    }
+                            host: "smtp.mailtrap.io",
+                            port: 2525,
+                            auth: {
+                              user: "b6454d63275054",
+                              pass: "287121db1a4cb7"
+                            }
                           }); 
                           transporter.verify(function (error, success) {
                             if (error) {
@@ -295,11 +302,12 @@ app.post("/api/PANVerification", function (req, res) {
                         let mailOptions = {
                             from: "customersupport@bfccapital.com",
                             to: toemail,
-                          //  cc: "pallavisinghbfcinfotech@gmail.com",
+                            //cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "PAN Verification",
-                            html: "Dear  "+toemail+" ,<br><br>Your otp is "+ OTP
+                            html: "Dear Investor,<br><br>Your Family Member has initiated to link you Folio(s) to group your folio under the Family Portfolio or by sharing the OTP ("+OTP+") with your family member."
+                            +"The weblink OTP will expire in 1 day if not accessed.<br><br> By accepting this request, your family member can view your mapped folios and also initiate transaction"
+                            +"request on your behalf and such transactions will be processed subject to your payment confirmation or OTP confirmation wherever applicable." 
                           }
-                          console.log(OTP);
                           transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
                               console.log(error);
@@ -394,12 +402,12 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                                             console.log(err);
                                         }
                                         else {
-                                            console.log("Insert successfully");
+                                            console.log("insert successfully");
                                         }
                                     });
                                     resdata = {
                                         status: 200,
-                                        message: 'Insert successfully',
+                                        message: 'insert successfully',
                                     }
                                     res.json(resdata)
                                     return resdata;
@@ -415,7 +423,6 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
         console.log(err)
     }
 });
-
 
 app.post("/api/getfoliodetail", function (req, res) {     
 	try{
