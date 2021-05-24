@@ -282,7 +282,7 @@ app.post("/api/PANVerification", function (req, res) {
                        resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
                         
                         for(var j=0;j<resdata.data.length;j++){
-                            var toemail = resdata.data[j].EMAIL;
+                            var toemail = resdata.data[j];
                          var transporter = nodemailer.createTransport({ 
                            host: 'mail.bfccapital.com',
                             port: 465,
