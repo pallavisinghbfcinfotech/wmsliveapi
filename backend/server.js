@@ -1306,9 +1306,9 @@ app.post("/api/gettransactionuserwise", function (req, res) {
 
    app.post("/api/getschemelist", function (req, res) {
 	   try{
-        var pan = req.body.pan;;
+        var folio = req.body.folio;;
         const pipeline = [
-                {$match : {PAN:pan}},
+                {$match : {FOLIO_NO:folio}},
                 {$group : {_id : { AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} }  }}},
                 {$lookup:
                 {
@@ -1333,14 +1333,14 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                 {$project :{ _id:0 , products:"$products" } },
            ]
         const pipeline1=[  //trans_karvy
-            {$match : {PAN1:pan,SCHEMEISIN : {$ne : null}}}, 
+            {$match : {TD_ACNO:folio,SCHEMEISIN : {$ne : null}}}, 
             {$group : {_id:{SCHEMEISIN:"$SCHEMEISIN"} }},
             {$lookup: { from: 'products',localField: '_id.SCHEMEISIN',foreignField: 'ISIN',as: 'master' } },
             { $unwind: "$master"},
             {$project:{_id:0,products:"$master" }   },
        ] 
         const pipeline2=[ ///trans_franklin
-            {$match : {IT_PAN_NO1:pan,ISIN : {$ne : null}}}, 
+            {$match : {FOLIO_NO:folio,ISIN : {$ne : null}}}, 
             {$group : {_id:{ISIN:"$ISIN"} }},
             {$lookup: { from: 'products',localField: '_id.ISIN',foreignField: 'ISIN',as: 'master' } },
             { $unwind: "$master"},
