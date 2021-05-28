@@ -232,6 +232,87 @@ var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofrank
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
+app.post("/api/userProfileMemberList", function (req, res) {
+    try{
+        var arr1=[];
+        let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+        if(req.body.pan ===""){
+            resdata = {
+                status: 400,
+                message: 'Please enter pan',
+            }
+        }else if(!regex.test(req.body.pan)) {
+            resdata = {
+                status: 400,
+                message: 'Please enter valid pan',
+            }
+        }else{
+            family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
+                if(member!=""){
+                    member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+                    arr1.push({PAN:req.body.pan.toUpperCase()});
+                    for(var j=0;j<member.length;j++){     
+                    arr1.push({PAN:member[j]}); 
+                    }
+                    var strPan = {$or:arr1};
+                  console.log(strPan)
+     pipeline = [  ///trans_cams
+        
+        { $group: { _id: {PAN: "$PAN",  INV_NAME: { "$toUpper": ["$INV_NAME"] }} } },
+        { $project: { _id: 0,PAN: "$_id.PAN",  INVNAME: { "$toUpper": ["$_id.INV_NAME"] } } },
+        { $match: strPan},
+    ]
+     pipeline1 = [  ///trans_karvy
+        
+        { $group: { _id: { PAN1: "$PAN1",  INVNAME: { "$toUpper": ["$INVNAME"] } } } },
+        { $project: { _id: 0,  PAN: "$_id.PAN1", INVNAME: { "$toUpper": ["$_id.INVNAME"] } } },
+        { $match: strPan},
+    ]
+     pipeline2 = [  ///trans_franklin
+       
+        { $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1", INVESTOR_2: { "$toUpper": ["$INVESTOR_2"] } } } },
+        { $project: { _id: 0,PAN: "$_id.IT_PAN_NO1",  INVNAME: { "$toUpper": ["$_id.INVESTOR_2"] }  } },
+        { $match: strPan},
+    ]
+    
+   transc.aggregate(pipeline, (err, camsdata) => {
+        transk.aggregate(pipeline1, (err, karvydata) => {
+             transf.aggregate(pipeline2, (err, frankdata) => {
+                if (frankdata != 0 || karvydata != 0 || camsdata != 0) {
+                    resdata = {
+                        status: 200,
+                        message: 'Successfull',
+                        data: frankdata
+                    }
+                } else {
+                    resdata = {
+                        status: 400,
+                        message: 'Data not found',
+                    }
+                }
+                var datacon = frankdata.concat(karvydata.concat(camsdata))
+                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                     .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                     .reverse().map(JSON.parse);
+                     var newdata1 = datacon.map(item=>{
+                        return [JSON.stringify(item),item]
+                         }); // creates array of array
+                         var maparr1 = new Map(newdata1); // create key value pair from array of array
+                         datacon = [...maparr1.values()];//converting back to array from mapobject 
+                     resdata.data = datacon;
+                  res.json(resdata);
+                return resdata;
+            });
+        });
+    });
+}
+            });
+  }
+} catch (err) {
+    console.log(err)
+}
+})
+
 app.post("/api/PANVerification", function (req, res) {
     try {
         if(req.body.memberPan === "" ) {
