@@ -958,6 +958,26 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                  }); // creates array of array
                                                  var maparr1 = new Map(newdata1); // create key value pair from array of array
                                                  datacon = [...maparr1.values()];//converting back to array from mapobject 
+					    
+					                                  datacon = datacon.map(function(obj) {
+                                if(obj['GUARDIANN0']){
+                                    obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+                                     // Delete old key
+                                          delete obj['GUARDIANN0'];
+                                }else if((obj['GUARDIANN0']) === ""){
+                                        obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+                                        delete obj['GUARDIANN0'];
+                                    }
+                                if(obj['GUARDIAN20'] === ""){
+                                    obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+                                     // Delete old key
+                                    delete obj['GUARDIAN20'];
+                                }else if((obj['GUARDIAN20']) === ""){
+                                    obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+                                    delete obj['GUARDIAN20'];
+                                }
+                                    return obj;
+                                });
                                         for (var i = 0; i < datacon.length; i++) {
                                                 if (datacon[i]['TRXN_NATUR'].match(/^Systematic/)) {
                                                     datacon[i]['TRXN_NATUR'] = "SIP";
