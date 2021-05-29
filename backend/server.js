@@ -308,9 +308,11 @@ app.post("/api/userProfileMemberList", function (req, res) {
                          for (var i = 0; i < datacon.length; i++) {                                          
                           if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
                              datacon[i]['PER_STATUS'] = "Minor";      
-                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
+                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
                              datacon[i]['PER_STATUS'] = "Individual";
-                           }
+                         }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI" ) {
+                             datacon[i]['PER_STATUS'] = "HUF";
+                         }
                      }
                      resdata.data = datacon;
                   res.json(resdata);
