@@ -234,7 +234,7 @@ var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
 app.post("/api/userProfileMemberList", function (req, res) {
     try{
-        var arr1=[];
+        var arr1=[];var arr2=[];
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if(req.body.pan ===""){
             resdata = {
@@ -251,38 +251,43 @@ app.post("/api/userProfileMemberList", function (req, res) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
                     arr1.push({PAN:req.body.pan.toUpperCase()});
+                    arr2.push({PAN1:req.body.pan.toUpperCase()});
                     for(var j=0;j<member.length;j++){     
                     arr1.push({PAN:member[j]}); 
+                    arr2.push({PAN1:member[j]}); 
                     }
                     var strPan = {$or:arr1};
-                  console.log(strPan)
+                    var strPan1 = {$or:arr2};
      pipeline = [  ///trans_cams
-        
-        { $group: { _id: {PAN: "$PAN",  INV_NAME: { "$toUpper": ["$INV_NAME"] }} } },
-        { $project: { _id: 0,PAN: "$_id.PAN",  INVNAME: { "$toUpper": ["$_id.INV_NAME"] } } },
         { $match: strPan},
+        { $group: { _id: {PAN: "$PAN",  INV_NAME: { "$toUpper": ["$INV_NAME"] }, TAX_STATUS:"$TAX_STATUS",} } },
+        { $lookup: { from: 'folio_cams', localField: '_id.PAN', foreignField: 'PAN_NO', as: 'detail' } },
+        { $unwind: "$detail" },
+        { $project: { _id: 0,PAN: "$_id.PAN",  INVNAME: { "$toUpper": ["$_id.INV_NAME"] } ,PER_STATUS:"$_id.TAX_STATUS",JOINT_NAME1: { "$toUpper": ["$detail.JNT_NAME1"] },JOINT_NAME2: { "$toUpper": ["$detail.JNT_NAME2"] } } },     
     ]
      pipeline1 = [  ///trans_karvy
-        
-        { $group: { _id: { PAN1: "$PAN1",  INVNAME: { "$toUpper": ["$INVNAME"] } } } },
-        { $project: { _id: 0,  PAN: "$_id.PAN1", INVNAME: { "$toUpper": ["$_id.INVNAME"] } } },
-        { $match: strPan},
+        { $match: strPan1},
+        { $group: { _id: { PAN1: "$PAN1",  INVNAME: { "$toUpper": ["$INVNAME"] } ,STATUS:"$STATUS" } } },
+        { $lookup: { from: 'folio_karvy', localField: '_id.PAN1', foreignField: 'PANGNO', as: 'detail' } },
+        { $unwind: "$detail" },
+        { $project: { _id: 0,  PAN: "$_id.PAN1", INVNAME: { "$toUpper": ["$_id.INVNAME"] },PER_STATUS:"$_id.STATUS",JOINT_NAME1: { "$toUpper": ["$detail.JTNAME1"] },JOINT_NAME2: { "$toUpper": ["$detail.JTNAME2"] } } },
+       
     ]
      pipeline2 = [  ///trans_franklin
        
-        { $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1", INVESTOR_2: { "$toUpper": ["$INVESTOR_2"] } } } },
-        { $project: { _id: 0,PAN: "$_id.IT_PAN_NO1",  INVNAME: { "$toUpper": ["$_id.INVESTOR_2"] }  } },
+        { $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1", INVESTOR_2: { "$toUpper": ["$INVESTOR_2"] },SOCIAL_S18:"$SOCIAL_S18",JOINT_NAM1:"$JOINT_NAM1",JOINT_NAM2:"$JOINT_NAM2" } } },
+        { $project: { _id: 0,PAN: "$_id.IT_PAN_NO1",  INVNAME: { "$toUpper": ["$_id.INVESTOR_2"] } ,PER_STATUS:"$_id.SOCIAL_S18",JOINT_NAME1:{ "$toUpper": ["$_id.JOINT_NAM1"] },JOINT_NAME2:{ "$toUpper": ["$_id.JOINT_NAM2"] } } },
         { $match: strPan},
     ]
     
    transc.aggregate(pipeline, (err, camsdata) => {
-        transk.aggregate(pipeline1, (err, karvydata) => {
-             transf.aggregate(pipeline2, (err, frankdata) => {
-                if (frankdata != 0 || karvydata != 0 || camsdata != 0) {
+         transk.aggregate(pipeline1, (err, karvydata) => {
+              transf.aggregate(pipeline2, (err, frankdata) => {
+                if ( camsdata != 0 || karvydata != 0 || frankdata!= 0) {
                     resdata = {
                         status: 200,
                         message: 'Successfull',
-                        data: frankdata
+                        data: camsdata
                     }
                 } else {
                     resdata = {
@@ -294,17 +299,25 @@ app.post("/api/userProfileMemberList", function (req, res) {
                  datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                      .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                      .reverse().map(JSON.parse);
+
                      var newdata1 = datacon.map(item=>{
                         return [JSON.stringify(item),item]
                          }); // creates array of array
                          var maparr1 = new Map(newdata1); // create key value pair from array of array
                          datacon = [...maparr1.values()];//converting back to array from mapobject 
+                         for (var i = 0; i < datacon.length; i++) {                                          
+                          if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+                             datacon[i]['PER_STATUS'] = "Minor";      
+                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
+                             datacon[i]['PER_STATUS'] = "Individual";
+                           }
+                     }
                      resdata.data = datacon;
                   res.json(resdata);
                 return resdata;
             });
-        });
-    });
+         });
+     });
 }
             });
   }
