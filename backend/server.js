@@ -309,13 +309,14 @@ app.post("/api/userProfileMemberList", function (req, res) {
                          var maparr1 = new Map(newdata1); // create key value pair from array of array
                          datacon = [...maparr1.values()];//converting back to array from mapobject 
                          for (var i = 0; i < datacon.length; i++) {                                          
-                          if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+                          if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" 
+                          || datacon[i]['PER_STATUS'] === "ON BEHALF OF MINOR" )  {
                              datacon[i]['PER_STATUS'] = "MINOR";      
-                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual" ) {
+                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual" || datacon[i]['PER_STATUS'] === "RESIDENT INDIVIDUAL" ) {
                              datacon[i]['PER_STATUS'] = "INDIVIDUAL";
-                           }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI" ) {
-                             datacon[i]['PER_STATUS'] = "HUF";
-                           }
+                         }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+                            datacon[i]['PER_STATUS'] = "HUF";
+                          }
                      }
                      resdata.data = datacon;
                   res.json(resdata);
