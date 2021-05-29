@@ -298,12 +298,12 @@ app.post("/api/userProfileMemberList", function (req, res) {
                         message: 'Data not found',
                     }
                 }
-                var datacon = frankdata.concat(karvydata.concat(camsdata))
-                      for (var i = 0; i < datacon.length; i++) {                                          
+                var datacon = frankdata.concat(karvydata.concat(camsdata))               
+                         for (var i = 0; i < datacon.length; i++) {                                          
                           if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" 
                           || datacon[i]['PER_STATUS'] === "ON BEHALF OF MINOR" )  {
                              datacon[i]['PER_STATUS'] = "MINOR";      
-                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual" || datacon[i]['PER_STATUS'] === "RESIDENT INDIVIDUAL" ) {
+                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Individual"|| datacon[i]['PER_STATUS'] === "Resident Individual" || datacon[i]['PER_STATUS'] === "RESIDENT INDIVIDUAL" ) {
                              datacon[i]['PER_STATUS'] = "INDIVIDUAL";
                          }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
                             datacon[i]['PER_STATUS'] = "HUF";
@@ -318,7 +318,13 @@ app.post("/api/userProfileMemberList", function (req, res) {
                          }); // creates array of array
                          var maparr1 = new Map(newdata1); // create key value pair from array of array
                          datacon = [...maparr1.values()];//converting back to array from mapobject 
-                     resdata.data = datacon;
+                         var filtered = datacon.filter(
+                            (temp => a =>
+                                (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PER_STATUS)
+                            )(Object.create(null))
+                        );
+                    
+                     resdata.data = filtered;
                   res.json(resdata);
                 return resdata;
             });
@@ -331,6 +337,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
     console.log(err)
 }
 })
+
 
 app.post("/api/PANVerification", function (req, res) {
     try {
