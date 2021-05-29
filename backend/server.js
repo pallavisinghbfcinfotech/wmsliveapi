@@ -299,16 +299,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
                     }
                 }
                 var datacon = frankdata.concat(karvydata.concat(camsdata))
-                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                     .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
-                     .reverse().map(JSON.parse);
-                     datacon = Array.from(new Set(datacon));
-                     var newdata1 = datacon.map(item=>{
-                        return [JSON.stringify(item),item]
-                         }); // creates array of array
-                         var maparr1 = new Map(newdata1); // create key value pair from array of array
-                         datacon = [...maparr1.values()];//converting back to array from mapobject 
-                         for (var i = 0; i < datacon.length; i++) {                                          
+                      for (var i = 0; i < datacon.length; i++) {                                          
                           if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" 
                           || datacon[i]['PER_STATUS'] === "ON BEHALF OF MINOR" )  {
                              datacon[i]['PER_STATUS'] = "MINOR";      
@@ -318,6 +309,15 @@ app.post("/api/userProfileMemberList", function (req, res) {
                             datacon[i]['PER_STATUS'] = "HUF";
                           }
                      }
+                     datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                     .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                     .reverse().map(JSON.parse);
+                     datacon = Array.from(new Set(datacon));
+                     var newdata1 = datacon.map(item=>{
+                        return [JSON.stringify(item),item]
+                         }); // creates array of array
+                         var maparr1 = new Map(newdata1); // create key value pair from array of array
+                         datacon = [...maparr1.values()];//converting back to array from mapobject 
                      resdata.data = datacon;
                   res.json(resdata);
                 return resdata;
