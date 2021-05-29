@@ -1258,7 +1258,9 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 					          datacon[i]['PER_STATUS'] = "Minor";      
 						}if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
 						   datacon[i]['PER_STATUS'] = "Individual";
-						   }
+						}if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI" ) {
+						     datacon[i]['PER_STATUS'] = "HUF";
+					 }
                                             }                 
                                             resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
                                             res.json(resdata);
@@ -1778,17 +1780,19 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                         }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
                             datacon[i]['TRXN_NATUR'] = "Con Out";
                         }if (datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || 
-                        datacon[i]['TRXN_NATUR'] === "Initial Allotment"
-                        || datacon[i]['TRXN_NATUR'] === "NEWPUR") {
+                             datacon[i]['TRXN_NATUR'] === "Initial Allotment"
+                          || datacon[i]['TRXN_NATUR'] === "NEWPUR") {
                             datacon[i]['TRXN_NATUR'] = "Purchase";
                         }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
-                         datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+                            datacon[i]['TRXN_NATUR'] === "ADDPUR") {
                             datacon[i]['TRXN_NATUR'] = "Add. Purchase";
                         }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
-                      datacon[i]['PER_STATUS'] = "Minor";      
+                            datacon[i]['PER_STATUS'] = "Minor";      
                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
                            datacon[i]['PER_STATUS'] = "Individual";
-                           }
+                        }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI" ) {
+                             datacon[i]['PER_STATUS'] = "HUF";
+                         }
 
                      }
 
