@@ -1769,9 +1769,9 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                         }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
                          datacon[i]['TRXN_NATUR'] === "ADDPUR") {
                             datacon[i]['TRXN_NATUR'] = "Add. Purchase";
-                        }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['STATUS'] === "MINOR" || datacon[i]['STATUS'] === "On Behalf of Minor" )  {
+                        }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
                       datacon[i]['PER_STATUS'] = "Minor";      
-                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
+                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
                            datacon[i]['PER_STATUS'] = "Individual";
                            }
 
