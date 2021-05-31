@@ -1369,11 +1369,39 @@ app.post("/api/getsipstpuserwise", function (req, res) {
 
 app.post("/api/getdividendscheme", function (req, res) {
     try{
+        let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+        if(req.body.fromyear ===""){
+            resdata = {
+                status: 400,
+                message: 'Please enter from year',
+            }           
+        }else if(req.body.toyear ===""){
+            resdata = {
+                status: 400,
+                message: 'Please enter to year',
+            }
+        }else if(req.body.pan ===""){
+            resdata = {
+                status: 400,
+                message: 'Please enter pan',
+            }
+        }else if(!regex.test(req.body.pan)) {
+            resdata = {
+                status: 400,
+                message: 'Please enter valid pan',
+            }
+        }else if(req.body.scheme ===""){
+                resdata = {
+                    status: 400,
+                    message: 'Please enter scheme',
+                }
+        } else{
+            
     var yer = req.body.fromyear;
     var secyer = req.body.toyear;
     yer = yer + "-04-01";
     secyer = secyer + "-03-31"
-    if(req.body.pan != "" && req.body.name != ""){
+//    if(req.body.pan != "" ){
     const pipeline = [  ///trans_cams                                                     
         { $match: { $and: [{ TRXN_NATUR: /Div/ }, { SCHEME: req.body.scheme },{ PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
         { $group: { _id: { INV_NAME: "$INV_NAME", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
@@ -1398,13 +1426,7 @@ app.post("/api/getdividendscheme", function (req, res) {
                         message: 'Successfull',
                         data: frankdata
                     }
-                } else {
-                    resdata = {
-                        status: 400,
-                        message: 'Data not found',
-                    }
-                }
-                var datacon = frankdata.concat(karvydata.concat(camsdata));
+                    var datacon = frankdata.concat(karvydata.concat(camsdata));
 
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                     .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
@@ -1422,21 +1444,21 @@ app.post("/api/getdividendscheme", function (req, res) {
                 resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime())
                 res.json(resdata)
                 return resdata
+                } else {
+                    resdata = {
+                        status: 400,
+                        message: 'Data not found',
+                    }
+                }
+                
             });
         });
     });
-}else{
-    resdata = {
-        status: 400,
-        message: 'Data not found',
-    }
-}
+        }
 } catch (err) {
     console.log(err)
 }
 });
-
-
 // app.post("/api/getdividend", function (req, res) {
 //     try{
 //     var yer = req.body.fromyear;
