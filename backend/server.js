@@ -338,33 +338,28 @@ app.post("/api/userProfileMemberList", function (req, res) {
 }
 })
 
-app.post("/api/getfolio", function (req, res) {
+app.post("/api/getfolioapi", function (req, res) {
     try{
         var perstatus = req.body.per_status;
         var statusvalue ="Minor";
         if(perstatus.toLowerCase() === statusvalue.toLowerCase()){
+
     pipeline1 = [  //folio_cams
         { $match:{  GUARD_PAN:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
         { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE:"$AMC_CODE" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIOCHK"  } },
+        { $project: { _id: 0, amc_code: "$_id.AMC_CODE" , folio:"$_id.FOLIOCHK"  } },
         { $sort: {amc_code:1}}
     ]
     pipeline2 = [  //trans_karvy
         { $match:{ GUARDPANNO:req.body.pan,INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { ACNO: "$ACNO", FUND:"$FUND" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.FUND', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.ACNO"  } },
+        { $project: { _id: 0, amc_code: "$_id.FUND" , folio:"$_id.ACNO"  } },
         { $sort: {amc_code:1}}
     ]
     pipeline3 = [  //trans_franklin
         { $match:{ GUARDIAN20:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+        { $project: { _id: 0, amc_code: "$_id.COMP_CODE" , folio:"$_id.FOLIO_NO"  } },
         { $sort: {amc_code:1}}
     ]
     folioc.aggregate(pipeline1, (err, camsdata) => {
@@ -403,25 +398,19 @@ app.post("/api/getfolio", function (req, res) {
     pipeline1 = [  //trans_cams
         { $match:{  PAN:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+        { $project: { _id: 0, amc_code: "$_id.AMC_CODE" , folio:"$_id.FOLIO_NO"  } },
         { $sort: {amc_code:1}}
     ]
     pipeline2 = [  //trans_karvy
         { $match:{ PAN1:req.body.pan,INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.TD_ACNO"  } },
+        { $project: { _id: 0, amc_code: "$_id.TD_FUND" , folio:"$_id.TD_ACNO"  } },
         { $sort: {amc_code:1}}
     ]
     pipeline3 = [  //trans_franklin
         { $match:{ IT_PAN_NO1:req.body.pan,INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
-        { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
-        { $unwind: "$amclist" },
-        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+        { $project: { _id: 0, amc_code: "$_id.COMP_CODE" , folio:"$_id.FOLIO_NO"  } },
         { $sort: {amc_code:1}}
     ]
     transc.aggregate(pipeline1, (err, camsdata) => {
@@ -462,6 +451,7 @@ app.post("/api/getfolio", function (req, res) {
     console.log(err)
 }
 })
+
 
 
 app.post("/api/PANVerification", function (req, res) {
