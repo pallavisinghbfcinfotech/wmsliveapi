@@ -346,24 +346,24 @@ app.post("/api/getfolioapi", function (req, res) {
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE:"$AMC_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
-                { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
-                { $sort: {AMC:1}}
+                { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+                { $sort: {amc_code:1}}
             ]
             pipeline2 = [  //trans_karvy
                 { $match:{ PAN1:req.body.pan,INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
                 { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND:"$TD_FUND" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.TD_FUND', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
-                { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.TD_ACNO"  } },
-                { $sort: {AMC:1}}
+                { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.TD_ACNO"  } },
+                { $sort: {amc_code:1}}
             ]
             pipeline3 = [  //trans_franklin
                 { $match:{ IT_PAN_NO1:req.body.pan,INVESTOR_2:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
                 { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
                 { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
                 { $unwind: "$amclist" },
-                { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
-                { $sort: {AMC:1}}
+                { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+                { $sort: {amc_code:1}}
             ]
             transc.aggregate(pipeline1, (err, camsdata) => {
                 transk.aggregate(pipeline2, (err, karvydata) => {
@@ -383,7 +383,7 @@ app.post("/api/getfolioapi", function (req, res) {
                      }) // check if there is any occurence of the item in whole array
                      .reverse()
                      .map(JSON.parse);
-                     resdata.data = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
+                     resdata.data = datacon.sort((a, b) => (a.amc_code > b.amc_code) ? 1 : -1);
                  res.send(resdata);
                  return resdata;
              }else{
@@ -440,7 +440,7 @@ app.post("/api/getfolioapi", function (req, res) {
              }) // check if there is any occurence of the item in whole array
              .reverse()
              .map(JSON.parse);
-             resdata.data = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
+             resdata.data = datacon.sort((a, b) => (a.amc_code > b.amc_code) ? 1 : -1);
          res.send(resdata);
          return resdata;
      }else{
@@ -466,7 +466,6 @@ app.post("/api/getfolioapi", function (req, res) {
     console.log(err)
 }
 })
-
 
 app.post("/api/PANVerification", function (req, res) {
     try {
