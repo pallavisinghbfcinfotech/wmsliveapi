@@ -338,7 +338,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
 }
 })
 
-app.post("/api/getfolioapi", function (req, res) {
+app.post("/api/getfolio", function (req, res) {
     try{
         if(req.body.per_status === "Individual"){
             pipeline1 = [  //trans_cams
