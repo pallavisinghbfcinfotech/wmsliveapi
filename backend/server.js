@@ -338,7 +338,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
 }
 })
 
-app.post("/api/getfolio", function (req, res) {
+app.post("/api/getfolioapi", function (req, res) {
     try{
         if(req.body.per_status === "Individual"){
             pipeline1 = [  //trans_cams
@@ -369,6 +369,11 @@ app.post("/api/getfolio", function (req, res) {
                 transk.aggregate(pipeline2, (err, karvydata) => {
                     transf.aggregate(pipeline3, (err, frankdata) => {
               if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+                resdata = {
+                    status: 200,
+                    message: 'Successful',
+                    data:frankdata
+                }
                  var datacon = frankdata.concat(karvydata.concat(camsdata))
                  var removeduplicates = Array.from(new Set(datacon));
                  datacon = removeduplicates.map(JSON.stringify)
@@ -378,12 +383,12 @@ app.post("/api/getfolio", function (req, res) {
                      }) // check if there is any occurence of the item in whole array
                      .reverse()
                      .map(JSON.parse);
-                     datacon = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
-                 res.send(datacon);
-                 return datacon;
+                     resdata.data = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
+                 res.send(resdata);
+                 return resdata;
              }else{
                 resdata = {
-                    status: 300,
+                    status: 400,
                     message: 'Data not found',
                 }
                 res.send(resdata);
@@ -398,30 +403,35 @@ app.post("/api/getfolio", function (req, res) {
         { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE:"$AMC_CODE" } } },
         { $lookup: { from: 'amc_list', localField: '_id.AMC_CODE', foreignField: 'amc_code', as: 'amclist' } },
         { $unwind: "$amclist" },
-        { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIOCHK"  } },
-        { $sort: {AMC:1}}
+        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIOCHK"  } },
+        { $sort: {amc_code:1}}
     ]
     pipeline2 = [  //trans_karvy
         { $match:{ GUARDPANNO:req.body.pan,INVNAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { ACNO: "$ACNO", FUND:"$FUND" } } },
         { $lookup: { from: 'amc_list', localField: '_id.FUND', foreignField: 'amc_code', as: 'amclist' } },
         { $unwind: "$amclist" },
-        { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.ACNO"  } },
-        { $sort: {AMC:1}}
+        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.ACNO"  } },
+        { $sort: {amc_code:1}}
     ]
     pipeline3 = [  //trans_franklin
         { $match:{ GUARDIAN20:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' }} },
         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE:"$COMP_CODE" } } },
         { $lookup: { from: 'amc_list', localField: '_id.COMP_CODE', foreignField: 'amc_code', as: 'amclist' } },
         { $unwind: "$amclist" },
-        { $project: { _id: 0, AMC: "$amclist.long_name" , FOLIO:"$_id.FOLIO_NO"  } },
-        { $sort: {AMC:1}}
+        { $project: { _id: 0, amc_code: "$amclist.long_name" , folio:"$_id.FOLIO_NO"  } },
+        { $sort: {amc_code:1}}
     ]
     folioc.aggregate(pipeline1, (err, camsdata) => {
         foliok.aggregate(pipeline2, (err, karvydata) => {
             foliof.aggregate(pipeline3, (err, frankdata) => {
       if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
-         var datacon = frankdata.concat(karvydata.concat(camsdata))
+            resdata = {
+                status: 200,
+                message: 'Successful',
+                data:frankdata
+            }
+         var datacon = frankdata.concat(karvydata.concat(camsdata));
          var removeduplicates = Array.from(new Set(datacon));
          datacon = removeduplicates.map(JSON.stringify)
              .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -430,12 +440,12 @@ app.post("/api/getfolio", function (req, res) {
              }) // check if there is any occurence of the item in whole array
              .reverse()
              .map(JSON.parse);
-             datacon = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
-         res.send(datacon);
-         return datacon;
+             resdata.data = datacon.sort((a, b) => (a.AMC > b.AMC) ? 1 : -1);
+         res.send(resdata);
+         return resdata;
      }else{
         resdata = {
-            status: 500,
+            status: 400,
             message: 'Data not found',
         }
         res.send(resdata);
@@ -444,11 +454,19 @@ app.post("/api/getfolio", function (req, res) {
  });
 });
 });
-}
+}else{
+    resdata = {
+        status: 400,
+        message: 'Data not found',
+    }
+    res.send(resdata);
+    return resdata;
+ }
 } catch (err) {
     console.log(err)
 }
 })
+
 
 app.post("/api/PANVerification", function (req, res) {
     try {
