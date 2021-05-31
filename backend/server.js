@@ -983,7 +983,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                                 }
                              var strFolio = {$or:arr1};
        pipeline = [  ///trans_cams
-            { $match: { $and:  [ strFolio,{SCHEME: /Tax/ }, { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $match: { $and:  [ strFolio,{SCHEME: /Tax/ }, {$or: [{ TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } ] } },
             //{ $match: { $and:  [ { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } ,{SCHEME: /Tax/ }, { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },]},{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }} },
@@ -993,7 +993,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             { $sort: { TRADDATE: -1 } }
     ]
        pipeline1 = [  ///trans_karvy                                             
-            { $match: { $and: [strFolio,{$or: [{ FUNDDESC: /TAX/ } ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{ TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } },{ TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $match: { $and: [strFolio,{$or: [{ FUNDDESC: /TAX/ } ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [{ TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
@@ -1002,7 +1002,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             { $sort: { TRADDATE: -1 } }
     ]
        pipeline2 = [  ///trans_franklin
-            { $match: { $and: [ {$or: [ { SCHEME_NA1: /TAX/ },{ SCHEME_NA1: /Taxshield/ } ] }, { AMOUNT: { $gte: 0 } } ,{$or: [ { TRXN_TYPE: { $not: /^SIPR.*/ } },{ TRXN_TYPE: { $not: /^TO.*/ } },{ TRXN_TYPE: { $not: /^DP.*/ } },{ TRXN_TYPE: { $not: /^RED.*/ } },{ TRXN_TYPE: { $not: /^REDR.*/ } },{ TRXN_TYPE: { $not: /^Gross Dividend.*/ } }, { TRXN_TYPE: { $not: /^Dividend Paid.*/ } }, { TRXN_TYPE: { $not: /^SWOF.*/ } }, { TRXN_TYPE: { $not: /^Transfer-Out.*/ } }, { TRXN_TYPE: { $not: /^Lateral Shift Out.*/ } } ] } , { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
+            { $match: { $and: [ strFolio, {$or: [ { SCHEME_NA1: /TAX/ },{ SCHEME_NA1: /Taxshield/ } ] }, { AMOUNT: { $gte: 0 } } ,{$or: [ { TRXN_TYPE: { $not: /^SIPR.*/ } },{ TRXN_TYPE: { $not: /^TO.*/ } },{ TRXN_TYPE: { $not: /^DP.*/ } },{ TRXN_TYPE: { $not: /^RED.*/ } },{ TRXN_TYPE: { $not: /^REDR.*/ } },{ TRXN_TYPE: { $not: /^Gross Dividend.*/ } }, { TRXN_TYPE: { $not: /^Dividend Paid.*/ } }, { TRXN_TYPE: { $not: /^SWOF.*/ } }, { TRXN_TYPE: { $not: /^Transfer-Out.*/ } }, { TRXN_TYPE: { $not: /^Lateral Shift Out.*/ } } ] } , { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
             { $group: { _id: {  SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE"  } } },
             { $project: { _id: 0,PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } } } },
             { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
@@ -1064,15 +1064,21 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                             } if (datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "Fresh Purchase") {
                                 datacon[i]['TRXN_NATUR'] = "Purchase";
                             }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
-                            datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+                               datacon[i]['TRXN_NATUR'] === "ADDPUR") {
                                datacon[i]['TRXN_NATUR'] = "Add. Purchase";
-                           }if (datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || datacon[i]['TRXN_NATUR'] === "NFO Purchase" || 
-                           datacon[i]['TRXN_NATUR'] === "Initial Allotment" || datacon[i]['TRXN_NATUR'] === "NEWPUR" ) {
+                           }if(datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || datacon[i]['TRXN_NATUR'] === "NFO Purchase" || 
+                               datacon[i]['TRXN_NATUR'] === "Initial Allotment" || datacon[i]['TRXN_NATUR'] === "NEWPUR" ) {
                                datacon[i]['TRXN_NATUR'] = "Purchase";
-                           }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
-                           || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
-                           || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
-                               datacon[i]['TRXN_NATUR'] = "Switch In";
+                           }if(datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
+                                || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
+                                || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
+                                datacon[i]['TRXN_NATUR'] = "Switch In";
+                            }if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+                                datacon[i]['PER_STATUS'] = "Minor";      
+                            }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
+                                 datacon[i]['PER_STATUS'] = "Individual";
+                            }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+                                datacon[i]['PER_STATUS'] = "HUF";
                            }
                         }
                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
@@ -1086,10 +1092,113 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
            });
        });
            }else{
-               resdata = {
-                   status: 400,
-                   message: 'Data not found',
-               }
+            pipeline = [  ///trans_cams
+            { $match: { $and:  [{ PAN: req.body.pan }, {SCHEME: /Tax/ }, {$or: [{ TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } ] } },
+            //{ $match: { $and:  [ { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } ,{SCHEME: /Tax/ }, { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },]},{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
+            { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }} },
+            { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+            { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+            { $sort: { TRADDATE: -1 } }
+    ]
+       pipeline1 = [  ///trans_karvy                                             
+            { $match: { $and: [{ PAN1: req.body.pan },{$or: [{ FUNDDESC: /TAX/ },{ FUNDDESC: /Tax/ }  ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [{ TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
+            { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
+            { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
+            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+            { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+            { $sort: { TRADDATE: -1 } }
+    ]
+       pipeline2 = [  ///trans_franklin
+            { $match: { $and: [ { IT_PAN_NO1: req.body.pan }, {$or: [ { SCHEME_NA1: /TAX/ },{ SCHEME_NA1: /Taxshield/ } ] }, { AMOUNT: { $gte: 0 } } ,{$or: [ { TRXN_TYPE: { $not: /^SIPR.*/ } },{ TRXN_TYPE: { $not: /^TO.*/ } },{ TRXN_TYPE: { $not: /^DP.*/ } },{ TRXN_TYPE: { $not: /^RED.*/ } },{ TRXN_TYPE: { $not: /^REDR.*/ } },{ TRXN_TYPE: { $not: /^Gross Dividend.*/ } }, { TRXN_TYPE: { $not: /^Dividend Paid.*/ } }, { TRXN_TYPE: { $not: /^SWOF.*/ } }, { TRXN_TYPE: { $not: /^Transfer-Out.*/ } }, { TRXN_TYPE: { $not: /^Lateral Shift Out.*/ } } ] } , { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
+            { $group: { _id: {  SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE"  } } },
+            { $project: { _id: 0,PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } } } },
+            { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
+            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+            { $project: { detail: 0 ,_id:0,TAX_STATUS:0,FOLIO_NO:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
+            { $sort: { TRADDATE: -1 } }
+    ]
+    transc.aggregate(pipeline, (err, camsdata) => {
+        transk.aggregate(pipeline1, (err, karvydata) => {
+           transf.aggregate(pipeline2, (err, frankdata) => {
+               if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+                 resdata = {
+                       status: 200,
+                       message: 'Successfull',
+                       data: frankdata
+                   }
+              
+               var datacon = frankdata.concat(karvydata.concat(camsdata));
+               
+              datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                   .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                   .reverse().map(JSON.parse);
+                   var newdata1 = datacon.map(item=>{
+                       return [JSON.stringify(item),item]
+                        }); // creates array of array
+                   var maparr1 = new Map(newdata1); // create key value pair from array of array
+                   datacon = [...maparr1.values()];//converting back to array from mapobject 
+                datacon = datacon.map(function(obj) {
+                  if(obj['GUARDIANN0']){
+                      obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+                      obj['GUARD_PAN'] = obj['GUARDPANNO'];
+                       // Delete old key
+                            delete obj['GUARDIANN0'];
+                            delete obj['GUARDPANNO'];
+                  }else if((obj['GUARDIANN0']) === ""){
+                          obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+                          obj['GUARD_PAN'] = obj['GUARDPANNO'];
+                          delete obj['GUARDIANN0'];
+                          delete obj['GUARDPANNO'];
+                      }
+                  if(obj['GUARDIAN20'] === ""){
+                      obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+                       // Delete old key
+                      delete obj['GUARDIAN20'];
+                  }else if((obj['GUARDIAN20']) === ""){
+                      obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+                      delete obj['GUARDIAN20'];
+                  }
+                      return obj;
+                  });
+
+                   for (var i = 0; i < datacon.length; i++) {
+                       if (datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Withdrawal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)) {
+                           datacon[i]['TRXN_NATUR'] = "SIP";
+                       } if (Math.sign(datacon[i]['AMOUNT']) === -1) {
+                           datacon[i]['TRXN_NATUR'] = "SIPR";
+                       } if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)) {
+                           datacon[i]['TRXN_NATUR'] = "STP";
+                       } if (datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "Fresh Purchase") {
+                           datacon[i]['TRXN_NATUR'] = "Purchase";
+                       }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
+                          datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+                          datacon[i]['TRXN_NATUR'] = "Add. Purchase";
+                      }if(datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || datacon[i]['TRXN_NATUR'] === "NFO Purchase" || 
+                          datacon[i]['TRXN_NATUR'] === "Initial Allotment" || datacon[i]['TRXN_NATUR'] === "NEWPUR" ) {
+                          datacon[i]['TRXN_NATUR'] = "Purchase";
+                      }if(datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
+                           || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
+                           || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
+                           datacon[i]['TRXN_NATUR'] = "Switch In";
+                       }if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+                           datacon[i]['PER_STATUS'] = "Minor";      
+                       }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
+                            datacon[i]['PER_STATUS'] = "Individual";
+                       }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+                           datacon[i]['PER_STATUS'] = "HUF";
+                      }
+                   }
+                   resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
+                   res.json(resdata);
+                  return resdata;
+                  } 
+                  
+               });
+           });
+        });
               }       
            });
        }
@@ -1097,6 +1206,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
        console.log(err)
    }
    })
+
 
 // app.post("/api/gettaxsavinguserwise", function (req, res) {
 //     try{
