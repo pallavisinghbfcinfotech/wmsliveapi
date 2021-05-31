@@ -1553,7 +1553,6 @@ app.post("/api/getdividend", function (req, res) {
             var secyer = req.body.toyear;
             yer = yer + "-04-01";
             secyer = secyer + "-03-31"
-            var name=req.body.name;
             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
@@ -1670,7 +1669,7 @@ app.post("/api/getdividend", function (req, res) {
     });
 });
     }else if(req.body.pan != ""){
-        var name=req.body.name;
+        
              pipeline = [  ///trans_cams                                                                    
                 { $match: { $and: [{ TRXN_NATUR: /Div/ },{ PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
