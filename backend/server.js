@@ -1553,6 +1553,7 @@ app.post("/api/getdividend", function (req, res) {
             var secyer = req.body.toyear;
             yer = yer + "-04-01";
             secyer = secyer + "-03-31"
+
             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
@@ -1661,15 +1662,21 @@ app.post("/api/getdividend", function (req, res) {
                 resdata.data = datacon;
                 res.json(resdata);
                 return resdata;
-                } 
+                } else{
+                    resdata = {
+                        status: 400,
+                        message: 'Data Not Found',
+                    }
+                    res.json(resdata);
+                    return resdata;
+                }
                 
              });
          });
       });
     });
 });
-    }else if(req.body.pan != ""){
-        
+    }else{     
              pipeline = [  ///trans_cams                                                                    
                 { $match: { $and: [{ TRXN_NATUR: /Div/ },{ PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
@@ -1705,33 +1712,32 @@ app.post("/api/getdividend", function (req, res) {
                                 status: 200,
                                 message: 'Successfull',
                                 data: frankdata
-                            }
-                        } else {
-                            resdata = {
-                                status: 400,
-                                message: 'Data not found',
-                            }
-                        }
+                            } 
                         var datacon = frankdata.concat(karvydata.concat(camsdata))
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                             .reverse().map(JSON.parse);
                         resdata.data = datacon;
-                        res.json(resdata)
-                        return resdata
-                    });
+                        res.json(resdata);
+                        return resdata;
+                    }else {
+                        resdata = {
+                            status: 400,
+                            message: 'Data not found',
+                        }
+                        res.json(resdata);
+                        return resdata;
+                    }
                 });
-            })
-        }else{
-
-        }
-       });       
+            });
+        });
+     }
+ });       
     }
 } catch (err) {
 console.log(err)
 }
 });
-
 
 // app.post("/api/gettransactionuserwise1", function (req, res) {
 //     try{
