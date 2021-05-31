@@ -338,7 +338,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
 }
 })
 
-app.post("/api/getfolioapi", function (req, res) {
+app.post("/api/getfolio", function (req, res) {
     try{
         var perstatus = req.body.per_status;
         var statusvalue ="Minor";
