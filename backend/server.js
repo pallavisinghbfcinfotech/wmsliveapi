@@ -340,8 +340,9 @@ app.post("/api/userProfileMemberList", function (req, res) {
 
 app.post("/api/getfolio", function (req, res) {
     try{
-        //if(req.body.per_status === "Individual"){
-      if(req.body.per_status === "Minor"){
+        var perstatus = req.body.per_status;
+        var statusvalue ="Minor";
+        if(perstatus.toLowerCase() === statusvalue.toLowerCase()){
     pipeline1 = [  //folio_cams
         { $match:{  GUARD_PAN:req.body.pan,INV_NAME:{$regex : `^${req.body.name}.*` , $options: 'i' } } },
         { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE:"$AMC_CODE" } } },
