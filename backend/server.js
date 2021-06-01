@@ -2473,7 +2473,7 @@ console.log(err)
 
 app.post("/api/gettransactionuserwise", function (req, res) {
     try{
-        var member="";
+        var member="";var guardpan1=[];var guardpan2=[];
         var arr1=[];var arr2=[];var arr3=[];var alldata=[];var arrFolio=[];var arrName=[];
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if(req.body.month ===""){
@@ -2503,23 +2503,31 @@ app.post("/api/gettransactionuserwise", function (req, res) {
              family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+                    guardpan1.push({GUARD_PAN:req.body.pan.toUpperCase()});
+                    guardpan2.push({GUARDPANNO:req.body.pan.toUpperCase()});
                     arr1.push({PAN:req.body.pan.toUpperCase()});
-                    arr2.push({GUARD_PAN:req.body.pan.toUpperCase()});
-                    arr3.push({GUARDPANNO:req.body.pan.toUpperCase()});
+                    arr2.push({PAN1:req.body.pan.toUpperCase()});
+                    arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
                     for(var j=0;j<member.length;j++){     
-                    arr1.push({PAN:member[j]}); 
-                    arr2.push({GUARD_PAN:member[j]});
-                    arr3.push({GUARDPANNO:member[j]});
+                    guardpan1.push({GUARD_PAN:member[j]}); 
+                    guardpan2.push({GUARDPANNO:member[j]});
+                    arr1.push({PAN:member[j]});
+                    arr2.push({PAN1:member[j]});
+                    arr3.push({IT_PAN_NO1:member[j]});
                     }
-                    var strPan2 = {$or:arr2};
-                    var strPan3 = {$or:arr3};
-                    folioc.find(strPan2).distinct("FOLIOCHK", function (err, member1) {
-                      foliok.find(strPan3).distinct("ACNO", function (err, member2) {
+                    var strPan1 = {$or:guardpan1};
+                    var strPan2 = {$or:guardpan2};
+                    folioc.find(strPan1).distinct("FOLIOCHK", function (err, member1) {
+                      foliok.find(strPan2).distinct("ACNO", function (err, member2) {
                       var alldata = member1.concat(member2);   
-                            for(var j=0;j<alldata.length;j++){     
-                                arr1.push({FOLIO_NO:alldata[j]});
-                                }
-                             var strFolio = {$or:arr1};
+                      for(var j=0;j<alldata.length;j++){     
+                        arr1.push({FOLIO_NO:alldata[j]});
+                        arr2.push({TD_ACNO:alldata[j]});
+                        arr3.push({FOLIO_NO:alldata[j]});
+                        }
+                        var strFolio = {$or:arr1};
+                        var strFolio1 = {$or:arr2};
+                        var strFolio2 = {$or:arr3};
         pipeline = [  ///trans_cams
             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
@@ -2532,7 +2540,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
          pipeline1 = [  ///trans_karvy
             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio ] } },
+            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio1 ] } },
             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
             { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
@@ -2541,7 +2549,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
          pipeline2 = [  ///trans_franklin
             { $group: { _id: { SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
             { $project: { _id: 0, PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio] } },
+            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio2] } },
             { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
             { $project: { detail: 0 ,_id:0,TAX_STATUS:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
@@ -2565,6 +2573,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                  }); // creates array of array
                                  var maparr1 = new Map(newdata1); // create key value pair from array of array
                                  datacon = [...maparr1.values()];//converting back to array from mapobject 
+
                               datacon = datacon.map(function(obj) {
                                 if(obj['GUARDIANN0']){
                                     obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
@@ -2578,7 +2587,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                         delete obj['GUARDIANN0'];
                                         delete obj['GUARDPANNO'];
                                     }
-                                if(obj['GUARDIAN20'] === ""){
+                                if(obj['GUARDIAN20']){
                                     obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
                                      // Delete old key
                                     delete obj['GUARDIAN20'];
@@ -2587,6 +2596,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                     delete obj['GUARDIAN20'];
                                 }
                                     return obj;
+                                
                                 });
 
                         for (var i = 0; i < datacon.length; i++) {
@@ -2698,6 +2708,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                             .reverse().map(JSON.parse);
+
                             datacon = datacon.map(function(obj) {
                             if(obj['GUARDIANN0']){
                                 obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
@@ -2711,7 +2722,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                     delete obj['GUARDIANN0'];
                                     delete obj['GUARDPANNO'];
                                 }
-                            if(obj['GUARDIAN20'] === ""){
+                            if(obj['GUARDIAN20']){
                                 obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
                                  // Delete old key
                                 delete obj['GUARDIAN20'];
