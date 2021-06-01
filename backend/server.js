@@ -1480,7 +1480,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                             delete obj['GUARDIANN0'];
                                                             delete obj['GUARDPANNO'];
                                                         }
-                                                    if(obj['GUARDIAN20'] === ""){
+                                                    if(obj['GUARDIAN20']){
                                                         obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
                                                          // Delete old key
                                                         delete obj['GUARDIAN20'];
