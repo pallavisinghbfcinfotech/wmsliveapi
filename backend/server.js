@@ -1361,7 +1361,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
 // }
 // })
 
-app.post("/api/getsipstpuserwise", function (req, res) {
+app.post("/api/getsipstpuserwiseapi", function (req, res) {
     try{
         var member="";
         var guardpan1=[];var guardpan2=[];
@@ -1590,6 +1590,7 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                            console.log(err)
                        }
                        })
+
 
 // app.post("/api/getdividendscheme", function (req, res) {
 //     try{
