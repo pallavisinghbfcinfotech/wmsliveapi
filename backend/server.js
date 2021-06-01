@@ -1746,7 +1746,7 @@ app.post("/api/getdividendscheme", function (req, res) {
     console.log(err)
 }
 });
-// app.post("/api/getdividend", function (req, res) {
+// app.post("/api/getdividend1", function (req, res) {
 //     try{
 //     var yer = req.body.fromyear;
 //     var secyer = req.body.toyear;
@@ -1808,10 +1808,228 @@ app.post("/api/getdividendscheme", function (req, res) {
 // }
 // });
 
+// app.post("/api/getdividend2", function (req, res) {
+//     try{
+//         var member="";
+//         var arr1=[];var arr2=[];var arr3=[];var alldata=[];var arrFolio=[];var arrName=[];
+//         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+//         if(req.body.fromyear ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter from year',
+//             }
+            
+//         }else if(req.body.toyear ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter to year',
+//             }
+//         }else if(req.body.pan ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter pan',
+//             }
+//         }else if(!regex.test(req.body.pan)) {
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter valid pan',
+//             }
+//         }else{
+            
+//             var yer = req.body.fromyear;
+//             var secyer = req.body.toyear;
+//             yer = yer + "-04-01";
+//             secyer = secyer + "-03-31"
+
+//             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
+//                 if(member!=""){
+//                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+//                     arr1.push({PAN:req.body.pan.toUpperCase()});
+//                     arr2.push({GUARD_PAN:req.body.pan.toUpperCase()});
+//                     arr3.push({GUARDPANNO:req.body.pan.toUpperCase()});
+//                     for(var j=0;j<member.length;j++){     
+//                     arr1.push({PAN:member[j]}); 
+//                     arr2.push({GUARD_PAN:member[j]});
+//                     arr3.push({GUARDPANNO:member[j]});
+//                     }
+//                     var strPan2 = {$or:arr2};
+//                     var strPan3 = {$or:arr3};
+
+//                     folioc.find(strPan2).distinct("FOLIOCHK", function (err, member1) {
+//                       foliok.find(strPan3).distinct("ACNO", function (err, member2) {
+//                       var alldata = member1.concat(member2);   
+//                             for(var j=0;j<alldata.length;j++){     
+//                                 arr1.push({FOLIO_NO:alldata[j]});
+//                                 arr2.push({TD_ACNO:alldata[j]});
+//                                 arr3.push({FOLIO_NO:alldata[j]});
+//                                 }
+//                              var strFolio = {$or:arr1};
+//                              var strFolio1 = {$or:arr2};
+//                              var strFolio2 = {$or:arr3};
+                            
+//     const pipeline = [  ///trans_cams                                                     
+//             { $match: { $and: [strFolio,{ TRXN_NATUR: /Div/ },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//             { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//             { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT" } } },
+//             { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+//             { $sort: { TRADDATE: -1 } }
+//     ]
+//     const pipeline1 = [  ///trans_karvy
+//             { $match: { $and: [ strFolio1, { TRDESC: /Div/ }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//             { $group: { _id: { PAN1:"$PAN1",STATUS:"$STATUS",FUNDDESC: "$FUNDDESC", TD_ACNO:"$TD_ACNO",INVNAME: "$INVNAME" }, TD_AMT: { $sum: "$TD_AMT" } } },
+//             { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
+//             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+//             { $sort: { TRADDATE: -1 } }
+//     ]
+//     const pipeline2 = [  ///trans_franklin
+//             { $match: { $and: [strFolio2, { $or: [{ TRXN_TYPE: /DIR/ }, { TRXN_TYPE: /DP/ }] }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//             { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",SOCIAL_S18:"$SOCIAL_S18",SCHEME_NA1: "$SCHEME_NA1",FOLIO_NO:"$FOLIO_NO", INVESTOR_2: "$INVESTOR_2" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//             { $project: { _id: 0,PAN:"$_id.IT_PAN_NO1",PER_STATUS:"$_id.SOCIAL_S18", SCHEME: "$_id.SCHEME_NA1", FOLIO_NO:"$_id.FOLIO_NO",INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT" } } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
+//             { $project: { detail: 0 ,_id:0,TAX_STATUS:0,FOLIO_NO:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
+//             { $sort: { TRADDATE: -1 } }
+//     ]
+
+//     transc.aggregate(pipeline, (err, camsdata) => {
+//         transk.aggregate(pipeline1, (err, karvydata) => {
+//             transf.aggregate(pipeline2, (err, frankdata) => {
+//                 if (camsdata != 0 || karvydata != 0 || frankdata != 0) {
+//                     resdata = {
+//                         status: 200,
+//                         message: 'Successfull',
+//                         data: frankdata
+//                     }
+               
+//                 var datacon = frankdata.concat(karvydata.concat(camsdata))
+//                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+//                         .reverse().map(JSON.parse);
+//                         var newdata1 = datacon.map(item=>{
+//                             return [JSON.stringify(item),item]
+//                              }); // creates array of array
+//                         var maparr1 = new Map(newdata1); // create key value pair from array of array
+//                         datacon = [...maparr1.values()];//converting back to array from mapobject 
+//                      datacon = datacon.map(function(obj) {
+//                        if(obj['GUARDIANN0']){
+//                            obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                            obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                             // Delete old key
+//                                  delete obj['GUARDIANN0'];
+//                                  delete obj['GUARDPANNO'];
+//                        }else if((obj['GUARDIANN0']) === ""){
+//                                obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                                obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                                delete obj['GUARDIANN0'];
+//                                delete obj['GUARDPANNO'];
+//                            }
+//                        if(obj['GUARDIAN20'] === ""){
+//                            obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                             // Delete old key
+//                            delete obj['GUARDIAN20'];
+//                        }else if((obj['GUARDIAN20']) === ""){
+//                            obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                            delete obj['GUARDIAN20'];
+//                        }
+//                            return obj;
+//                        });
+//                        for (var i = 0; i < datacon.length; i++) {
+//                        if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+//                         datacon[i]['PER_STATUS'] = "Minor";      
+//                     }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
+//                          datacon[i]['PER_STATUS'] = "Individual";
+//                     }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+//                         datacon[i]['PER_STATUS'] = "HUF";
+//                    }
+//                 }
+//                 resdata.data = datacon;
+//                 res.json(resdata);
+//                 return resdata;
+//                 } else{
+//                     resdata = {
+//                         status: 400,
+//                         message: 'Data Not Found',
+//                     }
+//                     res.json(resdata);
+//                     return resdata;
+//                 }
+                
+//              });
+//          });
+//       });
+//     });
+// });
+//     }else{     
+//              pipeline = [  ///trans_cams                                                                    
+//                 { $match: { $and: [{ TRXN_NATUR: /Div/ },{ PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//                 { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//                 { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT" } } },
+//                 { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]
+//              pipeline1 = [  ///trans_karvy
+//                 { $match: { $and: [{ TRDESC: /Div/ }, { PAN1: req.body.pan }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//                 { $group: { _id: { PAN1:"$PAN1",STATUS:"$STATUS",FUNDDESC: "$FUNDDESC", TD_ACNO:"$TD_ACNO",INVNAME: "$INVNAME" }, TD_AMT: { $sum: "$TD_AMT" } } },
+//                 { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
+//                 { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]
+//              pipeline2 = [  ///trans_franklin
+//                 { $match: { $and: [ { $or: [{ TRXN_TYPE: /DIR/ }, { TRXN_TYPE: /DP/ }] },{ IT_PAN_NO1: req.body.pan }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+//                 { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",SOCIAL_S18:"$SOCIAL_S18",SCHEME_NA1: "$SCHEME_NA1",FOLIO_NO:"$FOLIO_NO", INVESTOR_2: "$INVESTOR_2" }, AMOUNT: { $sum: "$AMOUNT" } } },
+//                 { $project: { _id: 0,PAN:"$_id.IT_PAN_NO1",PER_STATUS:"$_id.SOCIAL_S18", SCHEME: "$_id.SCHEME_NA1", FOLIO_NO:"$_id.FOLIO_NO",INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT" } } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
+//                 { $project: { detail: 0 ,_id:0,TAX_STATUS:0,FOLIO_NO:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]       
+//             transc.aggregate(pipeline, (err, camsdata) => {
+//                 transk.aggregate(pipeline1, (err, karvydata) => {
+//                     transf.aggregate(pipeline2, (err, frankdata) => {
+//                         if (camsdata != 0 || karvydata != 0 || frankdata != 0) {
+//                             resdata = {
+//                                 status: 200,
+//                                 message: 'Successfull',
+//                                 data: frankdata
+//                             } 
+//                         var datacon = frankdata.concat(karvydata.concat(camsdata))
+//                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+//                             .reverse().map(JSON.parse);
+//                         resdata.data = datacon;
+//                         res.json(resdata);
+//                         return resdata;
+//                     }else {
+//                         resdata = {
+//                             status: 400,
+//                             message: 'Data not found',
+//                         }
+//                         res.json(resdata);
+//                         return resdata;
+//                     }
+//                 });
+//             });
+//         });
+//      }
+//  });       
+//     }
+// } catch (err) {
+// console.log(err)
+// }
+// });
+
 app.post("/api/getdividend", function (req, res) {
     try{
         var member="";
-        var arr1=[];var arr2=[];var arr3=[];var alldata=[];var arrFolio=[];var arrName=[];
+        var guardpan1=[];var guardpan2=[];var alldata=[];var arrFolio=[];var arrName=[];
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if(req.body.fromyear ===""){
             resdata = {
@@ -1840,52 +2058,61 @@ app.post("/api/getdividend", function (req, res) {
             var secyer = req.body.toyear;
             yer = yer + "-04-01";
             secyer = secyer + "-03-31"
-
+            var arr1=[];var arr2=[];var arr3=[];
             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+                    guardpan1.push({GUARD_PAN:req.body.pan.toUpperCase()});
+                    guardpan2.push({GUARDPANNO:req.body.pan.toUpperCase()});
                     arr1.push({PAN:req.body.pan.toUpperCase()});
-                    arr2.push({GUARD_PAN:req.body.pan.toUpperCase()});
-                    arr3.push({GUARDPANNO:req.body.pan.toUpperCase()});
+                    arr2.push({PAN1:req.body.pan.toUpperCase()});
+                    arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
                     for(var j=0;j<member.length;j++){     
-                    arr1.push({PAN:member[j]}); 
-                    arr2.push({GUARD_PAN:member[j]});
-                    arr3.push({GUARDPANNO:member[j]});
+                        guardpan1.push({GUARD_PAN:member[j]}); 
+                        guardpan2.push({GUARDPANNO:member[j]});
+                        arr1.push({PAN:member[j]});
+                        arr2.push({PAN1:member[j]});
+                        arr3.push({IT_PAN_NO1:member[j]});
                     }
-                    var strPan2 = {$or:arr2};
-                    var strPan3 = {$or:arr3};
-
-                    folioc.find(strPan2).distinct("FOLIOCHK", function (err, member1) {
-                      foliok.find(strPan3).distinct("ACNO", function (err, member2) {
+                    var strPan1 = {$or:guardpan1};
+                    var strPan2 = {$or:guardpan2};
+                    
+                    //arr1.push({PAN:arr1});
+                  
+                    folioc.find(strPan1).distinct("FOLIOCHK", function (err, member1) {
+                      foliok.find(strPan2).distinct("ACNO", function (err, member2) {
                       var alldata = member1.concat(member2);   
+                     
+                     
                             for(var j=0;j<alldata.length;j++){     
                                 arr1.push({FOLIO_NO:alldata[j]});
                                 arr2.push({TD_ACNO:alldata[j]});
                                 arr3.push({FOLIO_NO:alldata[j]});
                                 }
+                               
                              var strFolio = {$or:arr1};
                              var strFolio1 = {$or:arr2};
                              var strFolio2 = {$or:arr3};
                             
-    const pipeline = [  ///trans_cams                                                     
+     pipeline = [  ///trans_cams                                                     
             { $match: { $and: [strFolio,{ TRXN_NATUR: /Div/ },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
-            { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
-            { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT" } } },
+            { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME"  }, AMOUNT: { $sum: "$AMOUNT" } } },
+            { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT"  } } },
             { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
             { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
             { $sort: { TRADDATE: -1 } }
     ]
-    const pipeline1 = [  ///trans_karvy
-            { $match: { $and: [ strFolio1, { TRDESC: /Div/ }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+     pipeline1 = [  ///trans_karvy
+            { $match: { $and: [ strFolio1, { $or: [{TD_TRTYPE:/DIV/},{TRDESC: /.*Div.*/ } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
             { $group: { _id: { PAN1:"$PAN1",STATUS:"$STATUS",FUNDDESC: "$FUNDDESC", TD_ACNO:"$TD_ACNO",INVNAME: "$INVNAME" }, TD_AMT: { $sum: "$TD_AMT" } } },
-            { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
+            { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT"  } } },
             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
             { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
             { $sort: { TRADDATE: -1 } }
     ]
-    const pipeline2 = [  ///trans_franklin
+     pipeline2 = [  ///trans_franklin
             { $match: { $and: [strFolio2, { $or: [{ TRXN_TYPE: /DIR/ }, { TRXN_TYPE: /DP/ }] }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
             { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",SOCIAL_S18:"$SOCIAL_S18",SCHEME_NA1: "$SCHEME_NA1",FOLIO_NO:"$FOLIO_NO", INVESTOR_2: "$INVESTOR_2" }, AMOUNT: { $sum: "$AMOUNT" } } },
             { $project: { _id: 0,PAN:"$_id.IT_PAN_NO1",PER_STATUS:"$_id.SOCIAL_S18", SCHEME: "$_id.SCHEME_NA1", FOLIO_NO:"$_id.FOLIO_NO",INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT" } } },
@@ -1898,14 +2125,15 @@ app.post("/api/getdividend", function (req, res) {
     transc.aggregate(pipeline, (err, camsdata) => {
         transk.aggregate(pipeline1, (err, karvydata) => {
             transf.aggregate(pipeline2, (err, frankdata) => {
-                if (camsdata != 0 || karvydata != 0 || frankdata != 0) {
+                if ( karvydata != 0 ) {
                     resdata = {
                         status: 200,
                         message: 'Successfull',
                         data: frankdata
                     }
                
-                var datacon = frankdata.concat(karvydata.concat(camsdata))
+                var datacon = frankdata.concat(karvydata.concat(camsdata));
+                //console.log(datacon)
                 datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                         .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                         .reverse().map(JSON.parse);
@@ -1958,8 +2186,8 @@ app.post("/api/getdividend", function (req, res) {
                     return resdata;
                 }
                 
-             });
-         });
+              });
+          });
       });
     });
 });
@@ -1967,16 +2195,16 @@ app.post("/api/getdividend", function (req, res) {
              pipeline = [  ///trans_cams                                                                    
                 { $match: { $and: [{ TRXN_NATUR: /Div/ },{ PAN: req.body.pan }, { TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 { $group: { _id: { PAN:"$PAN", TAX_STATUS:"$TAX_STATUS",SCHEME: "$SCHEME",FOLIO_NO:"$FOLIO_NO", INV_NAME: "$INV_NAME" }, AMOUNT: { $sum: "$AMOUNT" } } },
-                { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT" } } },
+                { $project: { _id: 0,PAN:"$_id.PAN", PER_STATUS:"$_id.TAX_STATUS",SCHEME: "$_id.SCHEME",FOLIO_NO:"$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", AMOUNT: { $sum: "$AMOUNT"  } } },
                 { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
                 { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
                 { $sort: { TRADDATE: -1 } }
             ]
              pipeline1 = [  ///trans_karvy
-                { $match: { $and: [{ TRDESC: /Div/ }, { PAN1: req.body.pan }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
+                { $match: { $and: [{ $or: [{TD_TRTYPE:/DIV/},{TRDESC: /Div/ } ]}, { PAN1: req.body.pan }, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 { $group: { _id: { PAN1:"$PAN1",STATUS:"$STATUS",FUNDDESC: "$FUNDDESC", TD_ACNO:"$TD_ACNO",INVNAME: "$INVNAME" }, TD_AMT: { $sum: "$TD_AMT" } } },
-                { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT" } } },
+                { $project: { _id: 0,PAN:"$_id.PAN1",PER_STATUS:"$_id.STATUS", SCHEME: "$_id.FUNDDESC",FOLIO_NO:"$_id.TD_ACNO", INVNAME: "$_id.INVNAME", AMOUNT: { $sum: "$TD_AMT"  } } },
                 { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
                 { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
@@ -1985,7 +2213,7 @@ app.post("/api/getdividend", function (req, res) {
              pipeline2 = [  ///trans_franklin
                 { $match: { $and: [ { $or: [{ TRXN_TYPE: /DIR/ }, { TRXN_TYPE: /DP/ }] },{ IT_PAN_NO1: req.body.pan }, { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }] } },
                 { $group: { _id: { IT_PAN_NO1:"$IT_PAN_NO1",SOCIAL_S18:"$SOCIAL_S18",SCHEME_NA1: "$SCHEME_NA1",FOLIO_NO:"$FOLIO_NO", INVESTOR_2: "$INVESTOR_2" }, AMOUNT: { $sum: "$AMOUNT" } } },
-                { $project: { _id: 0,PAN:"$_id.IT_PAN_NO1",PER_STATUS:"$_id.SOCIAL_S18", SCHEME: "$_id.SCHEME_NA1", FOLIO_NO:"$_id.FOLIO_NO",INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT" } } },
+                { $project: { _id: 0,PAN:"$_id.IT_PAN_NO1",PER_STATUS:"$_id.SOCIAL_S18", SCHEME: "$_id.SCHEME_NA1", FOLIO_NO:"$_id.FOLIO_NO",INVNAME: "$_id.INVESTOR_2", AMOUNT: { $sum: "$AMOUNT"  } } },
                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
                 { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
                 { $project: { detail: 0 ,_id:0,TAX_STATUS:0,FOLIO_NO:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
@@ -2025,6 +2253,7 @@ app.post("/api/getdividend", function (req, res) {
 console.log(err)
 }
 });
+
 
 // app.post("/api/gettransactionuserwise1", function (req, res) {
 //     try{
