@@ -292,13 +292,8 @@ app.post("/api/userProfileMemberList", function (req, res) {
                         message: 'Successfull',
                         data: camsdata
                     }
-                } else {
-                    resdata = {
-                        status: 400,
-                        message: 'Data not found',
-                    }
-                }
-                var datacon = frankdata.concat(karvydata.concat(camsdata))               
+                
+                var datacon = frankdata.concat(karvydata.concat(camsdata)) ;              
                          for (var i = 0; i < datacon.length; i++) {                                          
                           if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" 
                           || datacon[i]['PER_STATUS'] === "ON BEHALF OF MINOR" )  {
@@ -327,9 +322,85 @@ app.post("/api/userProfileMemberList", function (req, res) {
                      resdata.data = filtered;
                   res.json(resdata);
                 return resdata;
+            } else {
+                resdata = {
+                    status: 400,
+                    message: 'Data not found',
+                }
+            }
             });
          });
      });
+}else{
+    pipeline = [  ///trans_cams
+        { $match: {PAN:req.body.pan}},
+        { $group: { _id: {PAN: "$PAN",  INV_NAME: "$INV_NAME", TAX_STATUS:"$TAX_STATUS",} } },
+        { $lookup: { from: 'folio_cams', localField: '_id.PAN', foreignField: 'PAN_NO', as: 'detail' } },
+        { $unwind: "$detail" },
+        { $project: { _id: 0,PAN: "$_id.PAN",  INVNAME: { "$toUpper": ["$_id.INV_NAME"] } ,PER_STATUS:{ "$toUpper": ["$_id.TAX_STATUS" ] },JOINT_NAME1: { "$toUpper": ["$detail.JNT_NAME1"] },JOINT_NAME2: { "$toUpper": ["$detail.JNT_NAME2"] } } },     
+    ]
+     pipeline1 = [  ///trans_karvy
+        { $match: {PAN1:req.body.pan}},
+        { $group: { _id: { PAN1: "$PAN1",  INVNAME: "$INVNAME" ,STATUS:"$STATUS" } } },
+        { $lookup: { from: 'folio_karvy', localField: '_id.PAN1', foreignField: 'PANGNO', as: 'detail' } },
+        { $unwind: "$detail" },
+        { $project: { _id: 0,  PAN: "$_id.PAN1", INVNAME: { "$toUpper": ["$_id.INVNAME"] },PER_STATUS:{ "$toUpper": ["$_id.STATUS" ] },JOINT_NAME1: { "$toUpper": ["$detail.JTNAME1"] },JOINT_NAME2: { "$toUpper": ["$detail.JTNAME2"] } } },
+       
+    ]
+     pipeline2 = [  ///trans_franklin
+        { $match: {IT_PAN_NO1:req.body.pan}},
+        { $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1", INVESTOR_2:"$INVESTOR_2",SOCIAL_S18:"$SOCIAL_S18",JOINT_NAM1:"$JOINT_NAM1",JOINT_NAM2:"$JOINT_NAM2" } } },
+        { $project: { _id: 0,PAN: "$_id.IT_PAN_NO1",  INVNAME: { "$toUpper": ["$_id.INVESTOR_2"] } ,PER_STATUS:{ "$toUpper": ["$_id.SOCIAL_S18"] },JOINT_NAME1:{ "$toUpper": ["$_id.JOINT_NAM1"] },JOINT_NAME2:{ "$toUpper": ["$_id.JOINT_NAM2"] } } },
+       
+    ]
+    transc.aggregate(pipeline, (err, camsdata) => {
+        transk.aggregate(pipeline1, (err, karvydata) => {
+             transf.aggregate(pipeline2, (err, frankdata) => {
+               if ( camsdata != 0 || karvydata != 0 || frankdata!= 0) {
+                   resdata = {
+                       status: 200,
+                       message: 'Successfull',
+                       data: camsdata
+                   }
+               
+               var datacon = frankdata.concat(karvydata.concat(camsdata)) ;              
+                        for (var i = 0; i < datacon.length; i++) {                                          
+                         if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" 
+                         || datacon[i]['PER_STATUS'] === "ON BEHALF OF MINOR" )  {
+                            datacon[i]['PER_STATUS'] = "MINOR";      
+                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Individual"|| datacon[i]['PER_STATUS'] === "Resident Individual" || datacon[i]['PER_STATUS'] === "RESIDENT INDIVIDUAL" ) {
+                            datacon[i]['PER_STATUS'] = "INDIVIDUAL";
+                        }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+                           datacon[i]['PER_STATUS'] = "HUF";
+                         }
+                    }
+                    datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                    .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                    .reverse().map(JSON.parse);
+                    datacon = Array.from(new Set(datacon));
+                    var newdata1 = datacon.map(item=>{
+                       return [JSON.stringify(item),item]
+                        }); // creates array of array
+                        var maparr1 = new Map(newdata1); // create key value pair from array of array
+                        datacon = [...maparr1.values()];//converting back to array from mapobject 
+                        var filtered = datacon.filter(
+                           (temp => a =>
+                               (k => !temp[k] && (temp[k] = true))(a.INVNAME + '|' + a.PER_STATUS)
+                           )(Object.create(null))
+                       );
+                   
+                    resdata.data = filtered;
+                 res.json(resdata);
+               return resdata;
+           } else {
+               resdata = {
+                   status: 400,
+                   message: 'Data not found',
+               }
+           }
+           });
+        });
+    });
 }
             });
   }
