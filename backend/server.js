@@ -241,11 +241,15 @@ app.post("/api/userProfileMemberList", function (req, res) {
                 status: 400,
                 message: 'Please enter pan',
             }
+            res.json(resdata);
+            return resdata;
         }else if(!regex.test(req.body.pan)) {
             resdata = {
                 status: 400,
                 message: 'Please enter valid pan',
             }
+            res.json(resdata);
+            return resdata;
         }else{
             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
@@ -412,7 +416,6 @@ app.post("/api/userProfileMemberList", function (req, res) {
     console.log(err)
 }
 })
-
 
 app.post("/api/getfolio", function (req, res) {
     try{
