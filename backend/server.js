@@ -1451,22 +1451,29 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                 status: 400,
                 message: 'Please enter month',
             }
-            
+             res.json(resdata);
+             return resdata;
         }else if(req.body.year ===""){
             resdata = {
                 status: 400,
                 message: 'Please enter year',
             }
+	 res.json(resdata);
+         return resdata;
         }else if(req.body.pan ===""){
             resdata = {
                 status: 400,
                 message: 'Please enter pan',
             }
+	     res.json(resdata);
+             return resdata;
         }else if(!regex.test(req.body.pan)) {
             resdata = {
                 status: 400,
                 message: 'Please enter valid pan',
             }
+	    res.json(resdata);
+             return resdata;
         }else{
             var mon = parseInt(req.body.month);
             var yer = parseInt(req.body.year);
@@ -1666,6 +1673,8 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                 status: 400,
                                                 message: 'Data not found',
                                             }
+					    res.json(resdata)
+                                            return resdata;
                                         }
                                         });
                                     });
