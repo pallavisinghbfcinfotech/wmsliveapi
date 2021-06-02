@@ -327,6 +327,8 @@ app.post("/api/userProfileMemberList", function (req, res) {
                     status: 400,
                     message: 'Data not found',
                 }
+                res.json(resdata);
+                return resdata;
             }
             });
          });
@@ -393,10 +395,12 @@ app.post("/api/userProfileMemberList", function (req, res) {
                  res.json(resdata);
                return resdata;
            } else {
-               resdata = {
-                   status: 400,
-                   message: 'Data not found',
-               }
+            resdata = {
+                status: 400,
+                message: 'Data not found',
+            }
+            res.json(resdata);
+            return resdata;
            }
            });
         });
@@ -408,6 +412,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
     console.log(err)
 }
 })
+
 
 app.post("/api/getfolio", function (req, res) {
     try{
