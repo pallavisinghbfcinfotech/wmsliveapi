@@ -338,15 +338,15 @@ app.post("/api/userProfileMemberList", function (req, res) {
          });
      });
 }else{
-    pipeline = [  ///trans_cams
-        { $match: {PAN:req.body.pan}},
+  pipeline = [  ///trans_cams
+        { $match: {PAN:{$regex : `^${req.body.pan}.*` , $options: 'i' } } },
         { $group: { _id: {PAN: "$PAN",  INV_NAME: "$INV_NAME", TAX_STATUS:"$TAX_STATUS",} } },
         { $lookup: { from: 'folio_cams', localField: '_id.PAN', foreignField: 'PAN_NO', as: 'detail' } },
         { $unwind: "$detail" },
         { $project: { _id: 0,PAN: "$_id.PAN",  INVNAME: { "$toUpper": ["$_id.INV_NAME"] } ,PER_STATUS:{ "$toUpper": ["$_id.TAX_STATUS" ] },JOINT_NAME1: { "$toUpper": ["$detail.JNT_NAME1"] },JOINT_NAME2: { "$toUpper": ["$detail.JNT_NAME2"] } } },     
     ]
      pipeline1 = [  ///trans_karvy
-        { $match: {PAN1:req.body.pan}},
+        { $match: {PAN1:{$regex : `^${req.body.pan}.*` , $options: 'i' } } },
         { $group: { _id: { PAN1: "$PAN1",  INVNAME: "$INVNAME" ,STATUS:"$STATUS" } } },
         { $lookup: { from: 'folio_karvy', localField: '_id.PAN1', foreignField: 'PANGNO', as: 'detail' } },
         { $unwind: "$detail" },
@@ -354,7 +354,7 @@ app.post("/api/userProfileMemberList", function (req, res) {
        
     ]
      pipeline2 = [  ///trans_franklin
-        { $match: {IT_PAN_NO1:req.body.pan}},
+        { $match: {IT_PAN_NO1:{$regex : `^${req.body.pan}.*` , $options: 'i' } } },
         { $group: { _id: { IT_PAN_NO1: "$IT_PAN_NO1", INVESTOR_2:"$INVESTOR_2",SOCIAL_S18:"$SOCIAL_S18",JOINT_NAM1:"$JOINT_NAM1",JOINT_NAM2:"$JOINT_NAM2" } } },
         { $project: { _id: 0,PAN: "$_id.IT_PAN_NO1",  INVNAME: { "$toUpper": ["$_id.INVESTOR_2"] } ,PER_STATUS:{ "$toUpper": ["$_id.SOCIAL_S18"] },JOINT_NAME1:{ "$toUpper": ["$_id.JOINT_NAM1"] },JOINT_NAME2:{ "$toUpper": ["$_id.JOINT_NAM2"] } } },
        
