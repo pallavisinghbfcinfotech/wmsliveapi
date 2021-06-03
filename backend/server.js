@@ -1012,7 +1012,7 @@ app.post("/api/getamclist", function(req, res) {
 
 app.post("/api/gettaxsavinguserwise", function (req, res) {
     try{
-        var member="";
+        var member="";var guardpan1=[];var guardpan2=[];
         var arr1=[];var arr2=[];var arr3=[];var alldata=[];var arrFolio=[];var arrName=[];
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if(req.body.fromyear ===""){
@@ -1020,22 +1020,29 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                 status: 400,
                 message: 'Please enter from year',
             }
-            
+            res.json(resdata);
+            return resdata;
         }else if(req.body.toyear ===""){
             resdata = {
                 status: 400,
                 message: 'Please enter to year',
             }
+            res.json(resdata);
+            return resdata;
         }else if(req.body.pan ===""){
             resdata = {
                 status: 400,
                 message: 'Please enter pan',
             }
+            res.json(resdata);
+            return resdata;
         }else if(!regex.test(req.body.pan)) {
             resdata = {
                 status: 400,
                 message: 'Please enter valid pan',
             }
+            res.json(resdata);
+            return resdata;
         }else{
             var yer = req.body.fromyear;
             var secyer = req.body.toyear;
@@ -1044,27 +1051,34 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+                    guardpan1.push({GUARD_PAN:req.body.pan.toUpperCase()});
+                    guardpan2.push({GUARDPANNO:req.body.pan.toUpperCase()});
                     arr1.push({PAN:req.body.pan.toUpperCase()});
-                    arr2.push({GUARD_PAN:req.body.pan.toUpperCase()});
-                    arr3.push({GUARDPANNO:req.body.pan.toUpperCase()});
+                    arr2.push({PAN1:req.body.pan.toUpperCase()});
+                    arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
                     for(var j=0;j<member.length;j++){     
-                    arr1.push({PAN:member[j]}); 
-                    arr2.push({GUARD_PAN:member[j]});
-                    arr3.push({GUARDPANNO:member[j]});
+                    guardpan1.push({GUARD_PAN:member[j]}); 
+                    guardpan2.push({GUARDPANNO:member[j]});
+                    arr1.push({PAN:member[j]});
+                    arr2.push({PAN1:req.body.pan.toUpperCase()});
+                    arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
                     }
-                    var strPan2 = {$or:arr2};
-                    var strPan3 = {$or:arr3};
-                    folioc.find(strPan2).distinct("FOLIOCHK", function (err, member1) {
-                      foliok.find(strPan3).distinct("ACNO", function (err, member2) {
+                    var strPan1 = {$or:guardpan1};
+                    var strPan2 = {$or:guardpan2};
+                    folioc.find(strPan1).distinct("FOLIOCHK", function (err, member1) {
+                      foliok.find(strPan2).distinct("ACNO", function (err, member2) {
                       var alldata = member1.concat(member2);   
                             for(var j=0;j<alldata.length;j++){     
                                 arr1.push({FOLIO_NO:alldata[j]});
+                                arr2.push({TD_ACNO:alldata[j]});
+                                arr3.push({FOLIO_NO:alldata[j]});
                                 }
                              var strFolio = {$or:arr1};
+                             var strFolio1 = {$or:arr2};
+                             var strFolio2 = {$or:arr3};
        pipeline = [  ///trans_cams
-            { $match: { $and:  [ strFolio,{SCHEME: /Tax/ }, {$or: [{ TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } ] } },
-            //{ $match: { $and:  [ { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } ,{SCHEME: /Tax/ }, { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },]},{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
-            { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
+            { $match: { $and:  [ strFolio,{SCHEME: /Tax/ }, {$or: [{ TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } } ] },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
+             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }} },
             { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
@@ -1072,7 +1086,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             { $sort: { TRADDATE: -1 } }
     ]
        pipeline1 = [  ///trans_karvy                                             
-            { $match: { $and: [strFolio,{$or: [{ FUNDDESC: /TAX/ } ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [{ TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $match: { $and: [strFolio1,{$or: [ { FUNDDESC: /TAX/ } ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [ { TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
@@ -1081,7 +1095,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             { $sort: { TRADDATE: -1 } }
     ]
        pipeline2 = [  ///trans_franklin
-            { $match: { $and: [ strFolio, {$or: [ { SCHEME_NA1: /TAX/ },{ SCHEME_NA1: /Taxshield/ } ] }, { AMOUNT: { $gte: 0 } } ,{$or: [ { TRXN_TYPE: { $not: /^SIPR.*/ } },{ TRXN_TYPE: { $not: /^TO.*/ } },{ TRXN_TYPE: { $not: /^DP.*/ } },{ TRXN_TYPE: { $not: /^RED.*/ } },{ TRXN_TYPE: { $not: /^REDR.*/ } },{ TRXN_TYPE: { $not: /^Gross Dividend.*/ } }, { TRXN_TYPE: { $not: /^Dividend Paid.*/ } }, { TRXN_TYPE: { $not: /^SWOF.*/ } }, { TRXN_TYPE: { $not: /^Transfer-Out.*/ } }, { TRXN_TYPE: { $not: /^Lateral Shift Out.*/ } } ] } , { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
+            { $match: { $and: [ strFolio2, {$or: [ { SCHEME_NA1: /TAX/ },{ SCHEME_NA1: /Taxshield/ } ] }, { AMOUNT: { $gte: 0 } } ,{$or: [ { TRXN_TYPE: { $not: /^SIPR.*/ } },{ TRXN_TYPE: { $not: /^TO.*/ } },{ TRXN_TYPE: { $not: /^DP.*/ } },{ TRXN_TYPE: { $not: /^RED.*/ } },{ TRXN_TYPE: { $not: /^REDR.*/ } },{ TRXN_TYPE: { $not: /^Gross Dividend.*/ } }, { TRXN_TYPE: { $not: /^Dividend Paid.*/ } }, { TRXN_TYPE: { $not: /^SWOF.*/ } }, { TRXN_TYPE: { $not: /^Transfer-Out.*/ } }, { TRXN_TYPE: { $not: /^Lateral Shift Out.*/ } } ] } , { TRXN_DATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
             { $group: { _id: {  SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE"  } } },
             { $project: { _id: 0,PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", SCHEME: "$_id.SCHEME_NA1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } } } },
             { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
@@ -1163,7 +1177,14 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
                         res.json(resdata);
                        return resdata;
-                       } 
+                    } else{
+                        resdata = {
+                            status: 400,
+                            message: 'Data not found',
+                        }
+                        res.json(resdata);
+                       return resdata;
+                       }
                        
                     });
                 });
@@ -1172,7 +1193,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
        });
            }else{
             pipeline = [  ///trans_cams
-            { $match: { $and:  [{ PAN: req.body.pan }, {SCHEME: /Tax/ }, {$or: [{ TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } ] } },
+            { $match: { $and:  [{ PAN: req.body.pan }, {SCHEME: /Tax/ }, {$or: [ { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } , { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } } ] },{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } }  ] } },
             //{ $match: { $and:  [ { TRXN_NATUR: { $not: /^Lateral Shift Out.*/ } } ,{SCHEME: /Tax/ }, { TRXN_NATUR: { $not: /^Redemption.*/ } } , { TRXN_NATUR: { $not: /^Gross Dividend.*/ } },  { TRXN_NATUR: { $not: /^Dividend Paid.*/ } }, { TRXN_NATUR: { $not: /^Switchout.*/ } }, { TRXN_NATUR: { $not: /^Transfer-Out.*/ } },]},{ TRADDATE: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }} },
@@ -1182,7 +1203,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
             { $sort: { TRADDATE: -1 } }
     ]
        pipeline1 = [  ///trans_karvy                                             
-            { $match: { $and: [{ PAN1: req.body.pan },{$or: [{ FUNDDESC: /TAX/ },{ FUNDDESC: /Tax/ }  ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [{ TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
+            { $match: { $and: [{ PAN1: req.body.pan },{$or: [ { FUNDDESC: /TAX/ },{ FUNDDESC: /Tax/ }  ,{ FUNDDESC: /Tax Saver/ },{ FUNDDESC: /Long Term Equity Fund/ } ,{ FUNDDESC: /IDBI Equity Advantage Fund/ },{ FUNDDESC: /Sundaram Diversified Equity Fund/ } ] } , { TD_AMT: { $gte: 0 } } ,{$or: [ { TRDESC: { $not: /^Consolidation Out.*/ } },{ TRDESC: { $not: /^Redemption.*/ } },{ TRDESC: { $not: /^Rejection.*/ } },{ TRDESC: { $not: /^Gross Dividend.*/ } },{ TRDESC: { $not: /^Switch Over Out.*/ } },  { TRDESC: { $not: /^Dividend Paid.*/ } }, { TRDESC: { $not: /^Switchout.*/ } }, { TRDESC: { $not: /^Transfer-Out.*/ } }, { TRDESC: { $not: /^Lateral Shift Out.*/ } } ]}, { TD_TRDT: { $gte: new Date(moment(yer).format("YYYY-MM-DD")), $lt: new Date(moment(secyer).format("YYYY-MM-DD")) } } ] } },
             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
             { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
@@ -1232,7 +1253,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                           delete obj['GUARDIANN0'];
                           delete obj['GUARDPANNO'];
                       }
-                  if(obj['GUARDIAN20'] === ""){
+                  if(obj['GUARDIAN20']){
                       obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
                        // Delete old key
                       delete obj['GUARDIAN20'];
@@ -1273,7 +1294,14 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                    resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
                    res.json(resdata);
                   return resdata;
-                  } 
+                } else{
+                    resdata = {
+                        status: 400,
+                        message: 'Data not found',
+                    }
+                    res.json(resdata);
+                   return resdata;
+                   }
                   
                });
            });
@@ -1285,7 +1313,6 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
        console.log(err)
    }
    })
-
 
 // app.post("/api/gettaxsavinguserwise", function (req, res) {
 //     try{
