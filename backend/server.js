@@ -638,39 +638,41 @@ app.post("/api/PANVerification", function (req, res) {
 
 app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
     try {
-        if(req.body.adminPan === "") {
+        if (req.body.adminPan === "") {
             resdata = {
                 status: 400,
-                message: 'Please enter admin pan',
+                message: 'Please enter admin pan!',
             }
             res.json(resdata);
             return resdata;
-        }else if(req.body.memberPan === "") {
+        } else if (req.body.memberPan === "") {
             resdata = {
                 status: 400,
-                message: 'Please enter member pan',
+                message: 'Please enter member pan!',
             }
             res.json(resdata);
-        }else if(req.body.memberPan === req.body.adminPan) {
+		return resdata;
+        }else if (req.body.memberRelation === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter member relation!',
+            }
+            res.json(resdata);
+            return resdata;
+         } else if (req.body.otp === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter otp!',
+            }
+            res.json(resdata);
+            return resdata;
+        } else if (req.body.memberPan === req.body.adminPan) {
             resdata = {
                 status: 400,
                 message: 'Admin Pan & Family member Pan must not be same!',
             }
             res.json(resdata);
-        } else if(req.body.memberRelation === "") {
-            resdata = {
-                status: 400,
-                message: 'Please enter member relation',
-            }
-            res.json(resdata);
-            return resdata;
-        }else if(req.body.otp === "") {
-            resdata = {
-                status: 400,
-                message: 'Please enter otp',
-            }
-            res.json(resdata);
-            return resdata;
+		return resdata
         }else {
             var memberdata="";
                  var OTP = localStorage.getItem('otp');
@@ -678,7 +680,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                  if(memberPan!= req.body.memberPan){
                     resdata = {
                         status: 400,
-                        message: 'Member Pan not match',
+                        message: 'Member Pan not match!',
                     }
                     res.json(resdata);
                     return resdata;
@@ -686,7 +688,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                 }if(OTP!= req.body.otp){
                     resdata = {
                         status: 400,
-                        message: 'OTP not match',
+                        message: 'OTP not matched!',
                     }
                     res.json(resdata);
                     return resdata;
@@ -694,7 +696,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                     try {
                      //   for (i = 0; i < req.body.length; i++) {
                             var mod = new family({memberPan:memberPan,adminPan:req.body.adminPan,memberRelation:req.body.memberRelation});
-                            family.find({ memberPan: req.body.memberPan , adminPan:req.body.adminPan,memberRelation: req.body.memberRelation },{_id:0}, function (err, memberdata) {
+                            family.find({ memberPan: req.body.memberPan , adminPan:req.body.adminPan },{_id:0}, function (err, memberdata) {
                                 if(memberdata !=""){
                                     resdata = {
                                         status: 400,
