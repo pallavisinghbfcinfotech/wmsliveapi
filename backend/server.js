@@ -1607,7 +1607,8 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                 if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)) {
                                                     datacon[i]['TRXN_NATUR'] = "STP";
                                                 }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
-                                                    datacon[i]['PER_STATUS'] = "Minor";      
+                                                    datacon[i]['PER_STATUS'] = "Minor";   
+						    datacon[i]['PAN'] = "";  
                                                  }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
                                                          datacon[i]['PER_STATUS'] = "Individual";
                                                }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
