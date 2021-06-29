@@ -1167,7 +1167,8 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                                 || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
                                 datacon[i]['TRXN_NATUR'] = "Switch In";
                             }if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
-                                datacon[i]['PER_STATUS'] = "Minor";      
+                                datacon[i]['PER_STATUS'] = "Minor"; 
+				datacon[i]['PAN'] = ""; 
                             }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
                                  datacon[i]['PER_STATUS'] = "Individual";
                             }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
@@ -1284,7 +1285,8 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
                            || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
                            datacon[i]['TRXN_NATUR'] = "Switch In";
                        }if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
-                           datacon[i]['PER_STATUS'] = "Minor";      
+                           datacon[i]['PER_STATUS'] = "Minor";   
+			   datacon[i]['PAN'] = "";   
                        }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
                             datacon[i]['PER_STATUS'] = "Individual";
                        }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
