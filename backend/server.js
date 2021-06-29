@@ -654,7 +654,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
         }else if(req.body.memberPan === req.body.adminPan) {
             resdata = {
                 status: 400,
-                message: 'member & admin pan are not same ',
+                message: 'Admin Pan & Family member Pan must not be same!',
             }
             res.json(resdata);
         } else if(req.body.memberRelation === "") {
@@ -698,7 +698,7 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
                                 if(memberdata !=""){
                                     resdata = {
                                         status: 400,
-                                        message: 'Member Pan & Admin Pan Already Exists',
+                                        message: 'Family member already exist!',
                                     }
                                     res.json(resdata)
                                     return resdata;
