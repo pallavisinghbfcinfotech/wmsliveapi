@@ -2294,6 +2294,7 @@ app.post("/api/getdividend", function (req, res) {
                        for (var i = 0; i < datacon.length; i++) {
                        if(datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
                         datacon[i]['PER_STATUS'] = "Minor";      
+			datacon[i]['PAN'] = "";      
                     }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL") {
                          datacon[i]['PER_STATUS'] = "Individual";
                     }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
