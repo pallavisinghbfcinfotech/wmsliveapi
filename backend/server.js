@@ -602,7 +602,11 @@ app.post("/api/PANVerification", function (req, res) {
                           });
   
                         let mailOptions = {
-                            from: "customersupport@bfccapital.com",
+                        //    from: "customersupport@bfccapital.com",
+			      from: {
+				    name: 'BFC Capital',
+				    address: 'customersupport@bfccapital.com'
+			     }
                             to: toemail,
                             cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "PAN Verification",
