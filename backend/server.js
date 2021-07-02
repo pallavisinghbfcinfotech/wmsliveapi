@@ -552,9 +552,9 @@ app.post("/api/PANVerification", function (req, res) {
                 res.json(resdata);
                 return resdata;
             }else{
-            foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliokarvydata) {
-                folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliocamsdata) {
-                    foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1}, function (err, foliofranklindata) {
+          foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INVNAME"}, function (err, foliokarvydata) {
+                    folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INV_NAME"}, function (err, foliocamsdata) {
+                        foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INV_NAME"}, function (err, foliofranklindata) {
                     if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
                         resdata = {
                             status: 200,
@@ -573,6 +573,7 @@ app.post("/api/PANVerification", function (req, res) {
                         
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
+			      var name =datacon[0].Name;
 //                         for(j=0;j<datacon.length;j++){
 //                             var phone =datacon[j].ACNO;
 //                                     Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleUnicodeApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno="+phone+"&Msg=Your Mf Prodigy OTP to verify registration is "+OTP+". Please do not share this OTP with anyone to ensure the account's security.&TemplateID=1207161520359590832&EntityID=1201160224111799498",
@@ -610,7 +611,7 @@ app.post("/api/PANVerification", function (req, res) {
                             to: toemail,
                             cc: "pallavisinghbfcinfotech@gmail.com",
                             subject: "Mapping of Family Member's Folio(s)",
-                            html: "Dear Investor,<br><br>Your Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.You can authorize the same by sharing the OTP- <b>"+OTP+"</b> with your family member. <br>Note - By accepting this request, your family member can view your investment folios and initiate transactions on your behalf and such transactions will be processed only after your approval subject to your payment confirmation or OTP confirmation wherever applicable.<br>In case you need any clarification, please contact us on 9506031502 or you can also email to customersupport@bfccapital.com, quoting your PAN, mobile no. and your query.<br><br>Thanks & Regards<br>Team BFC Capital"
+                            html: "Dear "+name+",<br><br>Your Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.You can authorize the same by sharing the OTP- <b>"+OTP+"</b> with your family member. <br>Note - By accepting this request, your family member can view your investment folios and initiate transactions on your behalf and such transactions will be processed only after your approval subject to your payment confirmation or OTP confirmation wherever applicable.<br>In case you need any clarification, please contact us on 9506031502 or you can also email to customersupport@bfccapital.com, quoting your PAN, mobile no. and your query.<br><br>Thanks & Regards<br>Team BFC Capital"
                           }
                           transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
