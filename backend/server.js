@@ -609,8 +609,8 @@ app.post("/api/PANVerification", function (req, res) {
 			     },
                             to: toemail,
                             cc: "pallavisinghbfcinfotech@gmail.com",
-                            subject: "PAN Verification",
-                            html: "Dear Investor,<br><br>Your Family Member has initiated to link you Folio(s) to group your folio under the Family Portfolio or by sharing the OTP ("+OTP+") with your family member.The weblink OTP will expire in 1 day if not accessed.<br><br> By accepting this request, your family member can view your mapped folios and also initiate transaction request on your behalf and such transactions will be processed subject to your payment confirmation or OTP confirmation wherever applicable.<br><br>Thanks & Regards<br>Team BFC Capital"
+                            subject: "Mapping of Family Member's Folio(s)",
+                            html: "Dear Investor,<br><br>Your Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.You can authorize the same by sharing the OTP -<u>"+OTP+"</u> with your family member. <br>Note - By accepting this request, your family member can view your investment folios and initiate transactions on your behalf and such transactions will be processed only after your approval subject to your payment confirmation or OTP confirmation wherever applicable.<br>In case you need any clarification, please contact us on 9506031502 or you can also email to customersupport@bfccapital.com, quoting your PAN, mobile no. and your query.<br><br>Thanks & Regards<br>Team BFC Capital"
                           }
                           transporter.sendMail(mailOptions, function (error, info) {
                             if (error) {
