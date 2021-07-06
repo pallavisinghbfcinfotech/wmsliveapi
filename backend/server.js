@@ -232,6 +232,59 @@ var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofrank
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
+app.post("/api/isPANexist", function (req, res) {
+    try {
+        if (req.body.memberPan === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter pan',
+            }
+            res.json(resdata)
+            return resdata;
+        } else {
+            let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+            if (!regex.test(req.body.memberPan)) {
+                resdata = {
+                    status: 400,
+                    message: 'Please enter valid pan',
+                }
+                res.json(resdata);
+                return resdata;
+            } else {
+                foliok.find({ PANGNO: req.body.memberPan }, { _id: 0, EMAIL: 1 }, function (err, foliokarvydata) {
+                    folioc.find({ PAN_NO: req.body.memberPan }, { _id: 0, EMAIL: 1 }, function (err, foliocamsdata) {
+                        foliof.find({ PANNO1: req.body.memberPan }, { _id: 0, EMAIL: 1 }, function (err, foliofranklindata) {
+                            if (foliokarvydata != "" || foliocamsdata != "" || foliofranklindata != "") {
+                                resdata = {
+                                    status: 200,
+                                    message: 'Successful',
+                                    data: foliofranklindata,
+                                }
+                                datacon = foliokarvydata.concat(foliocamsdata.concat(foliofranklindata));
+                                datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                                    .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                                    .reverse().map(JSON.parse);
+
+                                res.json(resdata)
+                                return resdata;
+                            } else {
+                                resdata = {
+                                    status: 400,
+                                    message: 'PAN not found!',
+                                }
+                                res.json(resdata)
+                                return resdata;
+                            }
+                        });
+                    });
+                });
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+});
+
 app.post("/api/userProfileMemberList", function (req, res) {
     try{
         var arr1=[];var arr2=[];var arr3=[];
