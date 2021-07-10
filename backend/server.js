@@ -232,6 +232,179 @@ var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofrank
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
+app.post("/api/getAmcListHoldingNatureWise", function (req, res) {
+    try {
+        let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+        if (req.body.pan === ""){
+            resdata = {
+                status: 400,
+                message: 'Please enter pan !',
+            }
+            res.json(resdata);
+            return resdata;
+        }else if(!regex.test(req.body.pan)) {
+            resdata = {
+                status: 400,
+                message: 'Please enter valid pan !',
+            }
+            res.json(resdata);
+            return resdata;
+        }else if(req.body.holder_nature === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter holding nature !',
+            }
+            res.json(resdata);
+            return resdata;
+         } else{
+                if(req.body.holder_nature ==="SI"){
+                    pipeline = [//folio_franklin
+                        { $match: { PANNO1: req.body.pan,HOLDING_T6:"Single" } },
+                        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE: "$COMP_CODE" } } },
+                        { $project: { _id: 0,folio: "$_id.FOLIO_NO",amc_code: "$_id.COMP_CODE" } },
+                        { $sort: { amc_code: 1 } },
+                    ]
+                    pipeline1 = [  //folio_cams
+                        { $match: { PAN_NO: req.body.pan ,HOLDING_NA:"SI"} },
+                        { $group: { _id: { FOLIOCHK: "$FOLIOCHK", AMC_CODE: "$AMC_CODE" } } },
+                        { $project: { _id: 0, folio: "$_id.FOLIOCHK", amc_code: "$_id.AMC_CODE", } },
+                        { $sort: { amc_code: 1 } }
+                    ]
+                    pipeline2 = [ //folio_karvy
+                        { $match: { PANGNO: req.body.pan, MODEOFHOLD:"SINGLE" } },
+                        { $group: { _id: { ACNO: "$ACNO", FUND: "$FUND" } } },
+                        { $project: { _id: 0, folio: "$_id.ACNO", amc_code: "$_id.FUND"  } },
+                        { $sort: { amc_code: 1 } }
+                    ]  
+                    foliof.aggregate(pipeline, (err, newdata) => {
+                        folioc.aggregate(pipeline1, (err, newdata1) => {
+                            foliok.aggregate(pipeline2, (err, newdata2) => {
+                                if (newdata2 != 0 || newdata1 != 0 || newdata != 0 ) {
+                                    resdata = {
+                                        status: 200,
+                                        message: "Successfull",
+                                        data: newdata2
+                                    };
+                               
+                                var datacon = newdata.concat(newdata1.concat(newdata2));
+                                datacon = datacon
+                                    .map(JSON.stringify)
+                                    .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                                    .filter(function (item, index, arr) {
+                                        return arr.indexOf(item, index + 1) === -1;
+                                    }) // check if there is any occurence of the item in whole array
+                                    .reverse()
+                                    .map(JSON.parse);
+        
+                                for (var i = 0; i < datacon.length; i++) {
+                                    //console.log(datacon[i]['amc_code']);
+                                    if (datacon[i]['amc_code'] != "" && datacon[i]['folio'] != "" && datacon[i]['scheme'] != "") {
+        
+                                        resdata.data = datacon[i];
+        
+                                    }
+                                }
+                                resdata.data = datacon.sort((a, b) => (a.amc_code > b.amc_code) ? 1 : -1);
+                                res.json(resdata);
+                                return resdata;
+                            }else{
+                                resdata = {
+                                    status: 400,
+                                    message: "Data not found!"
+                                };
+                                res.json(resdata);
+                                return resdata;
+                            }
+                            });
+                        });
+                    });
+            } else{
+                if (req.body.holder_pan1 === ""){
+                    resdata = {
+                        status: 400,
+                        message: 'Please enter joint holder pan!',
+                    }
+                    res.json(resdata);
+                    return resdata;
+                }else if(!regex.test(req.body.holder_pan1)) {
+                    resdata = {
+                        status: 400,
+                        message: 'Please enter valid joint holder pan!',
+                    }
+                    res.json(resdata);
+                    return resdata;
+
+                }else{
+                    pipeline = [//trans_franklin
+                        { $match: {$and: [{ IT_PAN_NO1: req.body.pan},{IT_PAN_NO2:req.body.holder_pan1} ] } },
+                        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", COMP_CODE: "$COMP_CODE" } } },
+                        { $project: { _id: 0,folio: "$_id.FOLIO_NO",amc_code: "$_id.COMP_CODE" } },
+                        { $sort: { amc_code: 1 } },
+                    ]
+                    pipeline1 = [  //trans_cams
+                        { $match: { PAN: req.body.pan } },
+                        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", AMC_CODE: "$AMC_CODE" } } },
+                        { $project: { _id: 0, folio: "$_id.FOLIO_NO", amc_code: "$_id.AMC_CODE", } },
+                        { $sort: { amc_code: 1 } }
+                    ]
+                    pipeline2 = [ //trans_karvy
+                        { $match: {$and: [ { PAN1: req.body.pan},{PAN2:req.body.holder_pan1} ]  } },
+                        { $group: { _id: { TD_ACNO: "$TD_ACNO", TD_FUND: "$TD_FUND" } } },
+                        { $project: { _id: 0, folio: "$_id.TD_ACNO", amc_code: "$_id.TD_FUND"  } },
+                        { $sort: { amc_code: 1 } }
+                    ]  
+                    transf.aggregate(pipeline, (err, newdata) => {
+                        transc.aggregate(pipeline1, (err, newdata1) => {
+                            transk.aggregate(pipeline2, (err, newdata2) => {
+                                if (newdata2 != 0 || newdata1 != 0 || newdata != 0 ) {
+                                    resdata = {
+                                        status: 200,
+                                        message: "Successfull",
+                                        data: newdata2
+                                    };
+                               
+                                var datacon = newdata.concat(newdata1.concat(newdata2));
+                                datacon = datacon
+                                    .map(JSON.stringify)
+                                    .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                                    .filter(function (item, index, arr) {
+                                        return arr.indexOf(item, index + 1) === -1;
+                                    }) // check if there is any occurence of the item in whole array
+                                    .reverse()
+                                    .map(JSON.parse);
+        
+                                for (var i = 0; i < datacon.length; i++) {
+                                    //console.log(datacon[i]['amc_code']);
+                                    if (datacon[i]['amc_code'] != "" && datacon[i]['folio'] != "" && datacon[i]['scheme'] != "") {
+        
+                                        resdata.data = datacon[i];
+        
+                                    }
+                                }
+                                resdata.data = datacon.sort((a, b) => (a.amc_code > b.amc_code) ? 1 : -1);
+                                res.json(resdata);
+                                return resdata;
+                            } else {
+                                resdata = {
+                                    status: 400,
+                                    message: "Data not found!"
+                                };
+                                res.json(resdata);
+                                return resdata;
+                            }
+                            });
+                        });
+                    });
+                }
+            }
+           
+        }
+    } catch (err) {
+        console.log(e)
+    }
+});
+
+
 app.post("/api/isPANexist", function (req, res) {
     try {
         if (req.body.memberPan === "") {
