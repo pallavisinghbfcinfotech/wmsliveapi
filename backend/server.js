@@ -778,6 +778,8 @@ app.post("/api/PANVerification", function (req, res) {
                 res.json(resdata);
                 return resdata;
             }else{
+		     family.find({ memberPan: req.body.memberPan}, { _id: 0 }, function (err, memberdata) {
+                    if(memberdata === ""){
          foliok.find({ PANGNO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INVNAME",Phone:"$MOBILE" }, function (err, foliokarvydata) {
                     folioc.find({ PAN_NO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$MOBILE_NO" }, function (err, foliocamsdata) {
                         foliof.find({ PANNO1: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$PHONE_RES" }, function (err, foliofranklindata) {
@@ -873,6 +875,15 @@ app.post("/api/PANVerification", function (req, res) {
                  });
             });
        });           
+		 } else{
+                resdata = {
+                    status: 400,
+                    message: 'Member pan Already exists',
+                }
+                res.json(resdata)
+                return resdata;
+            }
+		    });
         }
     }
     } catch (err) {
