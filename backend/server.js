@@ -778,9 +778,9 @@ app.post("/api/PANVerification", function (req, res) {
                 res.json(resdata);
                 return resdata;
             }else{
-          foliok.find({ PANGNO: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INVNAME"}, function (err, foliokarvydata) {
-                    folioc.find({ PAN_NO: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INV_NAME"}, function (err, foliocamsdata) {
-                        foliof.find({ PANNO1: req.body.memberPan  },{_id:0,EMAIL:1,Name:"$INV_NAME"}, function (err, foliofranklindata) {
+         foliok.find({ PANGNO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INVNAME",Phone:"$MOBILE" }, function (err, foliokarvydata) {
+                    folioc.find({ PAN_NO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$MOBILE_NO" }, function (err, foliocamsdata) {
+                        foliof.find({ PANNO1: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$PHONE_RES" }, function (err, foliofranklindata) {
                     if(foliokarvydata !="" || foliocamsdata !="" || foliofranklindata !="") {
                         resdata = {
                             status: 200,
@@ -800,17 +800,23 @@ app.post("/api/PANVerification", function (req, res) {
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
 			      var name =datacon[0].Name;
-//                         for(j=0;j<datacon.length;j++){
-//                             var phone =datacon[j].ACNO;
-//                                     Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleUnicodeApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno="+phone+"&Msg=Your Mf Prodigy OTP to verify registration is "+OTP+". Please do not share this OTP with anyone to ensure the account's security.&TemplateID=1207161520359590832&EntityID=1201160224111799498",
-//                                 ).then(function (result) {
-//                                     console.log('SMS send successfully');
-//                                 });
-//                         }
-                       resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
-                        
+// 			     for(var j=0;j<datacon.length;j++){
+//                                     datacon[j].EMAIL = datacon[j].EMAIL.toUpperCase();
+//                                     datacon[j].Name = datacon[j].Name.toUpperCase();
+//                                 }
+                        for(j=0;j<datacon.length;j++){
+                            datacon[j].Phone=datacon[j].Phone;
+				datacon[j].EMAIL = datacon[j].EMAIL.toUpperCase();
+				datacon[j].Name = datacon[j].Name.toUpperCase();
+                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno=" + datacon[j].Phone + "&Msg=Dear "+datacon[j].Name+", \nYour Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.\nYou can authorize the same by sharing the OTP - "+OTP+" with your family member. BFC Capital.",
+                                ).then(function (result) {
+                                    console.log('SMS send successfully');
+                                });
+                        }
+                      // resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
+                        resdata.data = datacon;
                         for(var j=0;j<resdata.data.length;j++){
-                            var toemail = resdata.data[j];
+                            var toemail = resdata.data[j].EMAIL;
                          var transporter = nodemailer.createTransport({ 
                            host: 'mail.bfccapital.com',
                             port: 465,
