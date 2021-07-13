@@ -815,9 +815,9 @@ app.post("/api/PANVerification", function (req, res) {
                             //datacon[j].Phone=datacon[j].Phone;
 // 				datacon[j].EMAIL = datacon[j].EMAIL.toUpperCase();
 // 				datacon[j].Name = datacon[j].Name.toUpperCase();
-                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno=" +phone+ "&Msg=Dear "+name+", \nYour Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.\nYou can authorize the same by sharing the OTP - "+OTP+" with your family member. BFC Capital.",
+                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&Phno=" +phone+ "&Msg=Dear "+name+", Your Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.You can authorize the same by sharing the OTP- "+OTP+" with your family member. BFC Capital.",
                                 ).then(function (result) {
-                                    console.log('SMS send successfully');
+                                    console.log('SMS send successfully',phone);
                                 });
                      //   }
                        resdata.data  = [...new Set(datacon.map(({EMAIL}) => EMAIL.toLowerCase()))]
