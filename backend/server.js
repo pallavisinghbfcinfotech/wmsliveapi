@@ -985,116 +985,320 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
     }
 });
 
-app.post("/api/getfoliodetail", function (req, res) {     
-	try{
-		 var prodcode = req.body.amc_code+req.body.prodcode;
-                    const pipeline3 = [  //trans_cams
-                        {$match : {"FOLIO_NO":req.body.folio,"AMC_CODE":req.body.amc_code,"PRODCODE":prodcode}}, 
-                        {$group : {_id : {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO", AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} } ,UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"}  }}},
-                        {$lookup:
-                        {
-                        from: "products",
-                        let: { ccc: "$_id.code", amc:"$_id.AMC_CODE"},
-                        pipeline: [
-                            { $match:
-                                { $expr:
-                                    { $and:
-                                    [
-                                        { $eq: [ "$PRODUCT_CODE",  "$$ccc" ] },
-                                        { $eq: [ "$AMC_CODE", "$$amc" ] }
-                                    ]
-                                    }
-                                }
-                            },
-                            { $project: {  _id: 0 } }
-                        ],
-                        as: "products"
-                        }},
-                        { $unwind: "$products"},
-                        {$group :{ _id: {INV_NAME:"$_id.INV_NAME",BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO", products:"$products.ISIN" } , UNITS:{$sum:"$_id.UNITS"}, AMOUNT:{$sum:"$_id.AMOUNT"} } },
-                        {$lookup: { from: 'cams_nav',localField: '_id.products',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
-                        { $unwind: "$nav"},                                                                                                                                                        
-                        {$project:  {_id:0 , INVNAME:"$_id.INV_NAME",BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO",products:"$products.ISIN", cnav:"$nav.NetAssetValue"  ,navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } } , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
-                    ]
-                    const pipeline11 = [  //folio_karvy
-                        {$match : {"ACNO":req.body.folio}}, 
-                        {$group :{_id :  {INVNAME:"$INVNAME",BNAME:"$BNAME",BNKACNO:"$BNKACNO",NOMINEE:"$NOMINEE",JTNAME2:"$JTNAME2",JTNAME1:"$JTNAME1"} }}, 
-                        {$project:{_id:0,INVNAME:"$_id.INVNAME", BANK_NAME:"$_id.BNAME",AC_NO:"$_id.BNKACNO",NOMINEE:"$_id.NOMINEE",JTNAME2:"$_id.JTNAME2",JTNAME1:"$_id.JTNAME1"}}
-                   ]  
-                   const pipeline33 = [  //folio_cams
-                    {$match : {"FOLIOCHK":req.body.folio}}, 
-                    {$group :{_id :  {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO",NOM_NAME:"$NOM_NAME",JNT_NAME1:"$JNT_NAME1",JNT_NAME2:"$JNT_NAME2"} }}, 
-                    {$project:{_id:0,INVNAME:"$_id.INV_NAME", BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO",NOMINEE:"$_id.NOM_NAME",JTNAME1:"$_id.JNT_NAME1",JTNAME2:"$_id.JNT_NAME2"}}
-               ]    
-                const pipeline1=[  //trans_karvy
-                        {$match : {"TD_ACNO":req.body.folio,"SCHEMEISIN":req.body.isin}}, 
-                        {$group :{_id : {INVNAME:"$INVNAME",SCHEMEISIN:"$SCHEMEISIN",cnav:"$nav.NetAssetValue"},TD_UNITS:{$sum:"$TD_UNITS"}, TD_AMT:{$sum:"$TD_AMT"} }},
-                        {$group :{_id:{ INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN",cnav:"$nav.NetAssetValue"}, TD_UNITS:{$sum:"$TD_UNITS"},TD_AMT:{$sum:"$TD_AMT"} }},
-                        {$lookup: { from: 'cams_nav',localField: '_id.SCHEMEISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
-                            { $unwind: "$nav"},
-                        {$project:  {_id:0, INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN", cnav:"$nav.NetAssetValue" ,navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }  , UNITS:{$sum:"$TD_UNITS"},AMOUNT:{$sum:"$TD_AMT"} }   },
-                    ] 
-                    const pipeline2=[  //trans_franklin
-                        {$match : {"FOLIO_NO":req.body.folio,"ISIN":req.body.isin}}, 
-                        {$group :{_id : {INVESTOR_2:"$INVESTOR_2",ISIN:"$ISIN",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",PERSONAL23:"$PERSONAL23",JOINT_NAM2:"$JOINT_NAM2",JOINT_NAM1:"$JOINT_NAM1",cnav:"$nav.NetAssetValue"},UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"} }},
-                        {$group :{_id:{ INVESTOR_2:"$_id.INVESTOR_2",ISIN:"$_id.ISIN",NOMINEE1:"$_id.NOMINEE1",PBANK_NAME:"$_id.PBANK_NAME",PERSONAL23:"$_id.PERSONAL23",JOINT_NAM2:"$_id.JOINT_NAM2",JOINT_NAM1:"$_id.JOINT_NAM1",cnav:"$nav.NetAssetValue"}, UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }},
-                        {$lookup: { from: 'cams_nav',localField: '_id.ISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
-                        { $unwind: "$nav"},
-                        {$project:  {_id:0, INVNAME:"$_id.INVESTOR_2",SCHEMEISIN:"$_id.ISIN",NOMINEE:"$_id.NOMINEE1",BANK_NAME:"$_id.PBANK_NAME",AC_NO:"$_id.PERSONAL23",JTNAME2:"$_id.JOINT_NAM2",JTNAME1:"$_id.JOINT_NAM1", cnav:"$nav.NetAssetValue",navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }   , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
-                ] 
-                var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
-                    var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
-                     var foliok = mongoose.model('folio_karvy', foliokarvy, 'folio_karvy');  
-                     var folioc = mongoose.model('folio_cams', foliocams, 'folio_cams');   
-                    var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');          
-                    transc.aggregate(pipeline3, (err, newdata3) => {
-                        folioc.aggregate(pipeline33, (err, newdata33) => {
-                            transk.aggregate(pipeline1, (err, newdata1) => {
-                                foliok.aggregate(pipeline11, (err, newdata11) => {
-                                transf.aggregate(pipeline2, (err, newdata2) => {
-                                    if (
-                                        newdata2 != 0 ||
-                                        newdata1 != 0 ||
-                                        newdata3 != 0 ||
-                                        newdata33 != 0 ||
-                                        newdata11 != 0
-                                    ) {
-                                        resdata = {
-                                        status: 200,
-                                        message: "Successfull",
-                                        data: newdata2
-                                        };
-                                    } else {
-                                        resdata = {
-                                        status: 400,
-                                        message: "Data not found"
-                                        };
-                                    }
-                                  let merged3 =  newdata3.map((items, j) => Object.assign({}, items, newdata33[j]));
-                                  let merged1 =  newdata1.map((items, j) => Object.assign({}, items, newdata11[j]));
-                                    var datacon = merged3.concat(merged1.concat(newdata2));
-                                    datacon = datacon
-                                        .map(JSON.stringify)
-                                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                                        .filter(function(item, index, arr) {
-                                        return arr.indexOf(item, index + 1) === -1;
-                                        }) // check if there is any occurence of the item in whole array
-                                        .reverse()
-                                        .map(JSON.parse);
-                                    resdata.data = datacon;
-                                    //console.log("res="+JSON.stringify(resdata))
-                                    res.json(resdata);
-                                    return resdata;
-                                    });  
-                              });
-                            });
-                        });
-                    })
-		 } catch (err) {
-                    console.log(err)
-                }
-}) 
+// app.post("/api/getfoliodetail", function (req, res) {     
+// 	try{
+// 		 var prodcode = req.body.amc_code+req.body.prodcode;
+//                     const pipeline3 = [  //trans_cams
+//                         {$match : {"FOLIO_NO":req.body.folio,"AMC_CODE":req.body.amc_code,"PRODCODE":prodcode}}, 
+//                         {$group : {_id : {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO", AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} } ,UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"}  }}},
+//                         {$lookup:
+//                         {
+//                         from: "products",
+//                         let: { ccc: "$_id.code", amc:"$_id.AMC_CODE"},
+//                         pipeline: [
+//                             { $match:
+//                                 { $expr:
+//                                     { $and:
+//                                     [
+//                                         { $eq: [ "$PRODUCT_CODE",  "$$ccc" ] },
+//                                         { $eq: [ "$AMC_CODE", "$$amc" ] }
+//                                     ]
+//                                     }
+//                                 }
+//                             },
+//                             { $project: {  _id: 0 } }
+//                         ],
+//                         as: "products"
+//                         }},
+//                         { $unwind: "$products"},
+//                         {$group :{ _id: {INV_NAME:"$_id.INV_NAME",BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO", products:"$products.ISIN" } , UNITS:{$sum:"$_id.UNITS"}, AMOUNT:{$sum:"$_id.AMOUNT"} } },
+//                         {$lookup: { from: 'cams_nav',localField: '_id.products',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
+//                         { $unwind: "$nav"},                                                                                                                                                        
+//                         {$project:  {_id:0 , INVNAME:"$_id.INV_NAME",BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO",products:"$products.ISIN", cnav:"$nav.NetAssetValue"  ,navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } } , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
+//                     ]
+//                     const pipeline11 = [  //folio_karvy
+//                         {$match : {"ACNO":req.body.folio}}, 
+//                         {$group :{_id :  {INVNAME:"$INVNAME",BNAME:"$BNAME",BNKACNO:"$BNKACNO",NOMINEE:"$NOMINEE",JTNAME2:"$JTNAME2",JTNAME1:"$JTNAME1"} }}, 
+//                         {$project:{_id:0,INVNAME:"$_id.INVNAME", BANK_NAME:"$_id.BNAME",AC_NO:"$_id.BNKACNO",NOMINEE:"$_id.NOMINEE",JTNAME2:"$_id.JTNAME2",JTNAME1:"$_id.JTNAME1"}}
+//                    ]  
+//                    const pipeline33 = [  //folio_cams
+//                     {$match : {"FOLIOCHK":req.body.folio}}, 
+//                     {$group :{_id :  {INV_NAME:"$INV_NAME",BANK_NAME:"$BANK_NAME",AC_NO:"$AC_NO",NOM_NAME:"$NOM_NAME",JNT_NAME1:"$JNT_NAME1",JNT_NAME2:"$JNT_NAME2"} }}, 
+//                     {$project:{_id:0,INVNAME:"$_id.INV_NAME", BANK_NAME:"$_id.BANK_NAME",AC_NO:"$_id.AC_NO",NOMINEE:"$_id.NOM_NAME",JTNAME1:"$_id.JNT_NAME1",JTNAME2:"$_id.JNT_NAME2"}}
+//                ]    
+//                 const pipeline1=[  //trans_karvy
+//                         {$match : {"TD_ACNO":req.body.folio,"SCHEMEISIN":req.body.isin}}, 
+//                         {$group :{_id : {INVNAME:"$INVNAME",SCHEMEISIN:"$SCHEMEISIN",cnav:"$nav.NetAssetValue"},TD_UNITS:{$sum:"$TD_UNITS"}, TD_AMT:{$sum:"$TD_AMT"} }},
+//                         {$group :{_id:{ INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN",cnav:"$nav.NetAssetValue"}, TD_UNITS:{$sum:"$TD_UNITS"},TD_AMT:{$sum:"$TD_AMT"} }},
+//                         {$lookup: { from: 'cams_nav',localField: '_id.SCHEMEISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
+//                             { $unwind: "$nav"},
+//                         {$project:  {_id:0, INVNAME:"$_id.INVNAME",SCHEMEISIN:"$_id.SCHEMEISIN", cnav:"$nav.NetAssetValue" ,navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }  , UNITS:{$sum:"$TD_UNITS"},AMOUNT:{$sum:"$TD_AMT"} }   },
+//                     ] 
+//                     const pipeline2=[  //trans_franklin
+//                         {$match : {"FOLIO_NO":req.body.folio,"ISIN":req.body.isin}}, 
+//                         {$group :{_id : {INVESTOR_2:"$INVESTOR_2",ISIN:"$ISIN",NOMINEE1:"$NOMINEE1",PBANK_NAME:"$PBANK_NAME",PERSONAL23:"$PERSONAL23",JOINT_NAM2:"$JOINT_NAM2",JOINT_NAM1:"$JOINT_NAM1",cnav:"$nav.NetAssetValue"},UNITS:{$sum:"$UNITS"}, AMOUNT:{$sum:"$AMOUNT"} }},
+//                         {$group :{_id:{ INVESTOR_2:"$_id.INVESTOR_2",ISIN:"$_id.ISIN",NOMINEE1:"$_id.NOMINEE1",PBANK_NAME:"$_id.PBANK_NAME",PERSONAL23:"$_id.PERSONAL23",JOINT_NAM2:"$_id.JOINT_NAM2",JOINT_NAM1:"$_id.JOINT_NAM1",cnav:"$nav.NetAssetValue"}, UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }},
+//                         {$lookup: { from: 'cams_nav',localField: '_id.ISIN',foreignField: 'ISINDivPayoutISINGrowth',as: 'nav' } },
+//                         { $unwind: "$nav"},
+//                         {$project:  {_id:0, INVNAME:"$_id.INVESTOR_2",SCHEMEISIN:"$_id.ISIN",NOMINEE:"$_id.NOMINEE1",BANK_NAME:"$_id.PBANK_NAME",AC_NO:"$_id.PERSONAL23",JTNAME2:"$_id.JOINT_NAM2",JTNAME1:"$_id.JOINT_NAM1", cnav:"$nav.NetAssetValue",navdate:{ $dateToString: { format: "%d-%m-%Y", date: "$nav.Date" } }   , UNITS:{$sum:"$UNITS"},AMOUNT:{$sum:"$AMOUNT"} }   },
+//                 ] 
+//                 var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
+//                     var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
+//                      var foliok = mongoose.model('folio_karvy', foliokarvy, 'folio_karvy');  
+//                      var folioc = mongoose.model('folio_cams', foliocams, 'folio_cams');   
+//                     var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');          
+//                     transc.aggregate(pipeline3, (err, newdata3) => {
+//                         folioc.aggregate(pipeline33, (err, newdata33) => {
+//                             transk.aggregate(pipeline1, (err, newdata1) => {
+//                                 foliok.aggregate(pipeline11, (err, newdata11) => {
+//                                 transf.aggregate(pipeline2, (err, newdata2) => {
+//                                     if (
+//                                         newdata2 != 0 ||
+//                                         newdata1 != 0 ||
+//                                         newdata3 != 0 ||
+//                                         newdata33 != 0 ||
+//                                         newdata11 != 0
+//                                     ) {
+//                                         resdata = {
+//                                         status: 200,
+//                                         message: "Successfull",
+//                                         data: newdata2
+//                                         };
+//                                     } else {
+//                                         resdata = {
+//                                         status: 400,
+//                                         message: "Data not found"
+//                                         };
+//                                     }
+//                                   let merged3 =  newdata3.map((items, j) => Object.assign({}, items, newdata33[j]));
+//                                   let merged1 =  newdata1.map((items, j) => Object.assign({}, items, newdata11[j]));
+//                                     var datacon = merged3.concat(merged1.concat(newdata2));
+//                                     datacon = datacon
+//                                         .map(JSON.stringify)
+//                                         .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                                         .filter(function(item, index, arr) {
+//                                         return arr.indexOf(item, index + 1) === -1;
+//                                         }) // check if there is any occurence of the item in whole array
+//                                         .reverse()
+//                                         .map(JSON.parse);
+//                                     resdata.data = datacon;
+//                                     //console.log("res="+JSON.stringify(resdata))
+//                                     res.json(resdata);
+//                                     return resdata;
+//                                     });  
+//                               });
+//                             });
+//                         });
+//                     })
+// 		 } catch (err) {
+//                     console.log(err)
+//                 }
+// }) 
 
+app.post("/api/getfoliodetail", function (req, res) {
+    var unit = 0; var balance = 0; var currentvalue = 0; var amt = 0; var cnav = 0;
+    var prodcode = req.body.amc_code + req.body.prodcode;
+    const pipeline1 = [  //trans_cams
+        { $match: { "FOLIO_NO": req.body.folio, "AMC_CODE": req.body.amc_code, "PRODCODE": prodcode } },
+        { $group: { _id: { INV_NAME: "$INV_NAME", BANK_NAME: "$BANK_NAME", AC_NO: "$AC_NO", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $reduce: { input: { $split: ["$PRODCODE", "$AMC_CODE"] }, initialValue: "", in: { $concat: ["$$value", "$$this"] } } }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } } },
+        {
+            $lookup:
+            {
+                from: "products",
+                let: { ccc: "$_id.code", amc: "$_id.AMC_CODE" },
+                pipeline: [
+                    {
+                        $match:
+                        {
+                            $expr:
+                            {
+                                $and:
+                                    [
+                                        { $eq: ["$PRODUCT_CODE", "$$ccc"] },
+                                        { $eq: ["$AMC_CODE", "$$amc"] }
+                                    ]
+                            }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ],
+                as: "products"
+            }
+        },
+        //{ $unwind: "$products" },
+        { $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+        { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+        { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", SCHEME: "$_id.SCHEME", NATURE: "$_id.TRXN_TYPE_", TD_TRDT: "$_id.TRADDATE", ISIN: "$products.ISIN", NOMINEE: "$detail.NOM_NAME", BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO", JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+     ]
+    const pipeline2 = [  //trans_karvy
+        { $match: { "TD_ACNO": req.body.folio, "SCHEMEISIN": req.body.isin } },
+        { $group: { _id: { TD_ACNO: "$TD_ACNO", INVNAME: "$INVNAME",FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE",TD_TRDT: "$TD_TRDT",  SCHEMEISIN: "$SCHEMEISIN" }, TD_UNITS: { $sum: "$TD_UNITS" }, TD_AMT: { $sum: "$TD_AMT" } } },
+        {
+            $lookup:
+            {
+                from: "cams_nav",
+                let: { isin: "$_id.SCHEMEISIN" },
+                pipeline: [
+                    {
+                        $match:
+                        {
+                            $expr:
+                            {
+                                $or:
+                                    [
+                                        { $eq: ["$ISINDivPayoutISINGrowth", "$$isin"] },
+                                        { $eq: ["$ISINDivReinvestment", "$$isin"] }
+                                    ]
+                            }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ],
+                as: "nav"
+            }
+        },
+        { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
+        { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", INVNAME: "$_id.INVNAME", SCHEME: "$_id.FUNDDESC", NATURE: "$_id.TD_TRTYPE", TD_TRDT: "$_id.TD_TRDT", ISIN: "$_id.SCHEMEISIN", NOMINEE: "$detail.NOMINEE", BANK_NAME: "$detail.BNAME", AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
+     ]
+   
+    const pipeline3 = [  //trans_franklin
+        { $match: { "FOLIO_NO": req.body.folio, "ISIN": req.body.isin } },
+        { $group: { _id: { FOLIO_NO: "$FOLIO_NO", INVESTOR_2: "$INVESTOR_2", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", ISIN: "$ISIN", NOMINEE1: "$NOMINEE1", PBANK_NAME: "$PBANK_NAME", PERSONAL23: "$PERSONAL23", JOINT_NAM2: "$JOINT_NAM2", JOINT_NAM1: "$JOINT_NAM1" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        {
+            $lookup:
+            {
+                from: "cams_nav",
+                let: { isin: "$_id.ISIN" },
+                pipeline: [
+                    {
+                        $match:
+                        {
+                            $expr:
+                            {
+                                $or:
+                                    [
+                                        { $eq: ["$ISINDivPayoutISINGrowth", "$$isin"] },
+                                        { $eq: ["$ISINDivReinvestment", "$$isin"] }
+                                    ]
+                            }
+                        }
+                    },
+                    { $project: { _id: 0 } }
+                ],
+                as: "nav"
+            }
+        },
+       { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INVESTOR_2", SCHEME: "$_id.SCHEME_NA1", NATURE: "$_id.TRXN_TYPE", TD_TRDT: "$_id.TRXN_DATE", ISIN: "$_id.ISIN", NOMINEE: "$_id.NOMINEE1", BANK_NAME: "$_id.PBANK_NAME", AC_NO: "$_id.PERSONAL23", JTNAME2: "$_id.JOINT_NAM2", JTNAME1: "$_id.JOINT_NAM1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+    ]
+
+    transc.aggregate(pipeline1, (err, camsdata) => {
+       transk.aggregate(pipeline2, (err, karvydata) => {
+            transf.aggregate(pipeline3, (err, frankdata) => {
+                        if (
+                            frankdata != 0 ||
+                            karvydata != 0 ||
+                            camsdata != 0
+                        ) {
+                            resdata = {
+                                status: 200,
+                                message: "Successfull",
+                                data: frankdata
+                            };
+                        } else {
+                            resdata = {
+                                status: 400,
+                                message: "Data not found"
+                            };
+                        }
+                        // let merged3 = transcamsdata.map((items, j) => Object.assign({}, items, foliocamsdata[j]));
+                        // let merged1 = karvydata.map((items, j) => Object.assign({}, items, foliokarvydata[j]));
+                        var datacon = camsdata.concat(karvydata.concat(frankdata));
+                        datacon = datacon
+                            .map(JSON.stringify)
+                            .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                            .filter(function (item, index, arr) {
+                                return arr.indexOf(item, index + 1) === -1;
+                            }) // check if there is any occurence of the item in whole array
+                            .reverse()
+                            .map(JSON.parse);
+                            for (i = 0; i < datacon.length; i++) {
+                                if (datacon[i]['NATURE'] === "RED" || datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
+                                    datacon[i]['NATURE'] === "Switch Out" || datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "LTOF" ||
+                                    datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO" || datacon[i]['NATURE'] === "CNO" ||
+                                    datacon[i]['NATURE'] === "FULR" || datacon[i]['NATURE'] === "Full Redemption" || datacon[i]['NATURE'] === "Partial Switch Out"
+                                    || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption"
+                                    || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF" || datacon[i]['NATURE'] === "TOCOB") {
+                                    unit = "-" + datacon[i].UNITS;
+                                } else {
+                                    unit = datacon[i].UNITS;
+                                }
+            
+                                balance = parseFloat(unit) + parseFloat(balance);
+                                cnav = datacon[i].cnav;
+                              
+                            }
+                            var index = datacon.length - 1;
+
+                if (balance > 0) {
+                    datacon[index].UNITS = balance;
+                    datacon[index].AMOUNT = parseFloat(cnav) * parseFloat(balance);
+                } else if (balance.isNaN || cnav != "") {
+                    datacon[index].UNITS = 0;
+                    datacon[index].AMOUNT = 0;
+                }
+                else {
+                    datacon[index].UNITS = 0;
+                    datacon[index].AMOUNT = 0;
+                }
+                if (datacon[0].BANK_NAME === "") {
+                    datacon[index].BANK_NAME = datacon[0].BANK_NAME;
+                }
+                else if (datacon[0].BANK_NAME[0] === "" || datacon[0].BANK_NAME[0] === undefined || datacon[0].BANK_NAME[0].length < 2) {
+                    datacon[index].BANK_NAME = datacon[0].BANK_NAME;
+                } else {
+                    datacon[index].BANK_NAME = datacon[0].BANK_NAME[0];
+                }
+                if (datacon[0].AC_NO === "") {
+                    datacon[index].AC_NO = datacon[0].AC_NO;
+                }
+                else if (datacon[0].AC_NO[0] === "" || datacon[0].AC_NO[0] === undefined || datacon[0].AC_NO[0].length < 2) {
+                    datacon[index].AC_NO = datacon[0].AC_NO;
+                } else {
+                    datacon[index].AC_NO = datacon[0].AC_NO[0];
+                }
+                if (datacon[0].JTNAME2 === "") {
+                    datacon[index].JTNAME2 = datacon[0].JTNAME2;
+                }
+                else if (datacon[0].JTNAME2[0] === "" || datacon[0].JTNAME2[0] === undefined || datacon[0].JTNAME2[0].length < 2) {
+                    datacon[index].JTNAME2 = datacon[0].JTNAME2;
+                } else {
+                    datacon[index].JTNAME2 = datacon[0].JTNAME2[0];
+                }
+                if (datacon[0].JTNAME1 === "") {
+                    datacon[index].JTNAME1 = datacon[0].JTNAME1;
+                }
+                else if (datacon[0].JTNAME1[0] === "" || datacon[0].JTNAME1[0] === undefined || datacon[0].JTNAME1[0].length < 2) {
+                    datacon[index].JTNAME1 = datacon[0].JTNAME1;
+                } else {
+                    datacon[index].JTNAME1 = datacon[0].JTNAME1[0];
+                }
+                if (datacon[0].NOMINEE === "") {
+                    datacon[index].NOMINEE = datacon[0].NOMINEE;
+                }
+                else if (datacon[0].NOMINEE[0] === "" || datacon[0].NOMINEE[0] === undefined || datacon[0].NOMINEE[0].length < 2) {
+                    datacon[index].NOMINEE = datacon[0].NOMINEE;
+                } else {
+                    datacon[index].NOMINEE = datacon[0].NOMINEE[0];
+                }
+                datacon[index].INVNAME = datacon[0].INVNAME;
+                resdata.data = [datacon[index]];
+
+                res.json(resdata);
+                return resdata;
+                    });
+        });
+    })
+})
 
 app.post("/api/getamclist", function(req, res) { 
 	try{
