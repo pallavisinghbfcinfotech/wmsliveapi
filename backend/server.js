@@ -3363,7 +3363,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
         var folio = req.body.folio;;
         const pipeline = [
                 {$match : {FOLIO_NO:folio}},
-                {$group : {_id : { AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code :{$reduce:{input:{$split:["$PRODCODE","$AMC_CODE"]},initialValue: "",in: {$concat: ["$$value","$$this"]}} }  }}},
+                {$group : {_id : { AMC_CODE:"$AMC_CODE", PRODCODE:"$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] }  }}},
                 {$lookup:
                 {
                 from: "products",
