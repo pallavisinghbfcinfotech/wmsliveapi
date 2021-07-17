@@ -1251,6 +1251,7 @@ app.post("/api/getfoliodetail", function (req, res) {
                             }else{
                             datacon[index].AMOUNT = 0;
                             datacon[index].UNITS = 0;
+			    }
                 resdata.data = [datacon[index]];
 
                 res.json(resdata);
