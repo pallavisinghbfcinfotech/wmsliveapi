@@ -1199,24 +1199,15 @@ app.post("/api/getfoliodetail", function (req, res) {
     transc.aggregate(pipeline1, (err, camsdata) => {
        transk.aggregate(pipeline2, (err, karvydata) => {
             transf.aggregate(pipeline3, (err, frankdata) => {
-                        if (
-                            frankdata != 0 ||
-                            karvydata != 0 ||
-                            camsdata != 0
-                        ) {
+                                       if (frankdata != 0 || karvydata != 0 || camsdata != 0 ) {
                             resdata = {
                                 status: 200,
                                 message: "Successfull",
                                 data: frankdata
                             };
-                        } else {
-                            resdata = {
-                                status: 400,
-                                message: "Data not found"
-                            };
-                        }
-
+                       
                         var datacon = camsdata.concat(karvydata.concat(frankdata));
+                      
                         datacon = datacon
                             .map(JSON.stringify)
                             .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -1241,27 +1232,32 @@ app.post("/api/getfoliodetail", function (req, res) {
                                 cnav = datacon[i].cnav;
                                 
                             }
-                              var index = datacon.length - 1;
+                            var index = datacon.length - 1;
+                            
                             if(balance >0){
                             datacon[index].AMOUNT = Math.round(parseFloat(cnav) * parseFloat(balance));
                             datacon[index].UNITS = balance;
                             }else if(balance.isNaN || cnav != ""){
                             datacon[index].AMOUNT = 0;
                             datacon[index].UNITS = 0;
-                            }else{
+                             }else{
                             datacon[index].AMOUNT = 0;
                             datacon[index].UNITS = 0;
-			    }
-		    console.log("datacon=",datacon[index]);
+                            }
+               
                 resdata.data = [datacon[index]];
-
+            } else {
+                resdata = {
+                    status: 400,
+                    message: "Data not found"
+                };
+            }
                 res.json(resdata);
                 return resdata;
                     });
         });
     })
 })
-
 app.post("/api/getamclist", function(req, res) { 
 	try{
     if(req.body.pan === "" || req.body.pan === undefined || req.body === "" || req.body.pan === null){
