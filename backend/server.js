@@ -1241,9 +1241,16 @@ app.post("/api/getfoliodetail", function (req, res) {
                                 cnav = datacon[i].cnav;
                                 
                             }
-                            var index = datacon.length - 1;
+                              var index = datacon.length - 1;
+                            if(balance >0){
                             datacon[index].AMOUNT = Math.round(parseFloat(cnav) * parseFloat(balance));
                             datacon[index].UNITS = balance;
+                            }else if(balance.isNaN || cnav != ""){
+                            datacon[index].AMOUNT = 0;
+                            datacon[index].UNITS = 0;
+                            }else{
+                            datacon[index].AMOUNT = 0;
+                            datacon[index].UNITS = 0;
                 resdata.data = [datacon[index]];
 
                 res.json(resdata);
