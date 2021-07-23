@@ -3482,8 +3482,8 @@ app.get("/api/getfoliolist", function (req, res) {
             //return resdata
     });
     })
-
-require("./routes/portfolio.routes.js")(app)
+app.post("./routes/portfolio.routes.js");
+//require("./routes/portfolio.routes.js")(app)
 
 app.use(express.static(path.join(__dirname, '/frontend/build')));
 app.get('*', (req, res) =>
