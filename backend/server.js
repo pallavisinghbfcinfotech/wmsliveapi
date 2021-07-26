@@ -8,12 +8,13 @@ import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
  import moment from 'moment';
- import { port_folio_data } from './controllers/port_folio.controller.js';
+ import  port_folio_data  from './controllers/port_folio.controller.js';
 var Schema = mongoose.Schema;
 dotenv.config();
 
 const mongodbUrl= config.MONGODB_URL;
 
+const { port_folio } = port_folio_data;
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
@@ -42,7 +43,7 @@ app.get("/", (req, res) => {
 // require("./routes/portfolio.routes.js")(app)
 //import portfolio from "./routes/portfolio.routes.js";
   
-    app.post("/port_folio", port_folio_data.port_folio_data);
+    app.post("/port_folio", port_folio_data.port_folio);
 //app.post("./routes/portfolio.routes.js");
 
 
