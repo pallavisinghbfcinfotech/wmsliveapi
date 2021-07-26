@@ -23,7 +23,8 @@ var doc = ""; var lastarray = []; var newarray = [];
 //module.exports = port_folio_data;
 
 
-port_folio_data = (req, res) => {
+
+exports.port_folio_data = (req, res) => {
 //     try {
 //         var resdata = "";
 //         pipeline1 = [  //trans_cams
