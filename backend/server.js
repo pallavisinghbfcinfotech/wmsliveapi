@@ -3483,7 +3483,7 @@ app.get("/api/getfoliolist", function (req, res) {
     });
     })
 //app.post("./routes/portfolio.routes.js");
-//require("./routes/portfolio.routes.js")(app)
+require("./routes/portfolio.routes.js")(app)
 
 app.use(express.static(path.join(__dirname, '/frontend/build')));
 app.get('*', (req, res) =>
