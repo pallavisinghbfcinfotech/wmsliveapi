@@ -22,7 +22,7 @@ var doc = ""; var lastarray = []; var newarray = [];
 
 //module.exports = port_folio_data;
 
-class Port_folio  {
+
 port_folio_data = (req, res) => {
 //     try {
 //         var resdata = "";
@@ -434,5 +434,4 @@ async function showfranklin(scheme, pan, folio, name) {
         console.log(err)
     }
 };
-}
-export default Port_folio;
+
