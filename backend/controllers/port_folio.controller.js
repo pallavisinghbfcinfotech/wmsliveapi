@@ -14,7 +14,9 @@ var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [
 var doc = ""; var lastarray = []; var newarray = [];
 
 //module.exports = port_folio_data;
-
+export default {
+  
+}
 exports.port_folio_data = (req, res) => {
 //     try {
 //         var resdata = "";
