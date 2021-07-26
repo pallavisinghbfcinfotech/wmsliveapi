@@ -1,4 +1,6 @@
-var db = require("../config.js");
+import db from '../config.js';
+
+//var db = require("../config.js");
 var async = require('async');
 var promise = require("promise");
 var mongoose = require('mongoose');
