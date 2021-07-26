@@ -1,16 +1,21 @@
 import db from '../config.js';
-
+import async from 'async';
+import promise from 'promise';
+import mongoose from 'mongoose';
+import moment from 'moment';
+import cors from 'cors';
+import Axios from 'axios';
 //var db = require("../config.js");
-var async = require('async');
-var promise = require("promise");
-var mongoose = require('mongoose');
+// var async = require('async');
+// var promise = require("promise");
+// var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var moment = require('moment');
-//var Loader = require("../../src/components/Admin/loader.js");
+// var moment = require('moment');
+// //var Loader = require("../../src/components/Admin/loader.js");
 
-var cors = require('cors');
-const Axios = require("axios");
+// var cors = require('cors');
+// const Axios = require("axios");
 
 var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
 var doc = ""; var lastarray = []; var newarray = [];
