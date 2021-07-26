@@ -34,6 +34,13 @@ app.use(express.urlencoded({ extended: true }));
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to WMS Api application." });
+});
+
+// require("./routes/portfolio.routes.js")(app)
+//import portfolio from "./routes/portfolio.routes.js";
+app.post("./routes/portfolio.routes.js");
 
 
 const navcams = new Schema({
@@ -3483,9 +3490,6 @@ app.get("/api/getfoliolist", function (req, res) {
     });
     })
 
-// require("./routes/portfolio.routes.js")(app)
-//import portfolio from "./routes/portfolio.routes.js";
-app.post("./routes/portfolio.routes.js");
 
 app.use(express.static(path.join(__dirname, '/frontend/build')));
 app.get('*', (req, res) =>
