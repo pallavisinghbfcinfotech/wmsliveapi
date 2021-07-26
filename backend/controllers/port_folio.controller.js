@@ -424,3 +424,5 @@ async function showfranklin(scheme, pan, folio, name) {
         console.log(err)
     }
 };
+
+module.exports = port_folio_data;
