@@ -21,10 +21,9 @@ var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [
 var doc = ""; var lastarray = []; var newarray = [];
 
 //module.exports = port_folio_data;
-export default {
-  
-}
-exports.port_folio_data = (req, res) => {
+
+class Port_folio  {
+port_folio_data = (req, res) => {
 //     try {
 //         var resdata = "";
 //         pipeline1 = [  //trans_cams
@@ -435,5 +434,5 @@ async function showfranklin(scheme, pan, folio, name) {
         console.log(err)
     }
 };
-
-//module.exports = port_folio_data;
+}
+export default Port_folio;
