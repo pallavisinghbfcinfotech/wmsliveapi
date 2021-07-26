@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 // require("./routes/portfolio.routes.js")(app)
 //import portfolio from "./routes/portfolio.routes.js";
   
-    app.post("/port_folio", port_folio_data.port_folio_data);
+  //  app.post("/port_folio", port_folio_data.port_folio_data);
 //app.post("./routes/portfolio.routes.js");
 
 
