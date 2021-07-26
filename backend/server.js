@@ -8,7 +8,7 @@ import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
  import moment from 'moment';
- 
+ import port_folio from '../controllers/port_folio.controller.js';
 var Schema = mongoose.Schema;
 dotenv.config();
 
@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 
 // require("./routes/portfolio.routes.js")(app)
 //import portfolio from "./routes/portfolio.routes.js";
-  const port_folio = require("../controllers/port_folio.controller.js");
+  
     app.post("/port_folio_data", port_folio.port_folio_data);
 //app.post("./routes/portfolio.routes.js");
 
