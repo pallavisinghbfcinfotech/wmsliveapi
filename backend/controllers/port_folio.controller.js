@@ -1,6 +1,6 @@
 import db from '../config.js';
 import async from 'async';
-import promise from 'promise';
+//import promise from 'promise';
 import mongoose from 'mongoose';
 import moment from 'moment';
 import cors from 'cors';
