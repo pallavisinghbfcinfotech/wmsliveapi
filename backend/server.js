@@ -15,8 +15,8 @@ dotenv.config();
 
 var db = config;
 
-console.log(db);
-return false;
+console.log("Test data ",db);
+
 
 const mongodbUrl= config.MONGODB_URL;
 
