@@ -25,7 +25,7 @@ var doc = ""; var lastarray = []; var newarray = [];
 export default {
 }
 
- class port_folio_data = (req, res) => {
+ class port_folio_data(req, res) => {
 //     try {
 //         var resdata = "";
 //         pipeline1 = [  //trans_cams
