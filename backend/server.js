@@ -10,7 +10,7 @@ import Axios from 'axios'
 import moment from 'moment';
 //import { default as port_folio_data } from './controllers/port_folio.controller.js';
 
-console.log(port_folio_data);
+
 var Schema = mongoose.Schema;
 dotenv.config();
 
