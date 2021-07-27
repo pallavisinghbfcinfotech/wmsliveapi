@@ -550,14 +550,11 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 	let cursor = "";
-	
-		
-	//	async function abcdefg(){
 		MongoClient.connect(config.MONGODB_URL, function(err, db) {
 		
 			    cursor = db.collection('trans_karvy').aggregate(pipeline5);
-				while (cursor.hasNext()) {
-				doc = cursor.next();
+				while (await cursor.hasNext()) {
+				doc = await cursor.next();
 
 				lastarray.push(doc);
 
@@ -565,10 +562,6 @@ app.post("/api/portfolio_api_data", function (req, res) {
 				return lastarray;
 
 			})
-		//}
-            
-	// abcdefg();
-            
         
         } catch (err) {
             console.log(err)
@@ -613,8 +606,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
             let cursor = db.collection('trans_cams').aggregate(pipeline4);
-            while (cursor.hasNext()) {
-                const doc = cursor.next();
+            while (await cursor.hasNext()) {
+                const doc = await cursor.next();
                 //dataarr.push(doc);
                 return doc;
             };
@@ -636,8 +629,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
             let cursor = db.collection('trans_franklin').aggregate(pipeline6);
-            while (cursor.hasNext()) {
-                const doc = cursor.next();
+            while (await cursor.hasNext()) {
+                const doc = await cursor.next();
                 //dataarr.push(doc);
                 return doc;
             };
