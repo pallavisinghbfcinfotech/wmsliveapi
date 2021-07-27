@@ -550,21 +550,22 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 	
-		MongoClient.connect(config.MONGODB_URL, function(err, db) {
-			    let cursor = db.collection('trans_karvy').aggregate(pipeline5);
-				while (cursor.hasNext()) {
-				doc = cursor.next();
-				lastarray.push(doc);
-			    };
-				return lastarray;
-			})
-          //
-	  // let cursor = db.collection('trans_karvy').aggregate(pipeline5);
-          //    while (await cursor.hasNext()) {
-          //      doc = await cursor.next();
-          //     lastarray.push(doc);
-          //  };
-	  //
+// 		MongoClient.connect(config.MONGODB_URL, function(err, db) {
+// 			    let cursor = db.collection('trans_karvy').aggregate(pipeline5);
+// 				while (cursor.hasNext()) {
+// 				doc = cursor.next();
+// 				lastarray.push(doc);
+// 			    };
+// 				return lastarray;
+// 			})
+          
+	  let cursor = db.collection('trans_karvy').aggregate(pipeline5);
+             while (await cursor.hasNext()) {
+               doc = await cursor.next();
+              lastarray.push(doc);
+	     };
+		return lastarray;
+	  
         } catch (err) {
             console.log(err)
         }
