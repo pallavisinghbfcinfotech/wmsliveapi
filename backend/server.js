@@ -13,7 +13,26 @@ import moment from 'moment';
 var Schema = mongoose.Schema;
 dotenv.config();
 
-var db = config;
+
+
+const options = {
+      useMongoClient: true,
+      autoIndex: false, // Don't build indexes
+      reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+      reconnectInterval: 500, // Reconnect every 500ms
+      poolSize: 10, // Maintain up to 10 socket connections
+      // If not connected, return errors immediately rather than waiting for reconnect
+      bufferMaxEntries: 0
+    };
+mongoose.Promise = global.Promise;
+var db = 
+mongoose.connect(process.env.MONGODB_URL, options , function(err, response){
+   if(err){ console.log('Failed to connect to ' + db); }
+   //else{ console.log('Connected to ' + db, ' + ', response); }
+   else{ console.log('Connected to ' + db); }
+});
+
+
 
 
 
