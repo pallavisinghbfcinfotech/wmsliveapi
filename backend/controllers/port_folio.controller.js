@@ -22,7 +22,7 @@ var doc = ""; var lastarray = []; var newarray = [];
 
 //module.exports = port_folio_data;
 
-export default {
+export default port_folio_data(){
 }
 
  port_folio_data = (req, res) => {
