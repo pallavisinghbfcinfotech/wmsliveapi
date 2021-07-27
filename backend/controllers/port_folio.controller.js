@@ -22,7 +22,8 @@ var doc = ""; var lastarray = []; var newarray = [];
 
 //module.exports = port_folio_data;
 
-
+export default {
+}
 
 exports.port_folio_data = (req, res) => {
 //     try {
