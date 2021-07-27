@@ -13,30 +13,6 @@ import moment from 'moment';
 var Schema = mongoose.Schema;
 dotenv.config();
 
-
-
-const options = {
-      useMongoClient: true,
-      autoIndex: false, // Don't build indexes
-      reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-      reconnectInterval: 500, // Reconnect every 500ms
-      poolSize: 10, // Maintain up to 10 socket connections
-      // If not connected, return errors immediately rather than waiting for reconnect
-      bufferMaxEntries: 0
-    };
-mongoose.Promise = global.Promise;
-var db = 
-mongoose.connect(config.MONGODB_URL, options , function(err, response){
-   if(err){ console.log('Failed to connect to ' + db); }
-   //else{ console.log('Connected to ' + db, ' + ', response); }
-   else{ console.log('Connected to ' + db); }
-});
-
-
-
-
-
-
 const mongodbUrl= config.MONGODB_URL;
 
 // console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
@@ -571,7 +547,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.NAVDATE" } }, ISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
-
+	MongoClient.connect(config.MONGODB_URL, function(err, db) {
             let cursor = db.collection('trans_karvy').aggregate(pipeline5);
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
@@ -579,7 +555,9 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 lastarray.push(doc);
 
             };
-            return lastarray;
+		return lastarray;
+	})
+            
         
         } catch (err) {
             console.log(err)
