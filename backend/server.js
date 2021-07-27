@@ -7,8 +7,8 @@ import bodyParser from 'body-parser';
 import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
- import moment from 'moment';
- import  port_folio_data  from './routes/portfolio.routes.js';
+import moment from 'moment';
+import { port_folio_data } from './routes/portfolio.routes.js';
 var Schema = mongoose.Schema;
 dotenv.config();
 
@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 // require("./routes/portfolio.routes.js")(app)
 //import portfolio from "./routes/portfolio.routes.js";
   
-  //  app.post("/port_folio", port_folio_data.port_folio_data);
+    app.post("/port_folio", port_folio_data.port_folio_data);
 //app.post("./routes/portfolio.routes.js");
 
 
