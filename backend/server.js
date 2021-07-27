@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
- import db from './config.js';
+ //import db from './config.js';
  import config from './config.js';
  import mongoose from 'mongoose';
  import path from 'path';
@@ -12,6 +12,8 @@ import moment from 'moment';
 
 var Schema = mongoose.Schema;
 dotenv.config();
+
+var db = config;
 
 const mongodbUrl= config.MONGODB_URL;
 
@@ -546,7 +548,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 
-            let cursor = transk.aggregate(pipeline5);
+            let cursor = db.collection('trans_karvy').aggregate(pipeline5);
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
 
