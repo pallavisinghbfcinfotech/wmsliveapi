@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
- import config from './config.js';
+ import db from './config.js';
  import mongoose from 'mongoose';
  import path from 'path';
 import bodyParser from 'body-parser';
@@ -262,9 +262,9 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
 
         //var db = db.db("wms");
-        transc.aggregate(pipeline1, (err, data1) => {
-            transk.aggregate(pipeline2, (err, data2) => {
-                transf.aggregate(pipeline3, (err, data3) => {
+        db.collection('trans_cams').aggregate(pipeline1, (err, data1) => {
+            db.collection('trans_karvy').aggregate(pipeline2, (err, data2) => {
+                db.collection('trans_franklin').aggregate(pipeline3, (err, data3) => {
                     //if (err) throw err;
                     var i = 0;
                     if (data2.length != 0) {
@@ -548,7 +548,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 
-            let cursor = transk.aggregate(pipeline5);
+            let cursor = db.collection('trans_karvy').aggregate(pipeline5);
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
 
@@ -599,7 +599,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", TD_NAV: "$_id.PURPRICE", NATURE: "$_id.TRXN_TYPE_", TD_TRDT: { $dateToString: { format: "%m/%d/%Y", date: "$_id.TRADDATE" } }, ISIN: "$products.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
-            let cursor = transc.aggregate(pipeline4);
+            let cursor = db.collection('trans_cams').aggregate(pipeline4);
             while (await cursor.hasNext()) {
                 const doc = await cursor.next();
                 //dataarr.push(doc);
@@ -622,7 +622,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", TD_NAV: "$_id.NAV", NATURE: "$_id.TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, ISIN: "$_id.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
-            let cursor = transf.aggregate(pipeline6);
+            let cursor = db.collection('trans_franklin').aggregate(pipeline6);
             while (await cursor.hasNext()) {
                 const doc = await cursor.next();
                 //dataarr.push(doc);
