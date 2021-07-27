@@ -15,6 +15,9 @@ dotenv.config();
 
 var db = config;
 
+console.log(db);
+return false;
+
 const mongodbUrl= config.MONGODB_URL;
 
 console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
