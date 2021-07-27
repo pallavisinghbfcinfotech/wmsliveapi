@@ -519,9 +519,6 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
                                 maindatacall();
 
-
-
-
                             } else {
                                 resdata = {
                                     status: 400,
@@ -549,7 +546,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 
-            let cursor = db.collection('trans_karvy').aggregate(pipeline5);
+            let cursor = transk.aggregate(pipeline5);
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
 
