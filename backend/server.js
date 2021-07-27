@@ -572,7 +572,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $sort: { TD_TRDT: -1 } }
             ]
 
-            let cursor = mongoose.collection('trans_karvy').aggregate(pipeline5);
+            let cursor = db.collection('trans_karvy').aggregate(pipeline5);
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
 
@@ -623,7 +623,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", TD_NAV: "$_id.PURPRICE", NATURE: "$_id.TRXN_TYPE_", TD_TRDT: { $dateToString: { format: "%m/%d/%Y", date: "$_id.TRADDATE" } }, ISIN: "$products.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
-            let cursor = mongoose.collection('trans_cams').aggregate(pipeline4);
+            let cursor = db.collection('trans_cams').aggregate(pipeline4);
             while (await cursor.hasNext()) {
                 const doc = await cursor.next();
                 //dataarr.push(doc);
@@ -646,7 +646,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", TD_NAV: "$_id.NAV", NATURE: "$_id.TRXN_TYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, ISIN: "$_id.ISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
-            let cursor = mongoose.collection('trans_franklin').aggregate(pipeline6);
+            let cursor = db.collection('trans_franklin').aggregate(pipeline6);
             while (await cursor.hasNext()) {
                 const doc = await cursor.next();
                 //dataarr.push(doc);
