@@ -15,12 +15,12 @@ dotenv.config();
 
 var db = config;
 
-console.log("Test data ",db);
+
 
 
 const mongodbUrl= config.MONGODB_URL;
 
-console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
+// console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
 	useUnifiedTopology: true,
@@ -33,6 +33,8 @@ mongoose.connect(mongodbUrl, {
         // If not connected, return errors immediately rather than waiting for reconnect
 	bufferMaxEntries: 0
 }).catch(error => console.log(error.reason));
+
+console.log("Test data ",mongoose);
 
 const app=express();
 app.use(express.json());
