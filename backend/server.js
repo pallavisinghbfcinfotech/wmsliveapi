@@ -26,7 +26,7 @@ const options = {
     };
 mongoose.Promise = global.Promise;
 var db = 
-mongoose.connect(process.env.MONGODB_URL, options , function(err, response){
+mongoose.connect(config.MONGODB_URL, options , function(err, response){
    if(err){ console.log('Failed to connect to ' + db); }
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
