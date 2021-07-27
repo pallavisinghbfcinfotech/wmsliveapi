@@ -549,6 +549,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
             ]
 	MongoClient.connect(config.MONGODB_URL, function(err, db) {
             let cursor = db.collection('trans_karvy').aggregate(pipeline5);
+	})
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
 
@@ -556,7 +557,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
             };
 		return lastarray;
-	})
+	
             
         
         } catch (err) {
