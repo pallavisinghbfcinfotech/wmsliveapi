@@ -549,8 +549,9 @@ app.post("/api/portfolio_api_data", function (req, res) {
                 { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.NAVDATE" } }, ISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
                 { $sort: { TD_TRDT: -1 } }
             ]
+	let cursor = "";
 	MongoClient.connect(config.MONGODB_URL, function(err, db) {
-            let cursor = db.collection('trans_karvy').aggregate(pipeline5);
+            cursor = db.collection('trans_karvy').aggregate(pipeline5);
 	})
             while (await cursor.hasNext()) {
                 doc = await cursor.next();
