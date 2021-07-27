@@ -263,9 +263,9 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
 
         //var db = db.db("wms");
-        db.collection('trans_cams').aggregate(pipeline1, (err, data1) => {
-            db.collection('trans_karvy').aggregate(pipeline2, (err, data2) => {
-                db.collection('trans_franklin').aggregate(pipeline3, (err, data3) => {
+        transc.aggregate(pipeline1, (err, data1) => {
+            transk.aggregate(pipeline2, (err, data2) => {
+                transf.aggregate(pipeline3, (err, data3) => {
                     //if (err) throw err;
                     var i = 0;
                     if (data2.length != 0) {
