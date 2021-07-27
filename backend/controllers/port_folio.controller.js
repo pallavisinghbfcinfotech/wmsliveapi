@@ -20,12 +20,11 @@ var Schema = mongoose.Schema;
 var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
 var doc = ""; var lastarray = []; var newarray = [];
 
-//module.exports = port_folio_data;
+const port_folio_data = function (port_folio_data) {
 
-// export default port_folio_data(){
-// }
+};
 
- export default port_folio_data = (req, res) => {
+  port_folio_data.portfolio = (req, res) => {
     try {
         var resdata = "";
         pipeline1 = [  //trans_cams
@@ -437,4 +436,5 @@ async function showfranklin(scheme, pan, folio, name) {
     }
 };
 
+module.exports = port_folio_data;
 
