@@ -25,7 +25,7 @@ var doc = ""; var lastarray = []; var newarray = [];
 export default {
 }
 
-module exports.port_folio_data = (req, res) => {
+ class port_folio_data = (req, res) => {
 //     try {
 //         var resdata = "";
 //         pipeline1 = [  //trans_cams
@@ -437,3 +437,4 @@ async function showfranklin(scheme, pan, folio, name) {
     }
 };
 
+module.exports =  port_folio_data ;
