@@ -235,6 +235,7 @@ const members = new Schema({
     memberRelation: { type: String },
 }, { versionKey: false });
 
+
   var transc = mongoose.model('trans_cams', transcams, 'trans_cams');   
   var transk = mongoose.model('trans_karvy', transkarvy, 'trans_karvy'); 
   var transf = mongoose.model('trans_franklin', transfranklin, 'trans_franklin');  
@@ -566,7 +567,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
 // 				return lastarray;
 // 			})
           
-	  let cursor = transk.aggregate(pipeline5);
+	  let cursor = mongoose.Collection('trans_karvy').aggregate(pipeline5);
              while (await cursor.hasNext()) {
                doc = await cursor.next();
               lastarray.push(doc);
