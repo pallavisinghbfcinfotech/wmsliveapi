@@ -44,7 +44,7 @@ mongo.connect(mongodbUrl, function(err, newDb){
    if(err){
        throw new Error('Database failed to connect');
    } else{
-       console.log('Successfully connected to MongoDB on port 27017');
+       console.log('Successfully connected to MongoDB',newDb);
    }
    db = newDb; // ADD THIS
 });
