@@ -40,15 +40,6 @@ app.use(express.urlencoded({ extended: true }));
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-mongo.connect('mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms?retryWrites=true',{ useNewUrlParser: true } , function(err, newDb){
-   if(err){
-       throw new Error('Database failed to connect');
-   } else{
-       console.log('Successfully connected to MongoDB',newDb);
-   }
-   db = newDb; // ADD THIS
-});
-console.log("db=",db);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to WMS Api application." });
