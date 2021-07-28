@@ -17,7 +17,7 @@ var Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 var db = 
-mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true } , function(err, db){
+mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
    if(err){ console.log('Failed to connect to ' + db); }
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
@@ -27,11 +27,12 @@ mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/w
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
 	useUnifiedTopology: true,
+	promiseLibrary: global.Promise,
 	//useCreateIndex:true,
 	autoIndex: false, // Don't build indexes
 	//useMongoClient: true,
-	reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
-	reconnectInterval: 500, // Reconnect every 500ms
+// 	reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+// 	reconnectInterval: 500, // Reconnect every 500ms
 	poolSize: 10, // Maintain up to 10 socket connections
         // If not connected, return errors immediately rather than waiting for reconnect
 	bufferMaxEntries: 0
