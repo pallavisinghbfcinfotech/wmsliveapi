@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
- //import db from './config.js';
  import config from './config.js';
  import mongoose from 'mongoose';
  import path from 'path';
@@ -9,9 +8,7 @@ import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
 import moment from 'moment';
-import MongoClientData from 'mongodb';
-var mongo = MongoClientData.MongoClient;
-var db;
+
 var Schema = mongoose.Schema;
 dotenv.config();
 
