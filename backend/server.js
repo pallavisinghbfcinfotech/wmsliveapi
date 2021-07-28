@@ -17,7 +17,7 @@ var Schema = mongoose.Schema;
 
 
 var db = 
-mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { } , function(err, db){
+mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true } , function(err, db){
    if(err){ console.log('Failed to connect to ' + db); }
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
