@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
  import config from './config.js';
- import db from './config.js';
+// import db from './config.js';
  import mongoose from 'mongoose';
  import path from 'path';
 import bodyParser from 'body-parser';
@@ -11,9 +11,17 @@ import Axios from 'axios'
 import moment from 'moment';
 
 var Schema = mongoose.Schema;
-dotenv.config();
+// dotenv.config();
 
-const mongodbUrl= config.MONGODB_URL;
+ const mongodbUrl= config.MONGODB_URL;
+
+
+var db = 
+mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { } , function(err, db){
+   if(err){ console.log('Failed to connect to ' + db); }
+   //else{ console.log('Connected to ' + db, ' + ', response); }
+   else{ console.log('Connected to ' + db); }
+});
 
 // console.log("I am mongodbUrflfffffffffffff", mongodbUrl);
 mongoose.connect(mongodbUrl, {
