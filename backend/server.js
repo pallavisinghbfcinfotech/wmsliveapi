@@ -48,6 +48,7 @@ mongo.connect(mongodbUrl, function(err, newDb){
    }
    db = newDb; // ADD THIS
 });
+console.log("db=",db);
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to WMS Api application." });
