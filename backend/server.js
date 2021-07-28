@@ -10,8 +10,8 @@ import localStorage from 'localStorage'
 import Axios from 'axios'
 import moment from 'moment';
 import MongoClientData from 'mongodb';
-var MongoClient = MongoClientData.MongoClient;
-
+var mongo = MongoClientData.MongoClient;
+var db;
 var Schema = mongoose.Schema;
 dotenv.config();
 
@@ -39,6 +39,15 @@ app.use(express.urlencoded({ extended: true }));
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
+mongo.connect('mongodb://localhost:27017/wms', function(err, newDb){
+   if(err){
+       throw new Error('Database failed to connect');
+   } else{
+       console.log('Successfully connected to MongoDB on port 27017');
+   }
+   db = newDb; // ADD THIS
+});
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to WMS Api application." });
