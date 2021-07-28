@@ -40,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
-mongo.connect('mongodb://localhost:27017/wms', function(err, newDb){
+mongo.connect(mongodbUrl, function(err, newDb){
    if(err){
        throw new Error('Database failed to connect');
    } else{
