@@ -22,7 +22,7 @@ mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/w
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
 });
-
+mongoose.Promise = global.Promise;
  console.log("I am mongodb", db);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
