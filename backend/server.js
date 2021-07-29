@@ -51,7 +51,7 @@ mongoose.connect(mongodbUrl, {
 	bufferMaxEntries: 0
 }).catch(error => console.log(error.reason));
 
-// console.log("Test data ",mongoose);
+console.log("Test data ",mongoose.collection);
 
 const app=express();
 app.use(express.json());
