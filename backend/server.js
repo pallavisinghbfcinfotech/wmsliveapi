@@ -9,20 +9,22 @@ import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
 import moment from 'moment';
-import MongoClient from 'mongodb';
-//import MongoClient from 'MongoData.MongoClient';
+import MongoData from 'mongodb';
+
 var Schema = mongoose.Schema;
 // dotenv.config();
-
+var MongoClient = MongoData.MongoClient;
  const mongodbUrl= config.MONGODB_URL;
 mongoose.Promise = global.Promise;
 
-var db = 
-MongoClient.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
-   if(err){ console.log('Failed to connect to ' + db); }
-   //else{ console.log('Connected to ' + db, ' + ', response); }
-   else{ console.log('Connected to ' + db); }
-});
+// var db = 
+// MongoClient.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
+//    if(err){ console.log('Failed to connect to ' + db); }
+//    //else{ console.log('Connected to ' + db, ' + ', response); }
+//    else{ console.log('Connected to ' + db); }
+// });
+
+var url = "mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms?authSource=admin&replicaSet=atlas-ded6sd-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true";
 
 const options = {
     useMongoClient: true,
@@ -263,7 +265,8 @@ var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
 
 app.post("/api/portfolio_api_data", function (req, res) {
-	mongoose.connect(url, options , function(err, db){
+	MongoClient.connect(url, function(err, db) {
+		db = db.db("wms");
     var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
     var doc = ""; var lastarray = []; var newarray = [];
     try {
