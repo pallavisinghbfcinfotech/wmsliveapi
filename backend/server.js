@@ -583,7 +583,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
 // 				return lastarray;
 // 			})
           
-	  let cursor =mongoose.collection('trans_karvy').aggregate(pipeline5);
+	  let cursor =db.collection('trans_karvy').aggregate(pipeline5);
              while (await cursor.hasNext()) {
                doc = await cursor.next();
               lastarray.push(doc);
