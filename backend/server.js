@@ -36,7 +36,7 @@ const options = {
     bufferMaxEntries: 0
   };
 
- console.log("I am mongodb", db);
+//  console.log("I am mongodb", db);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
 	useUnifiedTopology: true,
