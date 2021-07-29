@@ -268,7 +268,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
  	mongoose.connect(mongodbUrl, { useNewUrlParser: true } , function(err, db){
 //	MongoClient.connect(mongodbUrl, function(err, db) {
 		//db = db.db("wms");
-		console.log("db=",db);
+		console.log("db=",db.models);
     var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
     var doc = ""; var lastarray = []; var newarray = [];
     try {
