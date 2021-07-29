@@ -9,8 +9,8 @@ import nodemailer from 'nodemailer';
 import localStorage from 'localStorage'
 import Axios from 'axios'
 import moment from 'moment';
-import MongoData from 'mongodb';
-import MongoClient from 'MongoData.MongoClient';
+import MongoClient from 'mongodb';
+//import MongoClient from 'MongoData.MongoClient';
 var Schema = mongoose.Schema;
 // dotenv.config();
 
