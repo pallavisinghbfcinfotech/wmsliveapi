@@ -262,12 +262,13 @@ const members = new Schema({
 var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
-
+var db;
 
 app.post("/api/portfolio_api_data", function (req, res) {
 	mongoose.connect(mongodbUrl, { useNewUrlParser: true } , function(err, db){
 	//MongoClient.connect(mongodbUrl, function(err, db) {
 		//db = db.db("wms");
+		console.log("db=",db);
     var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
     var doc = ""; var lastarray = []; var newarray = [];
     try {
