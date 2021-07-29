@@ -24,6 +24,16 @@ MongoClient.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.ne
    else{ console.log('Connected to ' + db); }
 });
 
+const options = {
+    useMongoClient: true,
+    autoIndex: false, // Don't build indexes
+    reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
+    reconnectInterval: 500, // Reconnect every 500ms
+    poolSize: 10, // Maintain up to 10 socket connections
+    // If not connected, return errors immediately rather than waiting for reconnect
+    bufferMaxEntries: 0
+  };
+
  console.log("I am mongodb", db);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
@@ -253,6 +263,7 @@ var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
 
 app.post("/api/portfolio_api_data", function (req, res) {
+	mongoose.connect(url, options , function(err, db){
     var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
     var doc = ""; var lastarray = []; var newarray = [];
     try {
@@ -651,6 +662,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
             console.log(err)
         }
     };
+	});
 })
 
 
