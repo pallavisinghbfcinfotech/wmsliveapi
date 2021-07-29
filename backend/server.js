@@ -17,7 +17,7 @@ var Schema = mongoose.Schema;
 mongoose.Promise = global.Promise;
 
 var client = 
-mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
+mongoose.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
    if(err){ console.log('Failed to connect to ' + db); }
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
