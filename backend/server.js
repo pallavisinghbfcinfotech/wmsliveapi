@@ -265,7 +265,8 @@ var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 
 
 app.post("/api/portfolio_api_data", function (req, res) {
-	MongoClient.connect(mongodbUrl, function(err, db) {
+	mongoose.connect(mongodbUrl, { useNewUrlParser: true } , function(err, db){
+	//MongoClient.connect(mongodbUrl, function(err, db) {
 		db = db.db("wms");
     var operationsCompleted = 0; let dataarr = []; var user = []; let datascheme = [];
     var doc = ""; var lastarray = []; var newarray = [];
