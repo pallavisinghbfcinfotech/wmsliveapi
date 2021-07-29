@@ -17,13 +17,13 @@ var Schema = mongoose.Schema;
  const mongodbUrl= config.MONGODB_URL;
 mongoose.Promise = global.Promise;
 
-var client = 
-MongoClient.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
+var db = 
+MongoClient.connect("mongodb+srv://developer:developer@cluster0.jxhzj.mongodb.net/wms", { useNewUrlParser: true , useUnifiedTopology: true, promiseLibrary: global.Promise } , function(err, db){
    if(err){ console.log('Failed to connect to ' + db); }
    //else{ console.log('Connected to ' + db, ' + ', response); }
    else{ console.log('Connected to ' + db); }
 });
-let db = client.db('wms');
+
  console.log("I am mongodb", db);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
