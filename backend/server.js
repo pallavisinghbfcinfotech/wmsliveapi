@@ -253,7 +253,7 @@ const members = new Schema({
 var i=0;var resdata="";var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
-var db;var temp22=0;
+var db;var temp22=0; var temp33 = 0;
 
 // app.post("/api/portfolio_api_data", function (req, res) {
 //  	mongoose.connect(mongodbUrl, { useNewUrlParser: true } , function(err, db){
