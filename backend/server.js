@@ -849,7 +849,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                         } else {
 
                                                                             arrpurchase[p] = temp4 * parseFloat(navrate);
-                                                                            if if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0|| isNaN(alldays[p]) || temp4 === 0 ) {
+                                                                             if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0|| isNaN(alldays[p]) || temp4 === 0 ) {
                                                                                 arrdays[p] = 0;
                                                                                 alldays[p] = 0;
                                                                                 sum1[p] = 0;
