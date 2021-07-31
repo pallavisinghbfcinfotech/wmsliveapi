@@ -714,10 +714,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                         (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
                                     )(Object.create(null))
                                 );
-
                                 for (var b = 0; b < datacon.length; b++) {
-                                    datascheme.push(datacon[b].FOLIO);
-                                     console.log("uuuuu=", b,datacon[b].FOLIO)//1
+                                  //  datascheme.push(datacon[b].FOLIO);
                                     Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
                                         {
                                             rta: datacon[b].RTA,
@@ -727,76 +725,76 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                             name: datacon[b].NAME
                                         }
                                     ).then(function (result) {
-                                        newarray.push(result.data);
-                                        console.log("rrr=",b,newarray.length);
-                                         if(b === newarray.length){
-                                        for(var j=0;j<newarray.length;j++){
-                                            for(var k=0;k<newarray[j].length;k++){
-                                                dataarr.push(newarray[j][k]);
+                                       
+                                        lastarray.push(result.data);
+                                        if (b === lastarray.length) {
+                                            for (var j = 0; j < lastarray.length; j++) {
+                                                for (var k = 0; k < lastarray[j].length; k++) {
+                                                    dataarr.push(lastarray[j][k]);
+                                                }
                                             }
-                                        }
-                                        var unit = 0; var amount = 0; var days = 0; var date1 = ""; var date2 = ""; var arrunit = [];
-                                        var arrpurchase = []; var sum1 = []; var sum2 = []; var arrdays = []; var alldays = []; var navrate = 0;
-                                        var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var cnav = 0; var temp222 = 0; var finalarr = [];
-                                        var temp44 = 0;
+                                            var amount = 0; var days = 0; var date1 = ""; var date2 = ""; 
+                                             var sum1 = []; var sum2 = []; var arrdays = []; var alldays = []; var navrate = 0;var purchase=[];
+                                            var temp1, temp2 = 0; var temp3 = 0; var temp4 = 0; var cnav = 0; var temp222 = 0; var finalarr = [];
+                                            var temp44 = 0;
 
-                                        if (dataarr != null && dataarr.length > 0) {
+                                            if (dataarr != null && dataarr.length > 0) {
 
-                                            dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
-                                            dataarr = dataarr.sort((a, b) => (a.FOLIO > b.FOLIO) ? 1 : -1);
+                                                dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
+                                                // dataarr = dataarr.sort((a, b) => (a.FOLIO > b.FOLIO) ? 1 : -1);
+                                              
+                                                for (var a = 0; a < datacon.length; a++) {
+                                                    var unit = 0;var arrpurchase = [];  var arrunit = [];
+                                                    for (var i = 0; i < dataarr.length; i++) { 
+                                                       
+                                                        var currentval = 0;var balance = 0;  
+                                                        if (datacon[a].FOLIO === dataarr[i].FOLIO && datacon[a].SCHEME === dataarr[i].SCHEME) {
+                                                          
+                                                            if (Math.sign(dataarr[i].UNITS) != -1) {
+                                                                if (dataarr[i].NATURE === "Switch Out")
+                                                                    for (var jj = 0; jj < arrunit.length; jj++) {
 
-                                            
-                                            for (var i = 0; i < dataarr.length; i++) {
-                                                var currentval = 0; var balance = 0;
-                                                if (datascheme.indexOf(dataarr[i].FOLIO) != -1) {
-                                                    if (dataarr[i].FOLIO === datascheme[datascheme.indexOf(dataarr[i].FOLIO)]) {
-                                                        //console.log("schemeposition=",datascheme[datascheme.indexOf(dataarr[i].FOLIO)])
-                                                        // console.log("scheme=", dataarr[i].FOLIO, "===", datascheme[datascheme.indexOf(dataarr[i].FOLIO)])
-                                                        if (Math.sign(dataarr[i].UNITS) != -1) {
-                                                            if (dataarr[i].NATURE === "Switch Out")
-                                                                for (var jj = 0; jj < arrunit.length; jj++) {
+                                                                        if (arrunit[jj] === 0)
+                                                                            arrunit.shift();
+                                                                        if (arrpurchase[jj] === 0)
+                                                                            arrpurchase.shift();
+                                                                        if (arrdays[jj] === 0)
+                                                                            arrdays.shift();
+                                                                        if (alldays[jj] === 0)
+                                                                            alldays.shift();
+                                                                        if (sum1[jj] === 0)
+                                                                            sum1.shift();
+                                                                        if (sum2[jj] === 0)
+                                                                            sum2.shift();
+                                                                    }
+                                                            }
 
-                                                                    if (arrunit[jj] === 0)
-                                                                        arrunit.shift();
-                                                                    if (arrpurchase[jj] === 0)
-                                                                        arrpurchase.shift();
-                                                                    if (arrdays[jj] === 0)
-                                                                        arrdays.shift();
-                                                                    if (alldays[jj] === 0)
-                                                                        alldays.shift();
-                                                                    if (sum1[jj] === 0)
-                                                                        sum1.shift();
-                                                                    if (sum2[jj] === 0)
-                                                                        sum2.shift();
-                                                                }
-                                                        }
+                                                            if (dataarr[i].NATURE != 'Switch Out' && dataarr[i].UNITS != 0) {
 
-                                                        if (dataarr[i].NATURE != 'Switch Out') {
+                                                                unit = dataarr[i].UNITS
+                                                               amount = dataarr[i].AMOUNT;
+                                                                var date = dataarr[i].TD_TRDT;
+                                                                var navdate = dataarr[i].navdate;
 
-                                                            unit = dataarr[i].UNITS
-                                                            amount = dataarr[i].AMOUNT;
-                                                            var date = dataarr[i].TD_TRDT;
-                                                            var navdate = dataarr[i].navdate;
-
-                                                            var d = new Date(date.split("-").reverse().join("-"));
-                                                            var dd = d.getDate();
-                                                            var mm = d.getMonth() + 1;
-                                                            var yy = d.getFullYear();
-                                                            var newdate = mm + "/" + dd + "/" + yy;
+                                                                var d = new Date(date.split("-").reverse().join("-"));
+                                                                var dd = d.getDate();
+                                                                var mm = d.getMonth() + 1;
+                                                                var yy = d.getFullYear();
+                                                                var newdate = mm + "/" + dd + "/" + yy;
 
 
-                                                            var navd = new Date(navdate);
-                                                            var navdd = navd.getDate();
-                                                            var navmm = navd.getMonth() + 1;
-                                                            var navyy = navd.getFullYear();
-                                                            var newnavdate = navmm + "/" + navdd + "/" + navyy;
-                                                            date1 = new Date(newdate);
-                                                            date2 = new Date(newnavdate);
-                                                            days = moment(date2).diff(moment(date1), 'days');
-                                                            arrunit.push(dataarr[i].UNITS);
-                                                            arrpurchase.push(dataarr[i].UNITS * dataarr[i].TD_NAV);
-                                                            //sum1(purchase cost*days*cagr)
-                                                            if (days === 0) {
+                                                                var navd = new Date(navdate);
+                                                                var navdd = navd.getDate();
+                                                                var navmm = navd.getMonth() + 1;
+                                                                var navyy = navd.getFullYear();
+                                                                var newnavdate = navmm + "/" + navdd + "/" + navyy;
+                                                                date1 = new Date(newdate);
+                                                                date2 = new Date(newnavdate);
+                                                                days = moment(date2).diff(moment(date1), 'days');
+                                                                arrunit.push(dataarr[i].UNITS);
+                                                                arrpurchase.push(dataarr[i].UNITS * dataarr[i].TD_NAV);
+                                                                 //sum1(purchase cost*days*cagr)
+                                                            if (days === 0 && isNaN(days)) {
                                                                 sum1.push(0);
                                                                 arrdays.push(0);
                                                                 alldays.push(0);
@@ -804,120 +802,133 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                             } else {
                                                                 arrdays.push(parseFloat(days) * dataarr[i].UNITS * parseFloat(dataarr[i].TD_NAV));
                                                                 alldays.push(parseFloat(days));
-                                                                //   console.log("rrrr=",arrdays,days,(res2.data[n].UNITS * parseFloat(res2.data[n].TD_NAV)),res2.data[n].SCHEME);
-
                                                                 sum1.push(parseFloat(dataarr[i].UNITS * dataarr[i].TD_NAV) * parseFloat(days) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[i].cnav * dataarr[i].UNITS) / (dataarr[i].UNITS * dataarr[i].TD_NAV)), parseFloat(1 / parseFloat(days / 365)))) - 1) * 100));
                                                                 sum2.push(parseFloat(dataarr[i].UNITS * dataarr[i].TD_NAV) * parseFloat(days));
                                                             }
 
-                                                            temp1 = dataarr[i].UNITS;
-                                                            temp2 = temp1 + temp2;
-                                                            navrate = dataarr[i].TD_NAV;
+                                                                temp1 = dataarr[i].UNITS;
+                                                                temp2 = temp1 + temp2;
+                                                                navrate = dataarr[i].TD_NAV;
+                                                                console.log("sum1all=",sum1)
 
-                                                        } else {
+                                                            } else {
 
-                                                            unit = "-" + dataarr[i].UNITS
-                                                            amount = "-" + dataarr[i].AMOUNT
-                                                            if (temp4 != "") {
-                                                                arrunit.splice(0, 0, temp4);
-                                                            }
-                                                            temp2 = dataarr[i].UNITS;
-
-                                                            for (var p = 0; p < arrunit.length; p++) {
-                                                                temp3 = arrunit[p];
-                                                                // rowval = p;
-                                                                arrunit[p] = 0;
-                                                                //  console.log("forif=", temp2, ">", temp3)
-                                                                if (temp2 > temp3) {
-                                                                    arrpurchase[p] = 0;
-                                                                    arrdays[p] = 0;
-                                                                    alldays[p] = 0;
-                                                                    sum1[p] = 0;
-                                                                    sum2[p] = 0;
-                                                                    temp2 = parseFloat(temp2) - parseFloat(temp3);
-                                                                } else {
-                                                                    temp4 = temp3 - temp2;
-                                                                    var len = dataarr.length - 1;
-                                                                    if (dataarr[len].NATURE === "SIP" || dataarr[len].NATURE === "Purchase" || dataarr[len].NATURE === "Switch In") {
-                                                                        arrpurchase[p] = temp4 * parseFloat(dataarr[p].TD_NAV);
-                                                                        // console.log("ggg=",arrpurchase[p],res2.data[p].SCHEME)
-                                                                        if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
-                                                                            arrdays[p] = 0;
-                                                                            alldays[p] = 0;
-                                                                            sum1[p] = 0;
-                                                                            sum2[p] = 0;
-                                                                        } else {
-                                                                            arrdays[p] = parseFloat(alldays[p]) * parseFloat(temp4) * parseFloat(dataarr[p].TD_NAV);
-                                                                            sum1[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
-                                                                            sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]);
-                                                                        }
-                                                                    } else {
-
-                                                                        arrpurchase[p] = temp4 * parseFloat(dataarr[p].TD_NAV);
-
-                                                                        if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
-                                                                            arrdays[p] = 0;
-                                                                            alldays[p] = 0;
-                                                                            sum1[p] = 0;
-                                                                            sum2[p] = 0;
-                                                                        } else {
-                                                                            arrdays[p] = parseFloat(alldays[p]) * temp4 * parseFloat(dataarr[p].TD_NAV);
-                                                                            sum1[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
-                                                                            sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p])
-                                                                        }
-                                                                    }
-
-                                                                    break;
+                                                                unit = "-" + dataarr[i].UNITS
+                                                                amount = "-" + dataarr[i].AMOUNT
+                                                                if (temp4 != "") {
+                                                                    arrunit.splice(0, 0, temp4);
                                                                 }
-                                                            }
-                                                        }
-                                                        //console.log("hhh=", arrpurchase, dataarr[i].SCHEME)
-                                                        balance = parseFloat(unit) + parseFloat(balance);
-                                                        cnav = dataarr[i].cnav;
-                                                        currentval = cnav * balance
-                                                        newarray.push(currentval)
+                                                                temp2 = dataarr[i].UNITS;
 
-                                                        // console.log("cwwwwv=",currentval)
-                                                    }
+                                                                for (var p = 0; p < arrunit.length; p++) {
+                                                                    temp3 = arrunit[p];
+                                                                    arrunit[p] = 0;
+                                                                    
+                                                                    if (temp2 > temp3) {
+                                                                        arrpurchase[p] = 0;
+                                                                        arrdays[p] = 0;
+                                                                        alldays[p] = 0;
+                                                                        sum1[p] = 0;
+                                                                        sum2[p] = 0;
+                                                                        temp2 = parseFloat(temp2) - parseFloat(temp3);
+                                                                    } else {
+                                                                        temp4 = temp3 - temp2;
+                                                                        var len = dataarr.length - 1;
+                                                                        if (dataarr[len].NATURE === "SIP" || dataarr[len].NATURE === "Purchase" || dataarr[len].NATURE === "Switch In") {
+                                                                            arrpurchase[p] = temp4 * parseFloat(dataarr[p].TD_NAV);
+                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
+                                                                                arrdays[p] = 0;
+                                                                                alldays[p] = 0;
+                                                                                sum1[p] = 0;
+                                                                                sum2[p] = 0;
+                                                                            } else {
+                                                                                arrdays[p] = parseFloat(alldays[p]) * parseFloat(temp4) * parseFloat(dataarr[p].TD_NAV);
+                                                                                sum1[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
+                                                                                sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]);
+                                                                            }
+                                                                           
+                                                                        } else {
+
+                                                                            arrpurchase[p] = temp4 * parseFloat(navrate);
+                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
+                                                                                arrdays[p] = 0;
+                                                                                alldays[p] = 0;
+                                                                                sum1[p] = 0;
+                                                                                sum2[p] = 0;
+                                                                            } else {
+                                                                                arrdays[p] = parseFloat(alldays[p]) * temp4 * parseFloat(dataarr[p].TD_NAV);
+                                                                                sum1[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
+                                                                                sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p])
+                                                                            }
+                                                                            
+                                                                        }
+                                                                        
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }//else condition equal switch
+                                                          
+                                                            balance = parseFloat(unit) + parseFloat(balance);
+                                                            
+                                                            cnav = dataarr[i].cnav;
+                                                            
+                                                            currentval = cnav * balance
+                                                            newarray.push(Math.round(currentval))
+
+                                                            
+                                                        }//if match two array 
+
+                                                    } //dataarr inner loop
+                                                    temp22 = 0; temp33 = 0
+                                                    
+                                                     for (var k = 0; k < arrpurchase.length; k++) {
+                                                    temp33 = Math.round(arrpurchase[k]);
+                                                    temp22 = temp33 + temp22;
+                                                   }
+                                                    purchase.push(temp22);
+                                                    
+                                                   
+                                                } // datascheme first loop
+
+                                                temp22 = 0;temp33 = 0
+                                               for (var p = 0; p < newarray.length; p++) {
+                                                    temp44 = newarray[p] + temp44;
                                                 }
-
-                                            }
-
-                                            temp22 = 0;
-                                            // temp33 = 0;
-                                            for (var p = 0; p < newarray.length; p++) {
-                                                temp44 = newarray[p] + temp44;
-                                            }
-
-                                            for (var k = 0; k < arrpurchase.length; k++) {
-                                                temp33 = Math.round(arrpurchase[k]);
-                                                temp22 = temp33 + temp22;
-                                                temp222 = Math.round(arrdays[k]) + temp222;
+                                                for (var k = 0; k < purchase.length; k++) {
+                                                    temp33 = Math.round(purchase[k]);
+                                                    temp22 = temp33 + temp22;
+                                                }
+                                               
+                                                // for (var k = 0; k < arrpurchase.length; k++) {
+                                                //     temp33 = Math.round(arrpurchase[k]);
+                                                //     temp22 = temp33 + temp22;
+                                                //     temp222 = Math.round(arrdays[k]) + temp222;
 
 
+                                                // }
+                                                var sum1all = 0; var sum2all = 0;
+                                               
+                                                for (var kk = 0; kk < sum1.length; kk++) {
+                                                    sum1all = sum1[kk] + sum1all;
+                                                }
+                                                for (var kkk = 0; kkk < sum2.length; kkk++) {
+                                                    sum2all = sum2[kkk] + sum2all;
+                                                }
+                                                
+                                                cagr = sum1all / sum2all;
+                                                finalarr.push({ purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),cagr:cagr })
+                                                console.log("purchase=", finalarr)
+                                                resdata = {
+                                                    status: 200,
+                                                    message: "Successfull",
+                                                    data: temp22
+                                                }
+                                                resdata.data = finalarr;
+                                                res.json(resdata);
+                                            } else {
+                                                console.log("purchase=", "Data Not Found!")
                                             }
-                                            var sum1all = 0; var sum2all = 0;
-                                            for (var kk = 0; kk < sum1.length; kk++) {
-                                                sum1all = sum1[kk] + sum1all;
-                                            }
-                                            for (var kkk = 0; kkk < sum2.length; kkk++) {
-                                                sum2all = sum2[kkk] + sum2all;
-                                            }
-
-                                            cagr = sum1all / sum2all;
-                                            finalarr.push({ purchasecost: Math.round(temp22), currentvalue: Math.round(temp44), cagr: Math.round(cagr) })
-                                            console.log("purchase=", finalarr)
-                                            resdata = {
-                                                status: 200,
-                                                message: "Successfull",
-                                                data: cagr
-                                            }
-                                            resdata.data = finalarr;
-                                            res.json(resdata);
-                                        } else {
-                                            console.log("purchase=", "Data Not Found!")
                                         }
-                                    }
                                     })
                                 }
 
