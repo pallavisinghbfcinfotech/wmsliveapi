@@ -835,8 +835,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                         var len = dataarr.length - 1;
                                                                         if (dataarr[len].NATURE === "SIP" || dataarr[len].NATURE === "Purchase" || dataarr[len].NATURE === "Switch In") {
                                                                             arrpurchase[p] = temp4 * parseFloat(dataarr[p].TD_NAV);
-                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] ===0
-									       || isNaN(alldays[p])) {
+                                                                           if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0|| isNaN(alldays[p]) || temp4 === 0 ) {
                                                                                 arrdays[p] = 0;
                                                                                 alldays[p] = 0;
                                                                                 sum1[p] = 0;
@@ -850,8 +849,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                         } else {
 
                                                                             arrpurchase[p] = temp4 * parseFloat(navrate);
-                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] ===0
-									       || isNaN(alldays[p])) {
+                                                                            if if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0|| isNaN(alldays[p]) || temp4 === 0 ) {
                                                                                 arrdays[p] = 0;
                                                                                 alldays[p] = 0;
                                                                                 sum1[p] = 0;
