@@ -715,8 +715,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                     )(Object.create(null))
                                 );
                                 for (var b = 0; b < datacon.length; b++) {
-                                  //  datascheme.push(datacon[b].FOLIO);
-                                    Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
+                                   Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
                                         {
                                             rta: datacon[b].RTA,
                                             scheme: datacon[b].SCHEME,
@@ -794,7 +793,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                 arrunit.push(dataarr[i].UNITS);
                                                                 arrpurchase.push(dataarr[i].UNITS * dataarr[i].TD_NAV);
                                                                  //sum1(purchase cost*days*cagr)
-                                                            if (days === 0 && isNaN(days)) {
+                                                            if (days === 0 || isNaN(days)) {
                                                                 sum1.push(0);
                                                                 arrdays.push(0);
                                                                 alldays.push(0);
@@ -836,7 +835,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                         var len = dataarr.length - 1;
                                                                         if (dataarr[len].NATURE === "SIP" || dataarr[len].NATURE === "Purchase" || dataarr[len].NATURE === "Switch In") {
                                                                             arrpurchase[p] = temp4 * parseFloat(dataarr[p].TD_NAV);
-                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
+                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] ===0
+									       || isNaN(alldays[p])) {
                                                                                 arrdays[p] = 0;
                                                                                 alldays[p] = 0;
                                                                                 sum1[p] = 0;
@@ -850,7 +850,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                         } else {
 
                                                                             arrpurchase[p] = temp4 * parseFloat(navrate);
-                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p])) {
+                                                                            if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] ===0
+									       || isNaN(alldays[p])) {
                                                                                 arrdays[p] = 0;
                                                                                 alldays[p] = 0;
                                                                                 sum1[p] = 0;
