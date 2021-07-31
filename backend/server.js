@@ -809,7 +809,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                                 temp1 = dataarr[i].UNITS;
                                                                 temp2 = temp1 + temp2;
                                                                 navrate = dataarr[i].TD_NAV;
-                                                                console.log("sum1all=",sum1)
+                                                                //console.log("sum1all=",sum1)
 
                                                             } else {
 
@@ -916,8 +916,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                 }
                                                 
                                                 cagr = sum1all / sum2all;
-                                                finalarr.push({ purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),cagr:cagr })
-                                                console.log("purchase=", finalarr)
+                                                finalarr.push({ purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),cagr:Math.round(cagr) })
+                                               // console.log("purchase=", finalarr)
                                                 resdata = {
                                                     status: 200,
                                                     message: "Successfull",
