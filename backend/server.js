@@ -775,6 +775,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                 }
                                                 resdata.data = finalarr;
                                                 res.json(resdata);
+						    return resdata;
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
