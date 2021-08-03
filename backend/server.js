@@ -1531,7 +1531,7 @@ app.post("/api/PANVerification", function (req, res) {
                             //datacon[j].Phone=datacon[j].Phone;
 // 				datacon[j].EMAIL = datacon[j].EMAIL.toUpperCase();
 // 				datacon[j].Name = datacon[j].Name.toUpperCase();
-                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&EntityID=1201160224111799498&TemplateID=1207162512411734505&Phno=" +phone+ "&Msg=Dear "+name+", Your Verification OTP is: "+OTP+". Please do not share this OTP with anyone. BFC Capital.",
+                                    Axios.get("http://nimbusit.biz/api/SmsApi/SendSingleApi?UserID=bfccapital&Password=obmh6034OB&SenderID=BFCCAP&EntityID=1201160224111799498&TemplateID=1207162615727439769&Phno=" +phone+ "&Msg=Dear "+name+", Your Family Member has requested to link your Mutual Fund Investment Folio(s) to his/her portfolio.<br>You can authorize the same by sharing the OTP - "+OTP+" with your family member. BFC Capital.",
                                 ).then(function (result) {
                                     console.log('SMS send successfully',phone);
                                 });
