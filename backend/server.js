@@ -1369,8 +1369,8 @@ app.post("/api/PANVerification", function (req, res) {
                         localStorage.setItem('otp', OTP);
                         localStorage.setItem('memberPan', req.body.memberPan );
 			      var name =datacon[0].Name;
-			    //var phone= datacon[0].Phone;
-			    var phone="8859908258";
+			    var phone= datacon[0].Phone;
+			  //  var phone="8859908258";
 // 				 for(var j=0;j<datacon.length;j++){
 //                                     datacon[j].EMAIL = datacon[j].EMAIL.toUpperCase();
 //                                     datacon[j].Name = datacon[j].Name.toUpperCase();
