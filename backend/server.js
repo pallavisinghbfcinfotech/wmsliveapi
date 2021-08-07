@@ -1271,7 +1271,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     var temp4 = 0; var temp1, temp2 = 0; var temp3 = 0;
                                                     var cv = 0; var sum1 = []; var sum2 = []; 
                                                     var balance = 0; var days = 0; var arrdays = [];
-                                                    var currentval = 0;
+                                                    var currentval = 0;var gain=0;
                                                 dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
                                                 var scheme="";
                                                     for (var i = 0; i < dataarr.length; i++) {                                                      
@@ -1457,10 +1457,11 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                         sum2all = sum2[kkk] + sum2all;
                                                     }
                                                     var cagr = sum1all/sum2all;
+						    gain = Math.round(currentval)-temp22;
                                                     if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 || isNaN(cagr) || days ===0 || isNaN(days) ) {
                                                        
                                                     } else {
-                                                        purchase.push({puchase:temp22,current:Math.round(currentval),scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,unit:balance.toFixed(3),cagr:cagr.toFixed(2),days:Math.round(days)});       
+                                                         purchase.push({puchase:temp22,current:Math.round(currentval),gain:gain,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,unit:balance.toFixed(3),cagr:cagr.toFixed(1),days:Math.round(days)});
                                                     }  
                                                 } // datascheme first loop
 
