@@ -296,6 +296,13 @@ app.post("/api/portfolio_api", function (req, res) {
                                                 if (datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase" || datacon[i]['NATURE'] === "NEW" || datacon[i]['NATURE'] === "ADD") {
                                                     datacon[i]['NATURE'] = "Purchase";
                                                 }
+			 			  if (datacon[i]['TYPE'] === "Equity(G)" || datacon[i]['TYPE'] === "EQUITY FUND" || datacon[i]['TYPE'] === "EQUITY FUN" || datacon[i]['TYPE'] === "EQUITY-MF") {
+                                                    datacon[i]['TYPE'] = "EQUITY";
+                                                }else if (datacon[i]['TYPE'] === "DEBT FUND" || datacon[i]['TYPE'] === "LIQUID FUND" || datacon[i]['TYPE'] === "LIQUID" ) {
+                                                    datacon[i]['TYPE'] = "DEBT";
+                                                }else{
+                                                    datacon[i]['TYPE'] = "GOLD";
+                                                }
 							}
 			  datacon = datacon.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);	
 			 res.json(datacon);
@@ -366,6 +373,13 @@ app.post("/api/portfolio_api", function (req, res) {
                                                 if (datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase" || datacon[i]['NATURE'] === "NEW" || datacon[i]['NATURE'] === "ADD") {
                                                     datacon[i]['NATURE'] = "Purchase";
                                                 }
+			 			 if (datacon[i]['TYPE'] === "Equity(G)" || datacon[i]['TYPE'] === "EQUITY FUND" || datacon[i]['TYPE'] === "EQUITY FUN" || datacon[i]['TYPE'] === "EQUITY-MF") {
+                                                    datacon[i]['TYPE'] = "EQUITY";
+                                                }else if (datacon[i]['TYPE'] === "DEBT FUND" || datacon[i]['TYPE'] === "LIQUID FUND" || datacon[i]['TYPE'] === "LIQUID" ) {
+                                                    datacon[i]['TYPE'] = "DEBT";
+                                                }else{
+                                                    datacon[i]['TYPE'] = "GOLD";
+                                                }
 							}
 				  datacon = datacon.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);	
 			 res.json(datacon);
@@ -407,6 +421,13 @@ app.post("/api/portfolio_api", function (req, res) {
                                                 }
                                                 if (datacon[i]['NATURE'] === "ADDPUR" || datacon[i]['NATURE'] === "Additional Purchase" || datacon[i]['NATURE'] === "NEW" || datacon[i]['NATURE'] === "ADD") {
                                                     datacon[i]['NATURE'] = "Purchase";
+                                                }
+			 			 if (datacon[i]['TYPE'] === "Equity(G)" || datacon[i]['TYPE'] === "EQUITY FUND" || datacon[i]['TYPE'] === "EQUITY FUN" || datacon[i]['TYPE'] === "EQUITY-MF") {
+                                                    datacon[i]['TYPE'] = "EQUITY";
+                                                }else if (datacon[i]['TYPE'] === "DEBT FUND" || datacon[i]['TYPE'] === "LIQUID FUND" || datacon[i]['TYPE'] === "LIQUID" ) {
+                                                    datacon[i]['TYPE'] = "DEBT";
+                                                }else{
+                                                    datacon[i]['TYPE'] = "GOLD";
                                                 }
 											}
 				  datacon = datacon.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);	
