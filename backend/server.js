@@ -1512,7 +1512,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     message: "Successfull",
                                                     data: temp22
                                                 }
-                                                resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :} } ;
+                                                resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :""} } ;
                                                 res.json(resdata);
                                             
                                             } else {
