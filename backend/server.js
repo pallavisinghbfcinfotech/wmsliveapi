@@ -1209,7 +1209,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
             res.json(resdata);
             return resdata;
        } else {
-        var dataarr = [];var lastarray = []; let newarray = [];
+        var dataarr = [];var lastarray = []; let newarray = [];var sum11=[];var sum22=[];
         pipeline1 = [  //trans_cams
              { $match: { PAN: req.body.pan,INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
@@ -1498,7 +1498,18 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     purchase.push({purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,unit:balance.toFixed(3),cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
                                                     }                  
                                                 } // datascheme first loop
-
+						  for(var r=0;r<purchase.length;r++){
+                                                    sum11.push(purchase[r].purchase_cost * purchase[r].avg_days * purchase[r].cagr);
+                                                     sum22.push(purchase[r].purchase_cost * purchase[r].avg_days);
+                                               }
+                                                sum1all =0;sum2all =0;
+                                                for (var kk = 0; kk < sum11.length; kk++) {
+                                                    sum1all = sum11[kk] + sum1all;
+                                                }
+                                                for (var kkk = 0; kkk < sum22.length; kkk++) {
+                                                    sum2all = sum22[kkk] + sum2all;
+                                                }
+                                                var sumcagr = sum1all/sum2all;
                                                 var mkt = 0; var cost = 0;var totgain=0;
                                                 for (var p = 0; p < tot_mkt_value.length; p++) {
                                                     mkt = tot_mkt_value[p] + mkt;
@@ -1511,7 +1522,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     message: "Successfull",
                                                     data: temp22
                                                 }
-                                                resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :""} } ;
+                                                resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost,tot_gain: totgain,tot_cagr:sumcagr.toFixed(1)} } ;
                                                 res.json(resdata);
                                             
                                             } else {
