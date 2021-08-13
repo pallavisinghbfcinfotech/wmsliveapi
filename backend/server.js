@@ -441,7 +441,7 @@ app.post("/api/portfolio_api", function (req, res) {
 
 
 app.post("/api/portfolio_api_data", function (req, res) {
-   
+    req.setTimeout(500000);
     try {
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if (req.body.pan === "") {
