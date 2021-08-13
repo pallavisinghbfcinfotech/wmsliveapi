@@ -542,6 +542,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
                                 var dataarr = [];var lastarray = []; 
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
+				     console.log(datacon.length)
                                 for (var b = 0; b < datacon.length; b++) {
                                        Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api',
                                         {
@@ -560,6 +561,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                     dataarr.push(lastarray[j][k]);
                                                 }
                                             }
+						 console.log(dataarr.length)
                                             var amount = 0; var days = 0; var date1 = ""; var date2 = "";
                                             var arrdays =[]; var alldays =[];  
                                             var cnav = 0; var temp222 = 0; var finalarr = [];
