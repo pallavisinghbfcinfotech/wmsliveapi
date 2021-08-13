@@ -5189,9 +5189,6 @@ app.get("/api/getfoliolist", function (req, res) {
     });
     })
 
-//app.post('/api/port_folio_data', port_folio_data);
-
-
 app.use(express.static(path.join(__dirname, '/frontend/build')));
 app.get('*', (req, res) =>
   res.sendFile(path.join(__dirname, '/frontend/build/index.html'))
@@ -5205,5 +5202,8 @@ app.use((err, req, res, next) => {
   });
 
 app.listen(port, ()=> { console.log("server started at port ",port)})
+
+var server = app.listen(port, ()=> { console.log("server started at port ",port)});
+server.setTimeout(500000);
 
 
