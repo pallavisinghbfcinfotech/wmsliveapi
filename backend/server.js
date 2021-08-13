@@ -255,8 +255,8 @@ var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var db;var temp22=0; var temp33 = 0;var cagr=0;
 
-app.post("/api/portfolio_api", function (req, res) {
- req.setTimeout(500000);
+app.post("/api/portfolio_api", {timeout: 500000}, function (req, res) {
+ //req.setTimeout(500000);
  try { 
  if(req.body.rta === "KARVY"){
   const pipeline1 = [  //trans_karvy   
@@ -440,7 +440,7 @@ app.post("/api/portfolio_api", function (req, res) {
 })
 
 
-app.post("/api/portfolio_api_data", function (req, res) {
+app.post("/api/portfolio_api_data",{timeout: 500000}, function (req, res) {
     req.setTimeout(500000);
     try {
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
