@@ -37,7 +37,10 @@ mongoose.connect(mongodbUrl, {
 	//useMongoClient: true,
 // 	reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
 // 	reconnectInterval: 500, // Reconnect every 500ms
-	poolSize: 10, // Maintain up to 10 socket connections
+	poolSize: 30, // Maintain up to 10 socket connections
+	autoReconnect=true,
+	socketTimeoutMS=360000,
+	connectTimeoutMS=360000,
         // If not connected, return errors immediately rather than waiting for reconnect
 	bufferMaxEntries: 0
 }).catch(error => console.log(error.reason));
