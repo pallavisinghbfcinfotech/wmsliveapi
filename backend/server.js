@@ -10,6 +10,8 @@ import localStorage from 'localStorage'
 import Axios from 'axios'
 import moment from 'moment';
 import MongoData from 'mongodb';
+import cookieParser from 'cookie-parser';
+import timeout from 'connect-timeout';
 
 var Schema = mongoose.Schema;
 // dotenv.config();
@@ -50,6 +52,12 @@ console.log("Test data ",mongoose.collection);
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(timeout('5s'));
+app.use(bodyParser());
+app.use(haltOnTimedout);
+app.use(cookieParser());
+app.use(haltOnTimedout);
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
