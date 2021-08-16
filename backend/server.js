@@ -822,6 +822,9 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                             }
                                         }
                                     })
+					.catch(error=>{
+							console.log("error",error);
+ 					 });
                                 }//second query response for loop
                             } else {
                                 resdata = {
