@@ -1178,7 +1178,38 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
             return resdata;
        } else {
         var dataarr = [];var lastarray = []; let newarray = [];var sum11=[];var sum22=[];
-        pipeline1 = [  //trans_cams
+//         pipeline1 = [  //trans_cams
+//              { $match: { PAN: req.body.pan,INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+//             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" ,AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] }} } },
+//             {
+//                 $lookup:
+//                 {
+//                     from: "products",
+//                     let: { ccc: "$_id.code", amc: "$_id.AMC_CODE" },
+//                     pipeline: [
+//                         {
+//                             $match:
+//                             {
+//                                 $expr:
+//                                 {
+//                                     $and:
+//                                         [
+//                                             { $eq: ["$PRODUCT_CODE", "$$ccc"] },
+//                                             { $eq: ["$AMC_CODE", "$$amc"] }
+//                                         ]
+//                                 }
+//                             }
+//                         },
+//                         { $project: { _id: 0 } }
+//                     ],
+//                     as: "products"
+//                 }
+//             },
+        
+//             { $unwind: "$products" },
+//              { $project: { _id: 0, NAME: "$_id.INV_NAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" , PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS" } }
+//          ]
+	       pipeline1 = [  //trans_cams
              { $match: { PAN: req.body.pan,INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
             { $group: { _id: { INV_NAME: "$INV_NAME", PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" ,AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] }} } },
             {
@@ -1207,14 +1238,25 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
             },
         
             { $unwind: "$products" },
-             { $project: { _id: 0, NAME: "$_id.INV_NAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" , PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS" } }
+            { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'cams' } },
+             { $unwind: "$cams" },
+             { $project: { _id: 0, NAME: "$_id.INV_NAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" , PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS",JTNAME1:"$cams.JNT_NAME1",JTNAME2:"$cams.JNT_NAME2",JTPAN1:"$cams.JOINT1_PAN",JTPAN2:"$cams.JOINT2_PAN",MODE:"$cams.HOLDING_NA" } }
          ]
-         pipeline2 = [  //trans_karvy
+//          pipeline2 = [  //trans_karvy
+//              { $match: { PAN1: req.body.pan,INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
+//              { $group: { _id: { INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO",SCHEMEISIN:"$SCHEMEISIN" } } },
+//              { $lookup: { from: 'products', localField: '_id.SCHEMEISIN', foreignField: 'ISIN', as: 'products' } },
+//              { $unwind: "$products" },
+//              { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY" } }
+//          ]
+	       pipeline2 = [  //trans_karvy
              { $match: { PAN1: req.body.pan,INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
-             { $group: { _id: { INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO",SCHEMEISIN:"$SCHEMEISIN" } } },
-             { $lookup: { from: 'products', localField: '_id.SCHEMEISIN', foreignField: 'ISIN', as: 'products' } },
+             { $group: { _id: { INVNAME: "$INVNAME", PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO",SCHEMEISIN:"$SCHEMEISIN" } } },   
+              { $lookup: { from: 'products', localField: '_id.SCHEMEISIN', foreignField: 'ISIN', as: 'products' } },
              { $unwind: "$products" },
-             { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY" } }
+             { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'karvy' } },
+             { $unwind: "$karvy" },
+             { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.holder_nature" } }
          ]
          transc.aggregate(pipeline1, (err, data1) => {
             transk.aggregate(pipeline2, (err, data2) => {
@@ -1487,8 +1529,9 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                         tot_mkt_value.push(Math.round(currentval));
                                                         tot_cost.push(temp22);
                                                         tot_gain.push(gain);
-                                                    purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,amc:datacon[a].AMC,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
-                                                    }                  
+                                                  //  purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,amc:datacon[a].AMC,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
+                                                     purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,jh1_name:datacon[a].JTNAME1,jh1_pan:datacon[a].JTPAN1,jh2_name:datacon[a].JTNAME2,jh2_pan:datacon[a].JTPAN2,holder_nature:datacon[a].MODE,amc:datacon[a].AMC,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
+						    }                  
                                                 } // datascheme first loop
                                                 for(var r=0;r<purchase.length;r++){
                                                     sum11.push(purchase[r].purchase_cost * purchase[r].avg_days * purchase[r].cagr);
