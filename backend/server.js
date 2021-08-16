@@ -53,7 +53,7 @@ const app=express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(timeout('500s'));
+//app.use(timeout('500s'));
 app.use(bodyParser());
 // app.use(haltOnTimedout);
 // app.use(cookieParser());
@@ -1256,7 +1256,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
              { $unwind: "$products" },
              { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'karvy' } },
              { $unwind: "$karvy" },
-             { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.holder_nature" } }
+              { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.MODEOFHOLD" } }
          ]
          transc.aggregate(pipeline1, (err, data1) => {
             transk.aggregate(pipeline2, (err, data2) => {
