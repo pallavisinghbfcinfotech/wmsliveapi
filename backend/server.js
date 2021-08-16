@@ -266,7 +266,7 @@ var pipeline="";var pipeline1="";var pipeline2="";var pipeline3="";
 var foliokarvydata="";var foliocamsdata="";var foliofranklindata="";
 var db;var temp22=0; var temp33 = 0;var cagr=0;
 
-app.post("/api/portfolio_api", function (req, res) {
+app.post("/api/portfolio_api",timeout('5s'), bodyParser.json(),  function (req, res) {
  try { 
  if(req.body.rta === "KARVY"){
     const pipeline1 = [  //trans_karvy   
