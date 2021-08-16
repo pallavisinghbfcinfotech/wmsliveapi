@@ -55,9 +55,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(timeout('5s'));
 app.use(bodyParser());
-app.use(haltOnTimedout);
+// app.use(haltOnTimedout);
 app.use(cookieParser());
-app.use(haltOnTimedout);
+// app.use(haltOnTimedout);
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
