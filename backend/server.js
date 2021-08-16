@@ -53,7 +53,7 @@ const app=express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(timeout('5s'));
+app.use(timeout('500s'));
 app.use(bodyParser());
 // app.use(haltOnTimedout);
 // app.use(cookieParser());
