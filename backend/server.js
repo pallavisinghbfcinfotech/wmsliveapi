@@ -507,7 +507,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
 				     console.log(datacon.length)
                                 for (var b = 0; b < datacon.length; b++) {
-                                       Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
+                                       Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api',
                                         {
                                             rta: datacon[b].RTA,
                                             scheme: datacon[b].SCHEME,
