@@ -2387,11 +2387,11 @@ app.post("/api/verifiyPanOtpAddFamily", function (req, res) {
 // }) 
 
 app.post("/api/getfoliodetail", function (req, res) {
-    var unit = 0; var balance = 0; var currentvalue = 0; var amt = 0; var cnav = 0;
-    var prodcode = req.body.amc_code + req.body.prodcode;
+    var balance = 0; var currentvalue = 0; var amt = 0; var cnav = 0;
+    var pcode = req.body.amc_code + req.body.prodcode;
     const pipeline1 = [  //trans_cams
-        { $match: { "FOLIO_NO": req.body.folio, "AMC_CODE": req.body.amc_code, "PRODCODE": prodcode } },
-        { $group: { _id: { INV_NAME: "$INV_NAME", BANK_NAME: "$BANK_NAME", AC_NO: "$AC_NO", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $reduce: { input: { $split: ["$PRODCODE", "$AMC_CODE"] }, initialValue: "", in: { $concat: ["$$value", "$$this"] } } }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } } },
+        { $match: { FOLIO_NO: req.body.folio, AMC_CODE: req.body.amc_code, PRODCODE: pcode } },
+        { $group: { _id: { INV_NAME: "$INV_NAME",FOLIO_NO:"$FOLIO_NO", BANK_NAME: "$BANK_NAME", AC_NO: "$AC_NO", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] } } , UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" }  } },
         {
             $lookup:
             {
@@ -2420,12 +2420,14 @@ app.post("/api/getfoliodetail", function (req, res) {
         { $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
         { $unwind: "$nav" },
         { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-        { $unwind: "$detail" },
-        { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", SCHEME: "$_id.SCHEME", NATURE: "$_id.TRXN_TYPE_", navdate: "$_id.TRADDATE", SCHEMEISIN: "$products.ISIN", NOMINEE: "$detail.NOM_NAME", BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO", JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
-     ]
+        //{ $unwind: "$detail" },
+        { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", SCHEME: "$_id.SCHEME", NATURE: "$_id.TRXN_TYPE_", navdate: "$_id.TRADDATE", SCHEMEISIN: "$products.ISIN", NOMINEE: "$detail.NOM_NAME", JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1",BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO",  cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+    ]
+   
+
     const pipeline2 = [  //trans_karvy
-        { $match: { "TD_ACNO": req.body.folio, "SCHEMEISIN": req.body.isin } },
-        { $group: { _id: { TD_ACNO: "$TD_ACNO", INVNAME: "$INVNAME",FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE",TD_TRDT: "$TD_TRDT",  SCHEMEISIN: "$SCHEMEISIN" }, TD_UNITS: { $sum: "$TD_UNITS" }, TD_AMT: { $sum: "$TD_AMT" } } },
+        { $match:  {TD_ACNO: req.body.folio ,FMCODE: pcode ,TD_FUND: req.body.amc_code  } },
+        { $group: { _id: { TD_ACNO: "$TD_ACNO", INVNAME: "$INVNAME", FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE", TD_TRDT: "$TD_TRDT", SCHEMEISIN: "$SCHEMEISIN" }, TD_UNITS: { $sum: "$TD_UNITS"}, TD_AMT: { $sum:"$TD_AMT" } } },
         {
             $lookup:
             {
@@ -2452,10 +2454,10 @@ app.post("/api/getfoliodetail", function (req, res) {
         },
         { $unwind: "$nav" },
         { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-        { $unwind: "$detail" },
-        { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", INVNAME: "$_id.INVNAME", SCHEME: "$_id.FUNDDESC", NATURE: "$_id.TD_TRTYPE", navdate: "$_id.TD_TRDT", SCHEMEISIN: "$_id.SCHEMEISIN", NOMINEE: "$detail.NOMINEE", BANK_NAME: "$detail.BNAME", AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS" }, AMOUNT: { $sum: "$TD_AMT" } } },
-     ]
-   
+      // { $unwind: "$detail" },
+        { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", INVNAME: "$_id.INVNAME", SCHEME: "$_id.FUNDDESC", NATURE: "$_id.TD_TRTYPE", navdate: "$_id.TD_TRDT", SCHEMEISIN: "$_id.SCHEMEISIN", NOMINEE: "$detail.NOMINEE", BANK_NAME: "$detail.BNAME", AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS"} , AMOUNT: { $sum:"$TD_AMT" } } },
+    ]
+
     const pipeline3 = [  //trans_franklin
         { $match: { "FOLIO_NO": req.body.folio, "ISIN": req.body.isin } },
         { $group: { _id: { FOLIO_NO: "$FOLIO_NO", INVESTOR_2: "$INVESTOR_2", SCHEME_NA1: "$SCHEME_NA1", TRXN_TYPE: "$TRXN_TYPE", TRXN_DATE: "$TRXN_DATE", ISIN: "$ISIN", NOMINEE1: "$NOMINEE1", PBANK_NAME: "$PBANK_NAME", PERSONAL23: "$PERSONAL23", JOINT_NAM2: "$JOINT_NAM2", JOINT_NAM1: "$JOINT_NAM1" }, UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
@@ -2484,71 +2486,119 @@ app.post("/api/getfoliodetail", function (req, res) {
             }
         },
         { $unwind: "$nav" },
-       { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INVESTOR_2", SCHEME: "$_id.SCHEME_NA1", NATURE: "$_id.TRXN_TYPE", navdate: "$_id.TRXN_DATE", SCHEMEISIN: "$_id.ISIN", NOMINEE: "$_id.NOMINEE1", BANK_NAME: "$_id.PBANK_NAME", AC_NO: "$_id.PERSONAL23", JTNAME2: "$_id.JOINT_NAM2", JTNAME1: "$_id.JOINT_NAM1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
+        { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INVESTOR_2", SCHEME: "$_id.SCHEME_NA1", NATURE: "$_id.TRXN_TYPE", navdate: "$_id.TRXN_DATE", SCHEMEISIN: "$_id.ISIN", NOMINEE: "$_id.NOMINEE1", BANK_NAME: "$_id.PBANK_NAME", AC_NO: "$_id.PERSONAL23", JTNAME2: "$_id.JOINT_NAM2", JTNAME1: "$_id.JOINT_NAM1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
     ]
 
     transc.aggregate(pipeline1, (err, camsdata) => {
-       transk.aggregate(pipeline2, (err, karvydata) => {
-            transf.aggregate(pipeline3, (err, frankdata) => {
-                                       if (frankdata != 0 || karvydata != 0 || camsdata != 0 ) {
-                            resdata = {
-                                status: 200,
-                                message: "Successfull",
-                                data: frankdata
-                            };
-                       
-                        var datacon = camsdata.concat(karvydata.concat(frankdata));
-                      
-                        datacon = datacon
-                            .map(JSON.stringify)
-                            .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
-                            .filter(function (item, index, arr) {
-                                return arr.indexOf(item, index + 1) === -1;
-                            }) // check if there is any occurence of the item in whole array
-                            .reverse()
-                            .map(JSON.parse);
-                            for (i = 0; i < datacon.length; i++) {
-                                if (datacon[i]['NATURE'] === "RED" || datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
-                                    datacon[i]['NATURE'] === "Switch Out" || datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "LTOF" ||
-                                    datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO" || datacon[i]['NATURE'] === "CNO" ||
-                                    datacon[i]['NATURE'] === "FULR" || datacon[i]['NATURE'] === "Full Redemption" || datacon[i]['NATURE'] === "Partial Switch Out"
-                                    || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption"
-                                    || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF" || datacon[i]['NATURE'] === "TOCOB") {
-                                    unit = "-" + datacon[i].UNITS;
-                                } else {
-                                    unit = datacon[i].UNITS;
-                                }
-            
-                                balance = parseFloat(unit) + parseFloat(balance);
-                                cnav = datacon[i].cnav;
-                                
-                            }
-                            var index = datacon.length - 1;
-                            
-                            if(balance >0){
-                            datacon[index].AMOUNT = Math.round(parseFloat(cnav) * parseFloat(balance));
-                            datacon[index].UNITS = balance;
-                            }else if(balance.isNaN || cnav != ""){
-                            datacon[index].AMOUNT = 0;
-                            datacon[index].UNITS = 0;
-                             }else{
-                            datacon[index].AMOUNT = 0;
-                            datacon[index].UNITS = 0;
-                            }
-               
-                resdata.data = [datacon[index]];
-            } else {
-                resdata = {
-                    status: 400,
-                    message: "Data not found"
-                };
-            }
+        transk.aggregate(pipeline2, (err, karvydata) => {
+            console.log(karvydata.length)
+             transf.aggregate(pipeline3, (err, frankdata) => {
+                if (frankdata != 0 || karvydata != 0 || camsdata != 0 ) {
+                    resdata = {
+                        status: 200,
+                        message: "Successfull",
+                        data: karvydata
+                    };
+                  
+                    var datacon = camsdata.concat(karvydata.concat(frankdata));
+
+                    datacon = datacon
+                        .map(JSON.stringify)
+                        .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                        .filter(function (item, index, arr) {
+                            return arr.indexOf(item, index + 1) === -1;
+                        }) // check if there is any occurence of the item in whole array
+                        .reverse()
+                        .map(JSON.parse);
+                        datacon = Array.from(new Set(datacon));
+                        var unit = 0;
+                    for (var i = 0; i < datacon.length; i++) {
+                        if (datacon[i]['NATURE'] === "RED" || datacon[i]['NATURE'] === "LTOP" || datacon[i]['NATURE'] === "Lateral Shift Out" ||
+                            datacon[i]['NATURE'] === "Switch Out" || datacon[i]['NATURE'] === "IPOR" || datacon[i]['NATURE'] === "LTOF" ||
+                            datacon[i]['NATURE'] === "FUL" || datacon[i]['NATURE'] === "STPO" || datacon[i]['NATURE'] === "CNO" ||
+                            datacon[i]['NATURE'] === "FULR" || datacon[i]['NATURE'] === "Full Redemption" || datacon[i]['NATURE'] === "Partial Switch Out"
+                            || datacon[i]['NATURE'] === "Full Switch Out" || datacon[i]['NATURE'] === "Partial Redemption"
+                            || datacon[i]['NATURE'] === "SWD" || datacon[i]['NATURE'] === "SWOF" || datacon[i]['NATURE'] === "TOCOB") {
+                            unit = "-" + datacon[i].UNITS;
+                        } else {
+                            unit = datacon[i].UNITS;
+                        }
+
+                        balance = parseFloat(unit) + parseFloat(balance);
+                        cnav = datacon[i].cnav;
+
+                    }
+                   
+                    var index = datacon.length - 1;
+
+                    if (balance > 0) {
+                        datacon[index].UNITS = parseFloat(balance.toFixed(3));
+                        datacon[index].AMOUNT = Math.round(parseFloat(cnav) * parseFloat(balance));
+                    } else if (balance.isNaN || cnav != "") {
+                        datacon[index].UNITS = 0;
+                        datacon[index].AMOUNT = 0;
+                    }
+                    else {
+                        datacon[index].UNITS = 0;
+                        datacon[index].AMOUNT = 0;
+                    }
+                    if (datacon[0].BANK_NAME === "") {
+                        datacon[index].BANK_NAME = datacon[0].BANK_NAME;
+                    }
+                    else if (datacon[0].BANK_NAME[0] === "" || datacon[0].BANK_NAME[0] === undefined || datacon[0].BANK_NAME[0].length < 2) {
+                        datacon[index].BANK_NAME = datacon[0].BANK_NAME;
+                    } else {
+                        datacon[index].BANK_NAME = datacon[0].BANK_NAME[0];
+                    }
+                    if (datacon[0].AC_NO === "") {
+                        datacon[index].AC_NO = datacon[0].AC_NO;
+                    }
+                    else if (datacon[0].AC_NO[0] === "" || datacon[0].AC_NO[0] === undefined || datacon[0].AC_NO[0].length < 2) {
+                        datacon[index].AC_NO = datacon[0].AC_NO;
+                    } else {
+                        datacon[index].AC_NO = datacon[0].AC_NO[0];
+                    }
+                   // if (datacon[0].JTNAME2 === "") {
+                        datacon[index].JTNAME2 = datacon[0].JTNAME2[0];
+                //   }
+                    // else if (datacon[0].JTNAME2[0] === "" || datacon[0].JTNAME2[0] === undefined || datacon[0].JTNAME2[0].length < 2) {
+                    //     datacon[index].JTNAME2 = datacon[0].JTNAME2;
+                    // } else {
+                    //     datacon[index].JTNAME2 = datacon[0].JTNAME2[0];
+                    // }
+                   
+                   // if (datacon[0].JTNAME1 === "") {
+                        datacon[index].JTNAME1 = datacon[0].JTNAME1[0];
+                   // }
+                    // else if (datacon[0].JTNAME1[0] === "" || datacon[0].JTNAME1[0] === undefined || datacon[0].JTNAME1[0].length < 2) {
+                    //     datacon[index].JTNAME1 = datacon[0].JTNAME1;
+                    // } else {
+                    //     datacon[index].JTNAME1 = datacon[0].JTNAME1[0];
+                    // }
+                    if (datacon[0].NOMINEE === "") {
+                        datacon[index].NOMINEE = datacon[0].NOMINEE;
+                    }
+                    else if (datacon[0].NOMINEE[0] === "" || datacon[0].NOMINEE[0] === undefined || datacon[0].NOMINEE[0].length < 2) {
+                        datacon[index].NOMINEE = datacon[0].NOMINEE;
+                    } else {
+                        datacon[index].NOMINEE = datacon[0].NOMINEE[0];
+                    }
+                    datacon[index].INVNAME = datacon[0].INVNAME;
+    
+                    resdata.data = [datacon[index]];
+                } else {
+                    resdata = {
+                        status: 400,
+                        message: "Data not found"
+                    };
+                }
                 res.json(resdata);
                 return resdata;
-                    });
-        });
+            });
+       });
     })
 })
+
 app.post("/api/getamclist", function(req, res) { 
 	try{
     if(req.body.pan === "" || req.body.pan === undefined || req.body === "" || req.body.pan === null){
