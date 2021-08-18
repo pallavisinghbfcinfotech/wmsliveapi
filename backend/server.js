@@ -2425,7 +2425,7 @@ app.post("/api/getfoliodetail", function (req, res) {
    
 
     const pipeline2 = [  //trans_karvy
-        { $match:  {TD_ACNO: req.body.folio ,FMCODE: pcode ,TD_FUND: req.body.amc_code  } },
+        { $match:  {TD_ACNO: req.body.folio ,SCHEMEISIN:req.body.isin  } },
         { $group: { _id: { TD_ACNO: "$TD_ACNO", INVNAME: "$INVNAME", FUNDDESC: "$FUNDDESC", TD_TRTYPE: "$TD_TRTYPE", TD_TRDT: "$TD_TRDT", SCHEMEISIN: "$SCHEMEISIN" }, TD_UNITS: { $sum: "$TD_UNITS"}, TD_AMT: { $sum:"$TD_AMT" } } },
         {
             $lookup:
