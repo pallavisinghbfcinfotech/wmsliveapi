@@ -2420,7 +2420,6 @@ app.post("/api/getfoliodetail", function (req, res) {
         { $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
         { $unwind: "$nav" },
         { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-        //{ $unwind: "$detail" },
         { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", INVNAME: "$_id.INV_NAME", SCHEME: "$_id.SCHEME", NATURE: "$_id.TRXN_TYPE_", navdate: "$_id.TRADDATE", SCHEMEISIN: "$products.ISIN", NOMINEE: "$detail.NOM_NAME", JTNAME2: "$detail.JNT_NAME2", JTNAME1: "$detail.JNT_NAME1",BANK_NAME: "$_id.BANK_NAME", AC_NO: "$_id.AC_NO",  cnav: "$nav.NetAssetValue", UNITS: { $sum: "$UNITS" }, AMOUNT: { $sum: "$AMOUNT" } } },
     ]
    
@@ -2454,7 +2453,6 @@ app.post("/api/getfoliodetail", function (req, res) {
         },
         { $unwind: "$nav" },
         { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-      // { $unwind: "$detail" },
         { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", INVNAME: "$_id.INVNAME", SCHEME: "$_id.FUNDDESC", NATURE: "$_id.TD_TRTYPE", navdate: "$_id.TD_TRDT", SCHEMEISIN: "$_id.SCHEMEISIN", NOMINEE: "$detail.NOMINEE", BANK_NAME: "$detail.BNAME", AC_NO: "$detail.BNKACNO", JTNAME2: "$detail.JTNAME2", JTNAME1: "$detail.JTNAME1", cnav: "$nav.NetAssetValue", UNITS: { $sum: "$TD_UNITS"} , AMOUNT: { $sum:"$TD_AMT" } } },
     ]
 
@@ -2558,23 +2556,11 @@ app.post("/api/getfoliodetail", function (req, res) {
                     } else {
                         datacon[index].AC_NO = datacon[0].AC_NO[0];
                     }
-                   // if (datacon[0].JTNAME2 === "") {
+			
                         datacon[index].JTNAME2 = datacon[0].JTNAME2[0];
-                //   }
-                    // else if (datacon[0].JTNAME2[0] === "" || datacon[0].JTNAME2[0] === undefined || datacon[0].JTNAME2[0].length < 2) {
-                    //     datacon[index].JTNAME2 = datacon[0].JTNAME2;
-                    // } else {
-                    //     datacon[index].JTNAME2 = datacon[0].JTNAME2[0];
-                    // }
-                   
-                   // if (datacon[0].JTNAME1 === "") {
+               
                         datacon[index].JTNAME1 = datacon[0].JTNAME1[0];
-                   // }
-                    // else if (datacon[0].JTNAME1[0] === "" || datacon[0].JTNAME1[0] === undefined || datacon[0].JTNAME1[0].length < 2) {
-                    //     datacon[index].JTNAME1 = datacon[0].JTNAME1;
-                    // } else {
-                    //     datacon[index].JTNAME1 = datacon[0].JTNAME1[0];
-                    // }
+                  
                     if (datacon[0].NOMINEE === "") {
                         datacon[index].NOMINEE = datacon[0].NOMINEE;
                     }
