@@ -459,7 +459,11 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
             { $unwind: "$products" },
             { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'cams' } },
              { $unwind: "$cams" },
-              { $project: { _id: 0, NAME: "$_id.INV_NAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,ISIN:"$products.ISIN", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS",JTNAME1:"$cams.JNT_NAME1",JTNAME2:"$cams.JNT_NAME2",JTPAN1:"$cams.JOINT1_PAN",JTPAN2:"$cams.JOINT2_PAN",MODE:"$cams.HOLDING_NA",SIP_DATES:"$products.SIP_DATES" } }
+		{ $lookup: { from: 'cams_nav', localField: 'products.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+             { $unwind: "$nav" },
+              { $project: { _id: 0, NAME: "$_id.INV_NAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,
+			   ISIN:"$products.ISIN", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS",JTNAME1:"$cams.JNT_NAME1",
+			   JTNAME2:"$cams.JNT_NAME2",JTPAN1:"$cams.JOINT1_PAN",JTPAN2:"$cams.JOINT2_PAN",MODE:"$cams.HOLDING_NA",SIP_DATES:"$products.SIP_DATES",CNAV:"$nav.NetAssetValue" } }
          ]
          pipeline2 = [  //trans_karvy
              { $match: { PAN1: req.body.pan,INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
@@ -468,7 +472,11 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
              { $unwind: "$products" },
              { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'karvy' } },
              { $unwind: "$karvy" },
-         { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.MODEOFHOLD",ISIN:"$_id.SCHEMEISIN",SIP_DATES:"$products.SIP_DATES" } }
+	     { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+             { $unwind: "$nav" },
+         { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", 
+		      SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",
+		      MODE:"$karvy.MODEOFHOLD",ISIN:"$_id.SCHEMEISIN",SIP_DATES:"$products.SIP_DATES" ,CNAV:"$nav.NetAssetValue"} }
          ]
          transc.aggregate(pipeline1, (err, data1) => {
             transk.aggregate(pipeline2, (err, data2) => {
@@ -733,6 +741,9 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     }
                                                    
                                                     var cagr = sum1all/sum2all;
+						    var absreturn =(((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100).toFixed(2);
+                                                    gain = Math.round(currentval)-temp22;
+                                                   
                                                     gain = Math.round(currentval)-temp22;
                                                    
                                                     if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days) ) {
@@ -742,7 +753,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                         tot_mkt_value.push(Math.round(currentval));
                                                         tot_cost.push(temp22);
                                                         tot_gain.push(gain);
-                                                    purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,jh1_name:datacon[a].JTNAME1,jh1_pan:datacon[a].JTPAN1,jh2_name:datacon[a].JTNAME2,jh2_pan:datacon[a].JTPAN2,holder_nature:datacon[a].MODE,isin:datacon[a].ISIN,sip_dates:datacon[a].SIP_DATES,amc:datacon[a].AMC,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type}); 
+                                                   purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,jh1_name:datacon[a].JTNAME1,jh1_pan:datacon[a].JTPAN1,jh2_name:datacon[a].JTNAME2,jh2_pan:datacon[a].JTPAN2,holder_nature:datacon[a].MODE,isin:datacon[a].ISIN,sip_dates:datacon[a].SIP_DATES,amc:datacon[a].AMC,nav:datacon[a].CNAV,absolute_return:absreturn,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type}); 
                                                     }                  
                                                 } // datascheme first loop
                                                 for(var r=0;r<purchase.length;r++){
