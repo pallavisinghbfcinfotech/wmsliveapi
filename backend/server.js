@@ -1040,7 +1040,7 @@ app.post("/api/snapshot", function (req, res) {
                                                     message: "Successfull",
                                                     data: temp22
                                                 }
-                                                resdata.data = finalarr;
+                                                resdata.data = finalarr[0];
                                                 res.json(resdata);
                                             
                                                 
