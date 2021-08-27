@@ -4166,7 +4166,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
 //                        }
 //                        })
 
-app.post("/api/getsipstpuserwise", function (req, res) {
+app.post("/api/getsipstpuserwiseapi", function (req, res) {
     try{
         var member="";
         var guardpan1=[];var guardpan2=[];
@@ -4228,23 +4228,23 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                             var strFolio = {$or:arr1};
                             var strFolio1 = {$or:arr2};
                             pipeline = [  ///trans_cams
-                                { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, strFolio ] } },
+                                { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, strFolio,{ TRXN_NATUR: /Systematic/ }  ] } },
 
                                 { $group: { _id: {  TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT" ,TRADDATE: "$TRADDATE" } } },
 
                                 { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-                                { $unwind: "$detail" },
+                                //{ $unwind: "$detail" },
                                 { $project: {_id:0,GUARD_NAME:"$detail.GUARD_NAME",GUARD_PAN:"$detail.GUARD_PAN",PER_STATUS:"$_id.TAX_STATUS", TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR",  FOLIO_NO: "$_id.FOLIO_NO",SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT" , TRADDATE:{ $dateToString:{ format: "%d-%m-%Y", date: "$_id.TRADDATE"} } } },
                                
                                 { $sort: { TRADDATE: -1 } }                      
                             ]
                              pipeline1 = [  ///trans_karvy
-                                { $match: { $and: [strFolio1, {TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }  ] } },
+                                { $match: { $and: [strFolio1, {TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } } ,{ TRDESC: /Systematic/ }  ] } },
 
                                 { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC",  TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
 
                                 { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-                                { $unwind: "$detail" },
+                                //{ $unwind: "$detail" },
                                 { $project: { _id: 0,GUARD_NAME:"$detail.GUARDIANN0",GUARD_PAN:"$detail.GUARDPANNO", PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC" ,AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
                                
                                 { $sort: { TRADDATE: -1 } }
@@ -4269,6 +4269,11 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                                  datacon = [...maparr1.values()];//converting back to array from mapobject 
                                                  
                                                     for (var i = 0; i < datacon.length; i++) {
+                                                        if (datacon[i]['GUARD_NAME']) {
+                                                            datacon[i]['GUARD_NAME'] = datacon[i]['GUARD_NAME'][0] ;
+                                                        } if (datacon[i]['GUARD_PAN']) {
+                                                            datacon[i]['GUARD_PAN'] = datacon[i]['GUARD_PAN'][0] ;
+                                                        }
                                                         if (datacon[i]['TRXN_NATUR'].match(/^Systematic/)) {
                                                             datacon[i]['TRXN_NATUR'] = "SIP";
                                                         }
@@ -4307,22 +4312,22 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                         })
                     }else{
                         pipeline = [  ///trans_cams
-                            { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, {PAN:req.body.pan} ] } },
+                            { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, {PAN:req.body.pan},{ TRXN_NATUR: /Systematic/ }  ] } },
 
                             { $group: { _id: {  TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT" ,TRADDATE: "$TRADDATE" } } },
                             { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-                            { $unwind: "$detail" },
+                            //{ $unwind: "$detail" },
                             { $project: { _id: 0,GUARD_NAME:"$detail.GUARD_NAME",GUARD_PAN:"$detail.GUARD_PAN",PER_STATUS:"$_id.TAX_STATUS", TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR",  FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT" , TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }} },
                             
                             { $sort: { TRADDATE: -1 } }                      
                         ]
                          pipeline1 = [  ///trans_karvy
-                            { $match: { $and: [{PAN1:req.body.pan}, {TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }  ] } },
+                            { $match: { $and: [{PAN1:req.body.pan}, {TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } },{ TRDESC: /Systematic/ }   ] } },
 
                             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO",INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC",  TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
                             { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO', foreignField: 'ACNO', as: 'detail' } },
-                            { $unwind: "$detail" },
-                            { $project: { _id: 0,GUARD_NAME:"$detail.GUARDIANN0",GUARD_PAN:"$detail.GUARDPANNO", PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC" ,AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
+                            //{ $unwind: "$detail" },
+                            { $project: { _id: 0,GUARD_NAME:"$detail.GUARDIANN0",GUARD_PAN:"$detail.GUARDPANNO", PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO", INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC" ,AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } } } },
                            
                             
                             { $sort: { TRADDATE: -1 } }
@@ -4336,7 +4341,11 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                     message: 'Successfull',
                                     data: frankdata
                                 }
-                                datacon = karvydata.concat(camsdata)
+                                datacon = karvydata.concat(camsdata);
+                                datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                                            .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+                                            .reverse().map(JSON.parse);
+                                            datacon = Array.from(new Set(datacon));
                             for (var i = 0; i < datacon.length; i++) {
                                 if (datacon[i]['TRXN_NATUR'].match(/Systematic.*/)) {
                                     datacon[i]['TRXN_NATUR'] = "SIP";
@@ -4346,6 +4355,14 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                                 }
                                 if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/)) {
                                     datacon[i]['TRXN_NATUR'] = "STP";
+                                }if (datacon[i]['GUARD_NAME'] === null && datacon[i]['GUARD_PAN'] === null) {
+                                    datacon[i]['GUARD_NAME'] = "";
+                                    datacon[i]['GUARD_PAN'] = "";
+                                  }
+                                  if (datacon[i]['GUARD_NAME']) {
+                                    datacon[i]['GUARD_NAME'] = datacon[i]['GUARD_NAME'][0] ;
+                                } if (datacon[i]['GUARD_PAN']) {
+                                    datacon[i]['GUARD_PAN'] = datacon[i]['GUARD_PAN'][0] ;
                                 }
                             }
                             resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
