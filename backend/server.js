@@ -4201,8 +4201,9 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                 res.json(resdata);
                 return resdata;
             }else{
+                 var lastdate =  new Date(req.body.year, req.body.month, 0).getDate();
                 var firstdate = req.body.year+"-"+req.body.month+"-"+"01";
-                var seconddate =req.body.year+"-"+req.body.month+"-"+"31";;
+                var seconddate = req.body.year+"-"+req.body.month+"-"+lastdate;
                 family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                     if(member!=""){
                         member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
