@@ -5267,6 +5267,351 @@ console.log(err)
 // }
 // })
 
+// app.post("/api/gettransactionuserwise", function (req, res) {
+//     try{
+//         var member="";var guardpan1=[];var guardpan2=[];
+//         var arr1=[];var arr2=[];var arr3=[];var alldata=[];var arrFolio=[];var arrName=[];
+//         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+//         if(req.body.month ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter month',
+//             }
+//             res.json(resdata);
+//             return resdata;
+//         }else if(req.body.year ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter year',
+//             }
+//             res.json(resdata);
+//             return resdata;
+//         }else if(req.body.pan ===""){
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter pan',
+//             }
+//             res.json(resdata);
+//             return resdata;
+//         }else if(!regex.test(req.body.pan)) {
+//             resdata = {
+//                 status: 400,
+//                 message: 'Please enter valid pan',
+//             }
+//             res.json(resdata);
+//             return resdata;
+//         }else{
+//             var mon = parseInt(req.body.month);
+//             var yer = parseInt(req.body.year);
+//              family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
+//                 if(member!=""){
+//                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
+//                     guardpan1.push({GUARD_PAN:req.body.pan.toUpperCase()});
+//                     guardpan2.push({GUARDPANNO:req.body.pan.toUpperCase()});
+//                     arr1.push({PAN:req.body.pan.toUpperCase()});
+//                     // arr2.push({PAN1:req.body.pan.toUpperCase()});
+//                     // arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
+//                     for(var j=0;j<member.length;j++){     
+//                     guardpan1.push({GUARD_PAN:member[j]}); 
+//                     guardpan2.push({GUARDPANNO:member[j]});
+//                     arr1.push({PAN:member[j]});
+//                     // arr2.push({PAN1:member[j]});
+//                     // arr3.push({IT_PAN_NO1:member[j]});
+//                     }
+//                     var strPan1 = {$or:guardpan1};
+//                     var strPan2 = {$or:guardpan2};
+//                     folioc.find(strPan1).distinct("FOLIOCHK", function (err, member1) {
+//                       foliok.find(strPan2).distinct("ACNO", function (err, member2) {
+//                       var alldata = member1.concat(member2);   
+//                       for(var j=0;j<alldata.length;j++){     
+//                         arr1.push({FOLIO_NO:alldata[j]});
+//                         // arr2.push({TD_ACNO:alldata[j]});
+//                         // arr3.push({FOLIO_NO:alldata[j]});
+//                         }
+//                         var strFolio = {$or:arr1};
+//                         // var strFolio1 = {$or:arr2};
+//                         // var strFolio2 = {$or:arr3};
+//         pipeline = [  ///trans_cams
+//             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
+//             { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
+//             { $match: { $and: [{ month: mon }, { year: yer } ,strFolio  ] } },
+//             { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+//             { $sort: { TRADDATE: -1 } }
+//         ]
+//          pipeline1 = [  ///trans_karvy
+//             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
+//             { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
+//             { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio ] } },
+//             { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+//             { $sort: { TRADDATE: -1 } }
+//         ]
+//          pipeline2 = [  ///trans_franklin
+//             { $group: { _id: { SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
+//             { $project: { _id: 0, PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
+//             { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio] } },
+//             { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
+//             { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//             { $project: { detail: 0 ,_id:0,TAX_STATUS:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
+//             { $sort: { TRADDATE: -1 } }
+//         ]
+//         transc.aggregate(pipeline, (err, camsdata) => {
+//             transk.aggregate(pipeline1, (err, karvydata) => {
+//                 transf.aggregate(pipeline2, (err, frankdata) => {
+//                     if (frankdata != 0 || karvydata != 0 || camsdata != 0) {
+//                         resdata = {
+//                             status: 200,
+//                             message: 'Successfull',
+//                             data: frankdata
+//                         }
+//                         var datacon = frankdata.concat(karvydata.concat(camsdata));
+//                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+//                             .reverse().map(JSON.parse);
+//                             var newdata1 = datacon.map(item=>{
+//                                 return [JSON.stringify(item),item]
+//                                  }); // creates array of array
+//                                  var maparr1 = new Map(newdata1); // create key value pair from array of array
+//                                  datacon = [...maparr1.values()];//converting back to array from mapobject 
+
+//                               datacon = datacon.map(function(obj) {
+//                                 if(obj['GUARDIANN0']){
+//                                     obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                                     obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                                      // Delete old key
+//                                           delete obj['GUARDIANN0'];
+//                                           delete obj['GUARDPANNO'];
+//                                 }else if((obj['GUARDIANN0']) === ""){
+//                                         obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                                         obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                                         delete obj['GUARDIANN0'];
+//                                         delete obj['GUARDPANNO'];
+//                                     }
+//                                 if(obj['GUARDIAN20']){
+//                                     obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                                      // Delete old key
+//                                     delete obj['GUARDIAN20'];
+//                                 }else if((obj['GUARDIAN20']) === ""){
+//                                     obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                                     delete obj['GUARDIAN20'];
+//                                 }
+//                                     return obj;
+                                
+//                                 });
+
+//                         for (var i = 0; i < datacon.length; i++) {
+//                             if (datacon[i]['TRXN_NATUR'] === "Redemption" || datacon[i]['TRXN_NATUR'] === "FUL" || datacon[i]['TRXN_NATUR'] === "SIPR" || 
+//                         datacon[i]['TRXN_NATUR'] === "Full Redemption" || datacon[i]['TRXN_NATUR'] === "Partial Redemption") {
+//                             datacon[i]['TRXN_NATUR'] = "RED";
+//                         }  if (datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || 
+//                          datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)) {
+//                             datacon[i]['TRXN_NATUR'] = "SIP";
+//                         } if (datacon[i]['TRXN_NATUR'] === "Systematic Withdrawal") {
+//                             datacon[i]['TRXN_NATUR'] = "SWP";
+//                         }if (Math.sign(datacon[i]['AMOUNT']) === -1) {
+//                             datacon[i]['TRXN_NATUR'] = "SIPR";
+//                         } if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/) || datacon[i]['TRXN_NATUR'] === "S T P" || datacon[i]['TRXN_NATUR'] === "S T P In") {
+//                             datacon[i]['TRXN_NATUR'] = "STP";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift Out" || datacon[i]['TRXN_NATUR'] === "Switchout"
+//                          || datacon[i]['TRXN_NATUR'] === "Transfer-Out" || datacon[i]['TRXN_NATUR'] === "Transmission Out"
+//                           || datacon[i]['TRXN_NATUR'] === "Switch Over Out" || datacon[i]['TRXN_NATUR'] === "LTOP"
+//                           || datacon[i]['TRXN_NATUR'] === "LTOF" || datacon[i]['TRXN_NATUR'] === "Partial Switch Out" || 
+//                           datacon[i]['TRXN_NATUR'] === "Full Switch Out") {
+//                             datacon[i]['TRXN_NATUR'] = "Switch Out";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
+//                         || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
+//                         || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
+//                             datacon[i]['TRXN_NATUR'] = "Switch In";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Dividend Reinvest" || 
+//                         datacon[i]['TRXN_NATUR'] === "Dividend Paid"
+//                          || datacon[i]['TRXN_NATUR'] === "Div. Reinvestment") {
+//                             datacon[i]['TRXN_NATUR'] = "Dividend";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Gross Dividend") {
+//                             datacon[i]['TRXN_NATUR'] = "Dividend Payout";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Consolidation In") {
+//                             datacon[i]['TRXN_NATUR'] = "Con In";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
+//                             datacon[i]['TRXN_NATUR'] = "Con Out";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
+//                             datacon[i]['TRXN_NATUR'] = "Con Out";
+//                         }if (datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || 
+//                             datacon[i]['TRXN_NATUR'] === "Initial Allotment"
+//                         || datacon[i]['TRXN_NATUR'] === "NEWPUR") {
+//                             datacon[i]['TRXN_NATUR'] = "Purchase";
+//                         }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
+//                          datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+//                             datacon[i]['TRXN_NATUR'] = "Add. Purchase";
+//                         }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+//                             datacon[i]['PER_STATUS'] = "Minor";     
+// 		            datacon[i]['PAN'] = "";    
+//                         }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
+//                            datacon[i]['PER_STATUS'] = "Individual";
+//                        }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+//                          datacon[i]['PER_STATUS'] = "HUF";
+//                       }
+//                      }
+
+//                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
+//                      res.json(resdata);
+//                     return resdata;
+//                     }else{
+//                         resdata = {
+//                             status: 400,
+//                             message: 'Data not found',
+                            
+//                         }
+//                         res.json(resdata);
+//                        return resdata;
+//                     }
+                    
+//                  });
+//              });
+//           });
+//         });
+//     });
+//         }else{
+//             pipeline = [  ///trans_cams
+//                 { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
+//                 { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
+//                 { $match: { $and: [{ month: mon }, { year: yer } ,{PAN:req.body.pan}  ] } },
+//                 { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]
+//              pipeline1 = [  ///trans_karvy
+//                 { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
+//                 { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
+//                 { $match: { $and: [{ month: mon }, { year: yer }  ,{PAN:req.body.pan} ] } },
+//                 { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]
+//              pipeline2 = [  ///trans_franklin
+//                 { $group: { _id: { SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
+//                 { $project: { _id: 0, PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
+//                 { $match: { $and: [{ month: mon }, { year: yer }  ,{PAN:req.body.pan}] } },
+//                 { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
+//                 { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
+//                 { $project: { detail: 0 ,_id:0,TAX_STATUS:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
+//                 { $sort: { TRADDATE: -1 } }
+//             ]
+    
+//             transc.aggregate(pipeline, (err, camsdata) => {
+//                 transk.aggregate(pipeline1, (err, karvydata) => {
+//                     transf.aggregate(pipeline2, (err, frankdata) => {
+//                         if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+//                             resdata = {
+//                                 status: 200,
+//                                 message: 'Successfull',
+//                                 data: frankdata
+//                             }
+                        
+//                         datacon = frankdata.concat(karvydata.concat(camsdata))
+//                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+//                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
+//                             .reverse().map(JSON.parse);
+
+//                             datacon = datacon.map(function(obj) {
+//                             if(obj['GUARDIANN0']){
+//                                 obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                                 obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                                  // Delete old key
+//                                       delete obj['GUARDIANN0'];
+//                                       delete obj['GUARDPANNO'];
+//                             }else if((obj['GUARDIANN0']) === ""){
+//                                     obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
+//                                     obj['GUARD_PAN'] = obj['GUARDPANNO'];
+//                                     delete obj['GUARDIANN0'];
+//                                     delete obj['GUARDPANNO'];
+//                                 }
+//                             if(obj['GUARDIAN20']){
+//                                 obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                                  // Delete old key
+//                                 delete obj['GUARDIAN20'];
+//                             }else if((obj['GUARDIAN20']) === ""){
+//                                 obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
+//                                 delete obj['GUARDIAN20'];
+//                             }
+//                                 return obj;
+//                             });
+//                         for (var i = 0; i < datacon.length; i++) {
+//                             if (datacon[i]['TRXN_NATUR'] === "Redemption" || datacon[i]['TRXN_NATUR'] === "FUL" || datacon[i]['TRXN_NATUR'] === "SIPR" || 
+//                             datacon[i]['TRXN_NATUR'] === "Full Redemption" || datacon[i]['TRXN_NATUR'] === "Partial Redemption") {
+//                                 datacon[i]['TRXN_NATUR'] = "RED";
+//                             }  if (datacon[i]['TRXN_NATUR'].match(/Systematic Investment.*/) || 
+//                              datacon[i]['TRXN_NATUR'].match(/Systematic - Instalment.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic - To.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-NSE.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic Physical.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic-Normal.*/) || datacon[i]['TRXN_NATUR'].match(/Systematic (ECS).*/)) {
+//                                 datacon[i]['TRXN_NATUR'] = "SIP";
+//                             } if (datacon[i]['TRXN_NATUR'] === "Systematic Withdrawal") {
+//                                 datacon[i]['TRXN_NATUR'] = "SWP";
+//                             }if (Math.sign(datacon[i]['AMOUNT']) === -1) {
+//                                 datacon[i]['TRXN_NATUR'] = "SIPR";
+//                             } if (datacon[i]['TRXN_NATUR'].match(/Systematic - From.*/) || datacon[i]['TRXN_NATUR'] === "S T P" || datacon[i]['TRXN_NATUR'] === "S T P In") {
+//                                 datacon[i]['TRXN_NATUR'] = "STP";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift Out" || datacon[i]['TRXN_NATUR'] === "Switchout"
+//                              || datacon[i]['TRXN_NATUR'] === "Transfer-Out" || datacon[i]['TRXN_NATUR'] === "Transmission Out"
+//                               || datacon[i]['TRXN_NATUR'] === "Switch Over Out" || datacon[i]['TRXN_NATUR'] === "LTOP"
+//                               || datacon[i]['TRXN_NATUR'] === "LTOF" || datacon[i]['TRXN_NATUR'] === "Partial Switch Out" || 
+//                               datacon[i]['TRXN_NATUR'] === "Full Switch Out") {
+//                                 datacon[i]['TRXN_NATUR'] = "Switch Out";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Lateral Shift In" || datacon[i]['TRXN_NATUR'] === "Switch-In" 
+//                             || datacon[i]['TRXN_NATUR'] === "Transfer-In" || datacon[i]['TRXN_NATUR'] === "Switch Over In" 
+//                             || datacon[i]['TRXN_NATUR'] === "LTIN" || datacon[i]['TRXN_NATUR'] === "LTIA") {
+//                                 datacon[i]['TRXN_NATUR'] = "Switch In";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Dividend Reinvest" || 
+//                             datacon[i]['TRXN_NATUR'] === "Dividend Paid"
+//                              || datacon[i]['TRXN_NATUR'] === "Div. Reinvestment") {
+//                                 datacon[i]['TRXN_NATUR'] = "Dividend";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Gross Dividend") {
+//                                 datacon[i]['TRXN_NATUR'] = "Dividend Payout";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Consolidation In") {
+//                                 datacon[i]['TRXN_NATUR'] = "Con In";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
+//                                 datacon[i]['TRXN_NATUR'] = "Con Out";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Consolidation Out") {
+//                                 datacon[i]['TRXN_NATUR'] = "Con Out";
+//                             }if (datacon[i]['TRXN_NATUR'] === "Purchase" || datacon[i]['TRXN_NATUR'] === "NEW" || 
+//                                 datacon[i]['TRXN_NATUR'] === "Initial Allotment"
+//                             || datacon[i]['TRXN_NATUR'] === "NEWPUR") {
+//                                 datacon[i]['TRXN_NATUR'] = "Purchase";
+//                             }if(datacon[i]['TRXN_NATUR'] === "Additional Purchase" || datacon[i]['TRXN_NATUR'] === "ADD" ||
+//                              datacon[i]['TRXN_NATUR'] === "ADDPUR") {
+//                                 datacon[i]['TRXN_NATUR'] = "Add. Purchase";
+//                             }if (datacon[i]['PER_STATUS'] === "On Behalf Of Minor" || datacon[i]['PER_STATUS'] === "MINOR" || datacon[i]['PER_STATUS'] === "On Behalf of Minor" )  {
+//                                 datacon[i]['PER_STATUS'] = "Minor";   
+// 				datacon[i]['PAN'] = "";   
+//                             }if (datacon[i]['PER_STATUS'] === "INDIVIDUAL" || datacon[i]['PER_STATUS'] === "Resident Individual") {
+//                                datacon[i]['PER_STATUS'] = "Individual";
+//                            }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
+//                              datacon[i]['PER_STATUS'] = "HUF";
+//                           }
+//                         }
+//                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime())
+//                         res.json(resdata)
+//                         return resdata;
+//                     } else {
+//                         resdata = {
+//                             status: 400,
+//                             message: 'Data not found',
+//                         }
+//                         res.json(resdata)
+//                         return resdata;
+//                     }
+//                     });
+//                 });
+//             });
+//            }       
+//         });
+//     }
+// } catch (err) {
+//     console.log(err)
+// }
+// })
+
 app.post("/api/gettransactionuserwise", function (req, res) {
     try{
         var member="";var guardpan1=[];var guardpan2=[];
@@ -5301,23 +5646,23 @@ app.post("/api/gettransactionuserwise", function (req, res) {
             res.json(resdata);
             return resdata;
         }else{
-            var mon = parseInt(req.body.month);
-            var yer = parseInt(req.body.year);
+            var lastdate =  new Date(req.body.year, req.body.month, 0).getDate();
+            var firstdate = req.body.year+"-"+req.body.month+"-"+"01";
+            var seconddate = req.body.year+"-"+req.body.month+"-"+lastdate;
+            
              family.find({ adminPan:  {$regex : `^${req.body.pan}.*` , $options: 'i' }  },{_id:0,memberPan:1}, function (err, member) {
                 if(member!=""){
                     member  = [...new Set(member.map(({memberPan}) => memberPan.toUpperCase()))];
                     guardpan1.push({GUARD_PAN:req.body.pan.toUpperCase()});
                     guardpan2.push({GUARDPANNO:req.body.pan.toUpperCase()});
                     arr1.push({PAN:req.body.pan.toUpperCase()});
-                    // arr2.push({PAN1:req.body.pan.toUpperCase()});
-                    // arr3.push({IT_PAN_NO1:req.body.pan.toUpperCase()});
+                     arr2.push({PAN1:req.body.pan.toUpperCase()});
                     for(var j=0;j<member.length;j++){     
                     guardpan1.push({GUARD_PAN:member[j]}); 
                     guardpan2.push({GUARDPANNO:member[j]});
                     arr1.push({PAN:member[j]});
-                    // arr2.push({PAN1:member[j]});
-                    // arr3.push({IT_PAN_NO1:member[j]});
-                    }
+                     arr2.push({PAN1:member[j]});
+                     }
                     var strPan1 = {$or:guardpan1};
                     var strPan2 = {$or:guardpan2};
                     folioc.find(strPan1).distinct("FOLIOCHK", function (err, member1) {
@@ -5325,49 +5670,36 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                       var alldata = member1.concat(member2);   
                       for(var j=0;j<alldata.length;j++){     
                         arr1.push({FOLIO_NO:alldata[j]});
-                        // arr2.push({TD_ACNO:alldata[j]});
-                        // arr3.push({FOLIO_NO:alldata[j]});
-                        }
+                         arr2.push({TD_ACNO:alldata[j]});
+                         }
                         var strFolio = {$or:arr1};
-                        // var strFolio1 = {$or:arr2};
-                        // var strFolio2 = {$or:arr3};
+                         var strFolio1 = {$or:arr2};
         pipeline = [  ///trans_cams
+            { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, strFolio  ] } },
+
             { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
-            { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
-            { $match: { $and: [{ month: mon }, { year: yer } ,strFolio  ] } },
-            { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-            { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+            { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+            { $project: { _id: 0,GUARD_NAME:"$detail.GUARD_NAME",GUARD_PAN:"$detail.GUARD_PAN",PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } } } },
             { $sort: { TRADDATE: -1 } }
         ]
          pipeline1 = [  ///trans_karvy
+            { $match: { $and: [{TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, strFolio1  ] } },
+
             { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-            { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio ] } },
-            { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
-            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-            { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
+            { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO',foreignField: 'ACNO',as:'detail'} },
+            { $project: { _id: 0,GUARD_NAME:"$detail.GUARDIANN0",GUARD_PAN:"$detail.GUARDPANNO",PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString:{format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
             { $sort: { TRADDATE: -1 } }
         ]
-         pipeline2 = [  ///trans_franklin
-            { $group: { _id: { SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
-            { $project: { _id: 0, PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
-            { $match: { $and: [{ month: mon }, { year: yer }  ,strFolio] } },
-            { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
-            { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-            { $project: { detail: 0 ,_id:0,TAX_STATUS:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
-            { $sort: { TRADDATE: -1 } }
-        ]
+       
         transc.aggregate(pipeline, (err, camsdata) => {
             transk.aggregate(pipeline1, (err, karvydata) => {
-                transf.aggregate(pipeline2, (err, frankdata) => {
-                    if (frankdata != 0 || karvydata != 0 || camsdata != 0) {
+                    if ( karvydata != 0 || camsdata != 0) {
                         resdata = {
                             status: 200,
                             message: 'Successfull',
                             data: frankdata
                         }
-                        var datacon = frankdata.concat(karvydata.concat(camsdata));
+                        var datacon = karvydata.concat(camsdata);
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                             .reverse().map(JSON.parse);
@@ -5377,30 +5709,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                  var maparr1 = new Map(newdata1); // create key value pair from array of array
                                  datacon = [...maparr1.values()];//converting back to array from mapobject 
 
-                              datacon = datacon.map(function(obj) {
-                                if(obj['GUARDIANN0']){
-                                    obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
-                                    obj['GUARD_PAN'] = obj['GUARDPANNO'];
-                                     // Delete old key
-                                          delete obj['GUARDIANN0'];
-                                          delete obj['GUARDPANNO'];
-                                }else if((obj['GUARDIANN0']) === ""){
-                                        obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
-                                        obj['GUARD_PAN'] = obj['GUARDPANNO'];
-                                        delete obj['GUARDIANN0'];
-                                        delete obj['GUARDPANNO'];
-                                    }
-                                if(obj['GUARDIAN20']){
-                                    obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
-                                     // Delete old key
-                                    delete obj['GUARDIAN20'];
-                                }else if((obj['GUARDIAN20']) === ""){
-                                    obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
-                                    delete obj['GUARDIAN20'];
-                                }
-                                    return obj;
-                                
-                                });
+                             
 
                         for (var i = 0; i < datacon.length; i++) {
                             if (datacon[i]['TRXN_NATUR'] === "Redemption" || datacon[i]['TRXN_NATUR'] === "FUL" || datacon[i]['TRXN_NATUR'] === "SIPR" || 
@@ -5452,6 +5761,14 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                        }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
                          datacon[i]['PER_STATUS'] = "HUF";
                       }
+                       if (datacon[i]['GUARD_NAME']) {
+                        datacon[i]['GUARD_NAME'] = datacon[i]['GUARD_NAME'][0] ;
+                    } if (datacon[i]['GUARD_PAN']) {
+                        datacon[i]['GUARD_PAN'] = datacon[i]['GUARD_PAN'][0] ;
+                    } if (datacon[i]['GUARD_NAME'] === null && datacon[i]['GUARD_PAN'] === null) {
+                        datacon[i]['GUARD_NAME'] = "";
+                        datacon[i]['GUARD_PAN'] = "";
+                      }
                      }
 
                      resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
@@ -5467,78 +5784,44 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                        return resdata;
                     }
                     
-                 });
              });
           });
         });
     });
         }else{
             pipeline = [  ///trans_cams
+                { $match: { $and: [{TRADDATE: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } }, {PAN1:req.body.pan }  ] } },
+    
                 { $group: { _id: { TAX_STATUS:"$TAX_STATUS",TRXNNO:"$TRXNNO",INV_NAME: "$INV_NAME", PAN: "$PAN", TRXN_NATUR: "$TRXN_NATUR", FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", AMOUNT: "$AMOUNT", TRADDATE: "$TRADDATE" } } },
-                { $project: { _id: 0,PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } }, month: { $month: ('$_id.TRADDATE') }, year: { $year: ('$_id.TRADDATE') } } },
-                { $match: { $and: [{ month: mon }, { year: yer } ,{PAN:req.body.pan}  ] } },
-                { $lookup: { from: 'folio_cams', localField: 'FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
-                { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-                { $project: {    detail: 0 ,_id:0,TAX_STATUS:0,FOLIOCHK:0,AC_NO:0,FOLIO_DATE:0,PRODUCT:0,SCH_NAME:0,AMC_CODE:0,BANK_NAME:0,HOLDING_NA:0,IFSC_CODE:0,JNT_NAME1:0,JNT_NAME2:0,JOINT1_PAN:0,NOM2_NAME:0,NOM3_NAME:0,NOM_NAME:0,PRCODE:0,HOLDING_NATURE:0,PAN_NO:0,INV_NAME:0,EMAIL:0} },
+                { $lookup: { from: 'folio_cams', localField: '_id.FOLIO_NO', foreignField: 'FOLIOCHK', as: 'detail' } },
+                { $project: { _id: 0,GUARD_NAME:"$detail.GUARD_NAME",GUARD_PAN:"$detail.GUARD_PAN",PER_STATUS:"$_id.TAX_STATUS",TRXNNO:"$_id.TRXNNO", INVNAME: "$_id.INV_NAME", PAN: "$_id.PAN", TRXN_NATUR: "$_id.TRXN_NATUR", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRADDATE" } } } },
                 { $sort: { TRADDATE: -1 } }
             ]
              pipeline1 = [  ///trans_karvy
-                { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
-                { $project: { _id: 0,PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
-                { $match: { $and: [{ month: mon }, { year: yer }  ,{PAN:req.body.pan} ] } },
-                { $lookup: { from: 'folio_karvy', localField: 'FOLIO_NO', foreignField: 'ACNO', as: 'detail' } },
-                { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-                { $project: { detail: 0 , _id:0,STATUS:0,PRCODE:0,STATUSDESC:0,ACNO:0,BNKACNO:0,BNKACTYPE:0,FUNDDESC:0,NOMINEE:0,MODEOFHOLD:0,JTNAME2:0,FUND:0,EMAIL:0,BNAME:0,PANGNO:0,JTNAME1:0,PAN2:0} },
-                { $sort: { TRADDATE: -1 } }
-            ]
-             pipeline2 = [  ///trans_franklin
-                { $group: { _id: { SOCIAL_S18:"$SOCIAL_S18",TRXN_NO:"$TRXN_NO", INVESTOR_2: "$INVESTOR_2", IT_PAN_NO1: "$IT_PAN_NO1", TRXN_TYPE: "$TRXN_TYPE", FOLIO_NO: "$FOLIO_NO", SCHEME_NA1: "$SCHEME_NA1", AMOUNT: "$AMOUNT", TRXN_DATE: "$TRXN_DATE" } } },
-                { $project: { _id: 0, PER_STATUS:"$_id.SOCIAL_S18",TRXNNO:"$_id.TRXN_NO", INVNAME: "$_id.INVESTOR_2", PAN: "$_id.IT_PAN_NO1", TRXN_NATUR: "$_id.TRXN_TYPE", FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME_NA1", AMOUNT: "$_id.AMOUNT", TRADDATE: { $dateToString: { format: "%d-%m-%Y", date: "$_id.TRXN_DATE" } }, month: { $month: ('$_id.TRXN_DATE') }, year: { $year: ('$_id.TRXN_DATE') } } },
-                { $match: { $and: [{ month: mon }, { year: yer }  ,{PAN:req.body.pan}] } },
-                { $lookup: { from: 'folio_franklin', localField: 'FOLIO_NO', foreignField: 'FOLIO_NO', as: 'detail' } },
-                { $replaceRoot: { newRoot: { $mergeObjects: [ { $arrayElemAt: [ "$detail", 0 ] }, "$$ROOT" ] } } } ,
-                { $project: { detail: 0 ,_id:0,TAX_STATUS:0,PERSONAL_9:0,ACCNT_NO:0,AC_TYPE:0,ADDRESS1:0,BANK_CODE:0,BANK_NAME:0,COMP_CODE:0,D_BIRTH:0,EMAIL:0,HOLDING_T6:0,F_NAME:0,IFSC_CODE:0,JOINT_NAM1:0,JOINT_NAM2:0,KYC_ID:0,NEFT_CODE:0,NOMINEE1:0,PBANK_NAME:0,PANNO2:0,PANNO1:0,PHONE_RES:0,SOCIAL_ST7:0} },
-                { $sort: { TRADDATE: -1 } }
-            ]
+                { $match: { $and: [{TD_TRDT: { $gte: new Date(moment(firstdate).format("YYYY-MM-DD")), $lt: new Date(moment(seconddate).format("YYYY-MM-DD")) } },{PAN1:req.body.pan } ] } },
     
+                { $group: { _id: { STATUS:"$STATUS",TD_TRNO:"$TD_TRNO", INVNAME: "$INVNAME", PAN1: "$PAN1", TRDESC: "$TRDESC", TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_AMT: "$TD_AMT", TD_TRDT: "$TD_TRDT" } } },
+                { $lookup: { from: 'folio_karvy', localField: '_id.TD_ACNO',foreignField: 'ACNO',as:'detail'} },
+                { $project: { _id: 0,GUARD_NAME:"$detail.GUARDIANN0",GUARD_PAN:"$detail.GUARDPANNO",PER_STATUS:"$_id.STATUS", TRXNNO:"$_id.TD_TRNO",INVNAME: "$_id.INVNAME", PAN: "$_id.PAN1", TRXN_NATUR: "$_id.TRDESC", FOLIO_NO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", AMOUNT: "$_id.TD_AMT", TRADDATE: { $dateToString:{format: "%d-%m-%Y", date: "$_id.TD_TRDT" } }, month: { $month: ('$_id.TD_TRDT') }, year: { $year: ('$_id.TD_TRDT') } } },
+                { $sort: { TRADDATE: -1 } }
+            ]
+           
+             
             transc.aggregate(pipeline, (err, camsdata) => {
                 transk.aggregate(pipeline1, (err, karvydata) => {
-                    transf.aggregate(pipeline2, (err, frankdata) => {
-                        if (frankdata.length != 0 || karvydata.length != 0 || camsdata.length != 0) {
+                      if ( karvydata.length != 0 || camsdata.length != 0) {
                             resdata = {
                                 status: 200,
                                 message: 'Successfull',
                                 data: frankdata
                             }
                         
-                        datacon = frankdata.concat(karvydata.concat(camsdata))
+                        datacon = karvydata.concat(camsdata)
                         datacon = datacon.map(JSON.stringify).reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
                             .filter(function (item, index, arr) { return arr.indexOf(item, index + 1) === -1; }) // check if there is any occurence of the item in whole array
                             .reverse().map(JSON.parse);
 
-                            datacon = datacon.map(function(obj) {
-                            if(obj['GUARDIANN0']){
-                                obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
-                                obj['GUARD_PAN'] = obj['GUARDPANNO'];
-                                 // Delete old key
-                                      delete obj['GUARDIANN0'];
-                                      delete obj['GUARDPANNO'];
-                            }else if((obj['GUARDIANN0']) === ""){
-                                    obj['GUARD_NAME'] = obj['GUARDIANN0']; // Assign new key
-                                    obj['GUARD_PAN'] = obj['GUARDPANNO'];
-                                    delete obj['GUARDIANN0'];
-                                    delete obj['GUARDPANNO'];
-                                }
-                            if(obj['GUARDIAN20']){
-                                obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
-                                 // Delete old key
-                                delete obj['GUARDIAN20'];
-                            }else if((obj['GUARDIAN20']) === ""){
-                                obj['GUARD_NAME'] = obj['GUARDIAN20']; // Assign new key
-                                delete obj['GUARDIAN20'];
-                            }
-                                return obj;
-                            });
+                         
                         for (var i = 0; i < datacon.length; i++) {
                             if (datacon[i]['TRXN_NATUR'] === "Redemption" || datacon[i]['TRXN_NATUR'] === "FUL" || datacon[i]['TRXN_NATUR'] === "SIPR" || 
                             datacon[i]['TRXN_NATUR'] === "Full Redemption" || datacon[i]['TRXN_NATUR'] === "Partial Redemption") {
@@ -5588,6 +5871,13 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                                datacon[i]['PER_STATUS'] = "Individual";
                            }if (datacon[i]['PER_STATUS'] === "HINDU UNDIVIDED FAMI") {
                              datacon[i]['PER_STATUS'] = "HUF";
+                          } if (datacon[i]['GUARD_NAME']) {
+                            datacon[i]['GUARD_NAME'] = datacon[i]['GUARD_NAME'][0] ;
+                        } if (datacon[i]['GUARD_PAN']) {
+                            datacon[i]['GUARD_PAN'] = datacon[i]['GUARD_PAN'][0] ;
+                        } if (datacon[i]['GUARD_NAME'] === null && datacon[i]['GUARD_PAN'] === null) {
+                            datacon[i]['GUARD_NAME'] = "";
+                            datacon[i]['GUARD_PAN'] = "";
                           }
                         }
                         resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime())
@@ -5601,7 +5891,7 @@ app.post("/api/gettransactionuserwise", function (req, res) {
                         res.json(resdata)
                         return resdata;
                     }
-                    });
+                  
                 });
             });
            }       
