@@ -4369,7 +4369,14 @@ app.post("/api/getsipstpuserwise", function (req, res) {
                             resdata.data = datacon.sort((a, b) => new Date(b.TRADDATE.split("-").reverse().join("/")).getTime() - new Date(a.TRADDATE.split("-").reverse().join("/")).getTime());
                             res.json(resdata)
                             return resdata;
-                         }
+                           } else{
+                            resdata = {
+                                status: 400,
+                                message: 'Data not found',
+                            }
+                            res.json(resdata);
+                           return resdata;
+                        }
                         });
                       });
                     }
