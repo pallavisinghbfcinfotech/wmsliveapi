@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
  import config from './config.js';
-// import db from './config.js';
+ import db from './config.js';
  import mongoose from 'mongoose';
  import path from 'path';
 import bodyParser from 'body-parser';
@@ -11,7 +11,6 @@ import Axios from 'axios'
 import moment from 'moment';
 import MongoData from 'mongodb';
 
-import timeout from 'connect-timeout';
 
 var Schema = mongoose.Schema;
 // dotenv.config();
