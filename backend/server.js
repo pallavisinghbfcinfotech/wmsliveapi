@@ -4166,7 +4166,7 @@ app.post("/api/gettaxsavinguserwise", function (req, res) {
 //                        }
 //                        })
 
-app.post("/api/getsipstpuserwiseapi", function (req, res) {
+app.post("/api/getsipstpuserwise", function (req, res) {
     try{
         var member="";
         var guardpan1=[];var guardpan2=[];
