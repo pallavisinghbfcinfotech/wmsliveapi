@@ -360,9 +360,11 @@ app.post("/api/snapshot", function (req, res) {
                                
                                 var dataarr = [];var lastarray = []; 
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
+                              
                                 for (var b = 0; b < datacon.length; b++) {
-                                       Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api',
-                                       {
+                                       //Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
+                                    Axios.post('http://localhost:3001/api/portfolio_api',
+                                        {
                                             rta: datacon[b].RTA,
                                             scheme: datacon[b].SCHEME,
                                             pan: datacon[b].PAN,
@@ -385,13 +387,20 @@ app.post("/api/snapshot", function (req, res) {
                                            var newsum1=[];var newsum2=[];
 
                                             if (dataarr != null && dataarr.length > 0) {
-                                                
+                                                // for (var q = 0; q < dataarr.length; q++) {
+                                                //     Axios.post('http://localhost:3001/api/days_change',
+                                                //     {
+                                                //         isin: dataarr[q].ISIN,
+                                                //     }
+                                                // ).then(function (result1) {
+                                                  //  console.log(result1.data.data)
                                                 for (var c = 0; c < panarray.length; c++) {
                                                     let newarray = [];var purchase = [];var dayspurchase = [];
                                                     var name="";
                                                     let cagrarray=[];let cagrsum1array=[];
                                                     let cagrsum2array=[]; let finalsum1=0;
                                                     let finalsum2=0;var pan="";
+                                                    var equitytotal = 0;var debttotal = 0;var goldtotal=0;var equitydebtgoldtotal=0;
                                                 for (var a = 0; a < datacon.length; a++) {
                                                     var temp44 = 0;
                                                     if (panarray[c] === datacon[a].PAN) {
@@ -560,6 +569,15 @@ app.post("/api/snapshot", function (req, res) {
                                                                 cnav = 0;
                                                             }
                                                             currentval = cnav * balance
+
+                                                            if(dataarr[i].TYPE === "EQUITY"){
+                                                                equitytotal = parseFloat(currentval) + equitytotal;
+                                                            }else if(dataarr[i].TYPE === "DEBT"){
+                                                                debttotal = parseFloat(currentval) + debttotal;
+                                                            }else{
+                                                                goldtotal = parseFloat(currentval) + goldtotal;
+                                                            }
+
                                                             cv = currentval + cv;
                                                            // console.log("isin=",result1)
                                                         }//if match scheme & folio 
@@ -596,12 +614,20 @@ app.post("/api/snapshot", function (req, res) {
                                                         temp22 = temp33 + temp22;
                                                         temp222 = Math.round(arrdays[k]) + temp222;
                                                     }
-                                                    purchase.push(temp22);       
+                                                    if(temp22>0){
+                                                        purchase.push(temp22);
+                                                    }    
+                                                    if(temp222>0){  
                                                     dayspurchase.push(temp222);
+                                                    }
                                                 } // pan comparision
 
-                                               
+                                              
                                             }
+                                            equitytotal = Math.round(equitytotal);
+                                            debttotal = Math.round(debttotal);
+                                            goldtotal = Math.round(goldtotal);
+                                            equitydebtgoldtotal = Math.round(parseFloat(equitytotal) + parseFloat(debttotal) + parseFloat(goldtotal));
                                             sum1all=0;sum2all=0;
                                                 for (var kk = 0; kk < cagrsum1array.length; kk++) {
                                                     sum1all = cagrsum1array[kk] + sum1all;
@@ -644,25 +670,30 @@ app.post("/api/snapshot", function (req, res) {
                                              
                                            
                                                 if(temp22 !=0 && temp44 !=0){
-                                                finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44), cagr:cagr.toFixed(1),pan:pan })
-                                                    var pamt =0;var mamt =0;var camt =0;
+                                                finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),equitytotal:equitytotal,debttotal:debttotal,goldtotal:goldtotal,equitydebtgoldtotal:equitydebtgoldtotal, cagr:cagr.toFixed(1),pan:pan })
+                                                    var pamt =0;var mamt =0;var camt =0;var eamt=0;
+                                                    var damt=0;var gamt=0; var tamt=0;
                                                 for(var p=0;p<finalarr.length;p++){
                                                     pamt = finalarr[p].purchasecost + pamt ;
                                                     mamt = finalarr[p].currentvalue + mamt ;
-                                                    
+                                                    eamt = finalarr[p].equitytotal + eamt ;
+                                                    damt = finalarr[p].debttotal + damt ;
+                                                    gamt = finalarr[p].goldtotal + gamt ;
+                                                    tamt = finalarr[p].equitydebtgoldtotal + tamt ;
                                                 }
                                                 
                                             }
                                              console.log("finalarr=",finalarr)
-                                            // console.log("rrrrr=",finalarr.length)
-                                                resdata = {
+                                             resdata = {
                                                     status: 200,
                                                     message: "Successfull",
                                                     data: temp22
                                                 }
                                                  
                                                 if(finalarr.length === panarray.length){
-                                                    finalsnapshotarr.push({purchase_cost:pamt,market_value:mamt,cagr:finalcagr.toFixed(2)})
+                                               
+                                                    finalsnapshotarr.push({purchasecost:pamt,currentvalue:mamt,gain: mamt-pamt,
+                                                    dividend: 0,days_change: 0,equity_perc:((eamt/tamt)*100).toFixed(1),debt_perc:((damt/tamt)*100).toFixed(1),gold_perc:((gamt/tamt)*100).toFixed(1),cagr:finalcagr.toFixed(2)})
                                                     resdata.data = finalsnapshotarr;
                                                     res.json(resdata);
 
