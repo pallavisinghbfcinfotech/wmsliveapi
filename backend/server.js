@@ -1103,7 +1103,8 @@ app.post("/api/snapshot", function (req, res) {
 
 
 app.post("/api/portfolio_api",  function (req, res) {
- try { 
+req.setTimeout(500000);
+	try { 
  if(req.body.rta === "KARVY"){
     const pipeline1 = [  //trans_karvy   
         { $match: { FUNDDESC: req.body.scheme, PAN1: req.body.pan, TD_ACNO: req.body.folio, INVNAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
@@ -1642,6 +1643,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
 })
 
 app.post("/api/portfolio_api_data", function (req, res) {
+	req.setTimeout(500000);
     try {
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if (req.body.pan === "") {
