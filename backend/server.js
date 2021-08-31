@@ -2898,26 +2898,48 @@ app.post("/api/getfolio", function (req, res) {
 
 
 
-app.post("/api/PANVerification", function (req, res) {
-    try {
-	    let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
-        if(req.body.memberPan === "" ) {
+app. try {
+        let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
+        if (req.body.memberPan === "") {
             resdata = {
                 status: 400,
-                message: 'Please enter pan',
+                message: 'Please enter member pan!',
             }
             res.json(resdata)
             return resdata;
-        } else if(!regex.test(req.body.memberPan)) {
-                resdata = {
-                    status: 400,
-                    message: 'Please enter valid pan',
-                }
-                res.json(resdata);
-                return resdata;
-            }else{
-		    family.find({ memberPan: req.body.memberPan,adminPan:req.body.memberPan}, { _id: 0 }, function (err, memberdata) {
-			    if (memberdata.length === 0) {
+        } else if (!regex.test(req.body.memberPan)) {
+            resdata = {
+                status: 400,
+                message: 'Please enter valid member pan',
+            }
+            res.json(resdata);
+            return resdata;
+        }else if(req.body.adminPan === "") {
+            resdata = {
+                status: 400,
+                message: 'Please enter admin pan!',
+            }
+            res.json(resdata);
+            return resdata;
+        } else if (!regex.test(req.body.adminPan)) {
+            resdata = {
+                status: 400,
+                message: 'Please enter valid admin pan',
+            }
+            res.json(resdata);
+            return resdata;
+        }else if (req.body.memberPan === req.body.adminPan) {
+            resdata = {
+                status: 400,
+                message: 'Admin Pan & Family member Pan must not be same!',
+            }
+            res.json(resdata);
+        } else {
+            //var mod = new family({ memberPan: req.body.memberPan });
+            
+            // family.find({ memberPan: req.body.memberPan }).distinct("memberPan", function (err, memberdata) {
+                family.find({ memberPan: req.body.memberPan,adminPan:req.body.adminPan}, { _id: 0 }, function (err, memberdata) {
+			if (memberdata.length === 0) {
          foliok.find({ PANGNO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INVNAME",Phone:"$MOBILE" }, function (err, foliokarvydata) {
                     folioc.find({ PAN_NO: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$MOBILE_NO" }, function (err, foliocamsdata) {
                         foliof.find({ PANNO1: req.body.memberPan }, { _id: 0, EMAIL: 1, Name: "$INV_NAME",Phone:"$PHONE_RES" }, function (err, foliofranklindata) {
