@@ -2898,7 +2898,7 @@ app.post("/api/getfolio", function (req, res) {
 
 
 
-app.post("/api/portfolio_api_data", function (req, res) {
+app.post("/api/PANVerification", function (req, res) {
     try{
         let regex = /^([a-zA-Z]){5}([0-9]){4}([a-zA-Z]){1}?$/;
         if (req.body.memberPan === "") {
