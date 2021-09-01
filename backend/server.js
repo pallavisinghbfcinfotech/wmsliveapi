@@ -1563,7 +1563,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                     ).then(function (result) {
                                        
                                         lastarray.push(result.data);
-                                        if (b === lastarray.length) {
+                                      //  if (b === lastarray.length) {
                                             
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
@@ -1826,7 +1826,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
-                                        }
+                                        //}
                                     })
                                    
                               //  }
