@@ -1194,30 +1194,17 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                         (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
                                     )(Object.create(null))
                                 );
-                                // var uniquename = datacon.filter(
-                                //     (temp => a =>
-                                //         (k => !temp[k] && (temp[k] = true))(a.NAME + '|' + a.PAN)
-                                //     )(Object.create(null))
-                                // );
+                               
                                 var dataarr = [];var lastarray = []; 
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
-                                console.log(datacon.length, '---length---')
-                             //   for (var b = 0; b < datacon.length; b++) {
-                                 
+                               
                                        Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
-                                    //Axios.post('http://localhost:3001/api/portfolio_api_new',
-                                        {
-                                           /* rta: datacon[b].RTA,
-                                            scheme: datacon[b].SCHEME,
-                                            pan: datacon[b].PAN,
-                                            folio: datacon[b].FOLIO,
-                                            name: datacon[b].*/
-                                            datacon: datacon
+                                       {
+                                           datacon: datacon
                                         }
                                     ).then(function (result) {
                                       lastarray.push(result.data);
-                                        // if (b === lastarray.length) {
-                                            for (var j = 0; j < lastarray.length; j++) {
+                                       for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
                                                 }
@@ -1460,7 +1447,10 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                     temp33 = Math.round(purchase[k]);
                                                     temp22 = temp33 + temp22;
                                                 }
-                                                if(temp22 !=0 && temp44 !=0){
+                                              if(temp22 === 0 && temp44 === 0){
+                                                    cagr = 0;
+                                                finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44), cagr: parseFloat(cagr.toFixed(1)),pan:pan })
+                                            }else{
                                                 finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44), cagr: parseFloat(cagr.toFixed(1)),pan:pan })
                                             }
                                                 resdata = {
@@ -1469,21 +1459,17 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                                     data: temp22
                                                 }
                                                 resdata.data = finalarr;
-                                                console.log(finalarr, '----')
-                                                if(finalarr.length === panarray.length){
-
+                                               if(finalarr.length === panarray.length){
                                                     res.json(resdata);
-
                                                 }
                                                
                                                 }
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
-                                    //    }
+                                   
                                     })
                                     
-                             //   }//second query response for loop
                             } else {
                                 resdata = {
                                     status: 400,
@@ -1549,22 +1535,14 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                     )(Object.create(null))
                                 );
                                
-                               // for (var b = 0; b < datacon.length; b++) {  
-                                    Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
-                                  // Axios.post('http://localhost:3001/api/portfolio_api_new',
+                                    Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',       
                                         {
-                                            /*rta: datacon[b].RTA,
-                                            scheme: datacon[b].SCHEME,
-                                            pan: datacon[b].PAN,
-                                            folio: datacon[b].FOLIO,
-                                            name: datacon[b].NAME*/
-                                            datacon: datacon
+						datacon: datacon
                                         }
                                     ).then(function (result) {
                                        
                                         lastarray.push(result.data);
-                                      //  if (b === lastarray.length) {
-                                            
+                                    
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
@@ -1826,10 +1804,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
-                                        //}
+                                       
                                     })
-                                   
-                              //  }
 
                             } else {
                                 resdata = {
