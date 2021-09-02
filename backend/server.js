@@ -361,21 +361,13 @@ app.post("/api/snapshot", function (req, res) {
                                
                                 var dataarr = [];var lastarray = []; 
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
-                              
-                                for (var b = 0; b < datacon.length; b++) {
-                                       //Axios.post('https://wmslive.herokuapp.com/api/portfolio_api',
-                                    Axios.post('http://localhost:3001/api/portfolio_api',
-                                        {
-                                            rta: datacon[b].RTA,
-                                            scheme: datacon[b].SCHEME,
-                                            pan: datacon[b].PAN,
-                                            folio: datacon[b].FOLIO,
-                                            name: datacon[b].NAME
+                                Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
+                                    {
+                                            datacon:datacon
                                         }
                                     ).then(function (result) {
                                      
                                         lastarray.push(result.data);
-                                        if (b === lastarray.length) {
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
@@ -388,13 +380,7 @@ app.post("/api/snapshot", function (req, res) {
                                            var newsum1=[];var newsum2=[];
 
                                             if (dataarr != null && dataarr.length > 0) {
-                                                // for (var q = 0; q < dataarr.length; q++) {
-                                                //     Axios.post('http://localhost:3001/api/days_change',
-                                                //     {
-                                                //         isin: dataarr[q].ISIN,
-                                                //     }
-                                                // ).then(function (result1) {
-                                                  //  console.log(result1.data.data)
+                                               
                                                 for (var c = 0; c < panarray.length; c++) {
                                                     let newarray = [];var purchase = [];var dayspurchase = [];
                                                     var name="";
@@ -582,8 +568,6 @@ app.post("/api/snapshot", function (req, res) {
                                                             cv = currentval + cv;
                                                            // console.log("isin=",result1)
                                                         }//if match scheme & folio 
-                                                    //     console.log("isin=",result1)
-                                                    // });
                                                     } //dataarr inner loop
 
                                                     var sum1all = 0; var sum2all = 0;
@@ -646,9 +630,7 @@ app.post("/api/snapshot", function (req, res) {
                                                 for (var p = 0; p < cagrsum2array.length; p++) {
                                                     finalsum2 = cagrsum2array[p] + finalsum2;
                                                 }
-                                                
-                                            
-                                               cagr=finalsum1/finalsum2;
+                                                 cagr=finalsum1/finalsum2;
                                                sum1all=0;sum2all=0;
                                                for (var p = 0; p < newsum1.length; p++) {
                                                 sum1all = newsum1[p] + sum1all;
@@ -657,7 +639,6 @@ app.post("/api/snapshot", function (req, res) {
                                                 sum2all = newsum2[p] + sum2all;
                                             }
                                             
-                                        
                                            var finalcagr=sum1all/sum2all;
                                                 
                                                 for (var p = 0; p < newarray.length; p++) {
@@ -668,9 +649,12 @@ app.post("/api/snapshot", function (req, res) {
                                                     temp22 = temp33 + temp22;
                                                     
                                                 }
-                                             
-                                           
-                                                if(temp22 !=0 && temp44 !=0){
+                                              if(temp22 ===0 && temp44 ===0){
+                                                    equitytotal=0;
+                                                    debttotal=0;
+                                                    goldtotal=0;
+                                                    equitydebtgoldtotal=0;
+                                                    cagr=0;
                                                 finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),equitytotal:equitytotal,debttotal:debttotal,goldtotal:goldtotal,equitydebtgoldtotal:equitydebtgoldtotal, cagr:cagr.toFixed(1),pan:pan })
                                                     var pamt =0;var mamt =0;var camt =0;var eamt=0;
                                                     var damt=0;var gamt=0; var tamt=0;
@@ -683,8 +667,19 @@ app.post("/api/snapshot", function (req, res) {
                                                     tamt = finalarr[p].equitydebtgoldtotal + tamt ;
                                                 }
                                                 
+                                            }else{
+                                                finalarr.push({name:name, purchasecost: Math.round(temp22), currentvalue: Math.round(temp44),equitytotal:equitytotal,debttotal:debttotal,goldtotal:goldtotal,equitydebtgoldtotal:equitydebtgoldtotal, cagr:cagr.toFixed(1),pan:pan })
+                                                var pamt =0;var mamt =0;var camt =0;var eamt=0;
+                                                var damt=0;var gamt=0; var tamt=0;
+                                            for(var p=0;p<finalarr.length;p++){
+                                                pamt = finalarr[p].purchasecost + pamt ;
+                                                mamt = finalarr[p].currentvalue + mamt ;
+                                                eamt = finalarr[p].equitytotal + eamt ;
+                                                damt = finalarr[p].debttotal + damt ;
+                                                gamt = finalarr[p].goldtotal + gamt ;
+                                                tamt = finalarr[p].equitydebtgoldtotal + tamt ;
                                             }
-                                             console.log("finalarr=",finalarr)
+                                            }
                                              resdata = {
                                                     status: 200,
                                                     message: "Successfull",
@@ -699,33 +694,22 @@ app.post("/api/snapshot", function (req, res) {
                                                     res.json(resdata);
 
                                                 }
-                                               
-                                              //  }
-                                               
-                                          //  });
+      
                                             }
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
-                                            }
-                                        }
-                                        
+                                            }                                        
                                     })
-                                    
-                                }//second query response for loop
                             } else {
                                 resdata = {
                                     status: 400,
                                     message: 'Data not found',
                                 }
                             }
-                     //   }
-                 //   }
-                //});
             });
         })
     });
 });
-   // }
       } else {
         var dataarr = [];var lastarray = []; let newarray = [];
         let cagrsum1array=[];let cagrsum2array=[];let finalsum1=0;let finalsum2=0;
@@ -780,24 +764,19 @@ app.post("/api/snapshot", function (req, res) {
                                     )(Object.create(null))
                                 );
                                 var equitytotal = 0;var debttotal = 0;var goldtotal=0;var equitydebtgoldtotal=0;
-                                for (var b = 0; b < datacon.length; b++) {  
-                                    Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api',
-                                      {
-                                            rta: datacon[b].RTA,
-                                            scheme: datacon[b].SCHEME,
-                                            pan: datacon[b].PAN,
-                                            folio: datacon[b].FOLIO,
-                                            name: datacon[b].NAME
+                                 Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
+                                        {
+                                            datacon:datacon
                                         }
                                     ).then(function (result) {
 
                                         lastarray.push(result.data);
-                                        if (b === lastarray.length) {
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
                                                 }
                                             }
+                                          
                                             var amount = 0; var days = 0; var date1 = ""; var date2 = "";
                                              var arrdays = []; var alldays = []; var navrate = 0; 
                                              var purchase = [];var temp44 = 0;
@@ -814,11 +793,9 @@ app.post("/api/snapshot", function (req, res) {
                                                 dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
                                                
                                                     for (var i = 0; i < dataarr.length; i++) {
-                                                        
-                                                        var currentval = 0; var balance = 0;
-
                                                       
-                                                        if (datacon[a].FOLIO === dataarr[i].FOLIO && datacon[a].SCHEME === dataarr[i].SCHEME) {
+                                                        var currentval = 0; var balance = 0;
+														if (datacon[a].FOLIO === dataarr[i].FOLIO && datacon[a].SCHEME === dataarr[i].SCHEME) {
 
                                                             if (Math.sign(dataarr[i].UNITS) != -1) {
                                                                 if (dataarr[i].NATURE === "Switch Out")
@@ -884,11 +861,8 @@ app.post("/api/snapshot", function (req, res) {
                                                                 temp1 = dataarr[i].UNITS;
                                                                 temp2 = temp1 + temp2;
                                                                 navrate = dataarr[i].TD_NAV;
-                                                                
-
-                                                            } else {
-
-                                                                unit = "-" + dataarr[i].UNITS
+                                                               } else {
+																unit = "-" + dataarr[i].UNITS
                                                                 amount = "-" + dataarr[i].AMOUNT
                                                                 if (temp4 != "" && temp4 != 0) {
                                                                     arrunit.splice(0, 0, temp4);
@@ -936,8 +910,7 @@ app.post("/api/snapshot", function (req, res) {
                                                                                     sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]);
                                                                                   
                                                                                 } 
-                                                                              
-                                                                              
+                                                                               
                                                                             }
 
                                                                         } else {
@@ -964,29 +937,24 @@ app.post("/api/snapshot", function (req, res) {
                                                                                     sum2[p] = parseFloat(temp4.toFixed(3)) * parseFloat(dataarr[p].TD_NAV) * parseFloat(alldays[p])
                                                                                    
                                                                                 }
-                                                                               
-                                                                               
-                                                                            }
 
-                                                                        }
-                                                                       
+                                                                            }
+                                                                        }                                                                       
                                                                         break;
                                                                     }
                                                                 }
 
                                                             }//else condition equal switch
-                                                            
                                                             balance = parseFloat(unit) +parseFloat(balance);
-
-                                                            cnav = dataarr[i].cnav;
-                                                            if (cnav === "" || cnav === undefined || isNaN(balance) || isNaN(cnav) || balance === 0) {
+															cnav = dataarr[i].cnav;
+                                                            if (cnav === "" || cnav === undefined || isNaN(balance) || isNaN(cnav) || balance === 0 ) {
                                                                 balance = 0;
                                                                 cnav = 0;
-                                                            }
+                                                                currentval =0;
+                                                            }else{
                                                             currentval = cnav * balance
-                                                           
-                                                        console.log("type=",dataarr[i].TYPE,dataarr[i].SCHEME)
-                                                      
+                                                            }
+                                                       
                                                             if(dataarr[i].TYPE === "EQUITY"){
                                                                 equitytotal = parseFloat(currentval) + equitytotal;
                                                             }else if(dataarr[i].TYPE === "DEBT"){
@@ -994,13 +962,9 @@ app.post("/api/snapshot", function (req, res) {
                                                             }else{
                                                                 goldtotal = parseFloat(currentval) + goldtotal;
                                                             }
-                                                            
+                                                            cv = currentval + cv;
                                                         }//if match two scheme and folio array 
-                                                      
-                                                        cv = currentval + cv;
-                                                           //console.log("ssssscv=",currentval,cv)
-                                                    } //dataarr inner loop
-                                                   
+                                                      } //dataarr inner loop
                                                     if(isNaN(cv) || cv < 0) {
                                                         newarray.push(0)
                                                     }else{
@@ -1016,8 +980,6 @@ app.post("/api/snapshot", function (req, res) {
                                                     if(temp22>0){
                                                         purchase.push(temp22);
                                                     }
-                                                   
-                                                  
                                                 var sum1all = 0; var sum2all = 0;
 
                                                 for (var kk = 0; kk < sum1.length; kk++) {
@@ -1026,8 +988,7 @@ app.post("/api/snapshot", function (req, res) {
                                                 for (var kkk = 0; kkk < sum2.length; kkk++) {
                                                     sum2all = sum2[kkk] + sum2all;
                                                 }
-                                                
-                                            
+                                             
                                              if(isNaN(sum2all) || (sum2all) ===Infinity ||isNaN(sum1all)|| (sum1all) === Infinity){
                                                 cagrsum2array.push(0);
                                                 cagrsum1array.push(0);
@@ -1041,8 +1002,7 @@ app.post("/api/snapshot", function (req, res) {
                                                 debttotal = Math.round(debttotal);
                                                 equitydebtgoldtotal = parseFloat(equitytotal) + parseFloat(debttotal) + parseFloat(goldtotal);
 
-                                               // console.log(equitytotal,debttotal,equitydebttotal);
-                                                temp22 = 0; temp33 = 0
+                                               temp22 = 0; temp33 = 0
                                                 for (var p = 0; p < cagrsum1array.length; p++) {
                                                     finalsum1 = cagrsum1array[p] + finalsum1;
                                                 }
@@ -1051,7 +1011,7 @@ app.post("/api/snapshot", function (req, res) {
                                                 }
                                                 cagr=finalsum1/finalsum2;
                                                 temp44=0;
-                                               // console.log("cv=",newarray)
+                                                console.log("cv=",newarray)
                                                 for (var p = 0; p < newarray.length; p++) {
                                                     temp44 = newarray[p] + temp44;
                                                 }
@@ -1059,30 +1019,23 @@ app.post("/api/snapshot", function (req, res) {
                                                     temp33 = Math.round(purchase[k]);
                                                     temp22 = temp33 + temp22;
                                                 }
-                                                if(temp22 !=0 && temp44 !=0){
-                                                 //   pan:uniquename[0].PAN,
-                                                 temp22 = Math.round(temp22);
-                                                 temp44 = Math.round(temp44);
-                                                finalarr.push({name:uniquename[0].NAME, purchasecost: temp22, currentvalue: temp44,gain:temp44-temp22,dividend:0,days_change:0, cagr: parseFloat(cagr.toFixed(1)),equity_perc:((equitytotal/equitydebtgoldtotal)*100).toFixed(1),debt_perc:((debttotal/equitydebtgoldtotal)*100).toFixed(1),gold_perc:((goldtotal/equitydebtgoldtotal)*100).toFixed(1)})
-                                                }
-                                                console.log("purchase=", finalarr)
                                                 resdata = {
                                                     status: 200,
                                                     message: "Successfull",
                                                     data: temp22
                                                 }
+                                                if(temp22 !=0 && temp44 !=0){
+                                                 temp22 = Math.round(temp22);
+                                                 temp44 = Math.round(temp44);
+                                                finalarr.push({name:uniquename[0].NAME, purchasecost: temp22, currentvalue: temp44,gain:temp44-temp22,dividend:0,days_change:0, cagr: parseFloat(cagr.toFixed(1)),equity_perc:((equitytotal/equitydebtgoldtotal)*100).toFixed(1),debt_perc:((debttotal/equitydebtgoldtotal)*100).toFixed(1),gold_perc:((goldtotal/equitydebtgoldtotal)*100).toFixed(1)})
+                                                }
                                                 resdata.data = finalarr[0];
                                                 res.json(resdata);
-                                            
-                                                
+   
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
-                                        }
-                                    })
-                                   
-                                }
-
+                                    })                                 
                             } else {
                                 resdata = {
                                     status: 400,
@@ -1091,7 +1044,6 @@ app.post("/api/snapshot", function (req, res) {
                             }
                         }
                     }
-                // });
             });
         })
       }
