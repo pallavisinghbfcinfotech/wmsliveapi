@@ -690,7 +690,7 @@ app.post("/api/snapshot", function (req, res) {
                                                
                                                     finalsnapshotarr.push({purchasecost:pamt,currentvalue:mamt,gain: mamt-pamt,
                                                     dividend: 0,days_change: 0,equity_perc:((eamt/tamt)*100).toFixed(1),debt_perc:((damt/tamt)*100).toFixed(1),gold_perc:((gamt/tamt)*100).toFixed(1),cagr:finalcagr.toFixed(2)})
-                                                    resdata.data = finalsnapshotarr;
+                                                    resdata.data = finalsnapshotarr[0];
                                                     res.json(resdata);
 
                                                 }
