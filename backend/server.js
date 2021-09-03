@@ -1434,7 +1434,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
     });
 });
       } else {
-        var dataarr = [];var lastarray = []; let newarray = [];
+            var dataarr = [];var lastarray = []; let newarray = [];
         let cagrsum1array=[];let cagrsum2array=[];let finalsum1=0;let finalsum2=0;
 
         pipeline1 = [  //trans_cams
@@ -1463,10 +1463,7 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                     data: data2
                                 }
                                 let merged = data1.concat(data2);
-                                resdata = {
-                                    status: 200,
-                                    message: 'Successful',
-                                }
+                                
                                 var removeduplicates = Array.from(new Set(merged));
                                 datacon = removeduplicates.map(JSON.stringify)
                                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -1487,14 +1484,22 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                     )(Object.create(null))
                                 );
                                
-                                    Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',       
+                               // for (var b = 0; b < datacon.length; b++) {  
+                                   // Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api',
+                                   Axios.post('http://localhost:3001/api/portfolio_api_new',
                                         {
-						datacon: datacon
+                                            /*rta: datacon[b].RTA,
+                                            scheme: datacon[b].SCHEME,
+                                            pan: datacon[b].PAN,
+                                            folio: datacon[b].FOLIO,
+                                            name: datacon[b].NAME*/
+                                            datacon: datacon
                                         }
                                     ).then(function (result) {
                                        
                                         lastarray.push(result.data);
-                                    
+                                      // if (b === lastarray.length) {
+                                            
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
@@ -1756,8 +1761,10 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
-                                       
+                                       // }
                                     })
+                                   
+                              //  }
 
                             } else {
                                 resdata = {
@@ -1777,7 +1784,6 @@ app.post("/api/portfolio_api_data", function (req, res) {
         console.log(err)
     }
 })
-
 
 app.post("/api/portfolio_api_new",  function (req, res) {
     const data = _.groupBy(req.body.datacon, "RTA");
