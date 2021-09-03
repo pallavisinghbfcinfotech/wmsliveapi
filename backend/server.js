@@ -1787,7 +1787,8 @@ app.post("/api/portfolio_api_data", function (req, res) {
 
 app.post("/api/portfolio_api_new",  function (req, res) {
     const data = _.groupBy(req.body.datacon, "RTA");
-    req.setTimeout(500000);
+  
+    //req.setTimeout(500000);
 	try {
         let match = data.KARVY.map((val) => {
             return { FUNDDESC: val.SCHEME, PAN1: val.PAN, TD_ACNO: val.FOLIO, INVNAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
@@ -1838,7 +1839,7 @@ app.post("/api/portfolio_api_new",  function (req, res) {
                     }
                 }
 			    datacon1 = datacon1.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);
-
+                if(data.CAMS != undefined){
                 let camsMatch = data.CAMS.map((val) => {
                     return { SCHEME: val.SCHEME, PAN: val.PAN, FOLIO_NO: val.FOLIO, INV_NAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
                 })
@@ -1919,7 +1920,10 @@ app.post("/api/portfolio_api_new",  function (req, res) {
                     res.json(datacon);
                 });
 
-			    
+              }else{
+                var datacon = datacon1;           
+                res.json(datacon);
+              }
 		    });
 	 
     } catch (err) {
