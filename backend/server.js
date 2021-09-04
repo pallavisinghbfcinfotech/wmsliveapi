@@ -1633,19 +1633,21 @@ app.post("/api/portfolio_api_data", function (req, res) {
                                 );
                                
                                // for (var b = 0; b < datacon.length; b++) {  
-                                    Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
+                                  //  Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
                                    //Axios.post('http://localhost:3001/api/portfolio_api_new',
-                                        {
-                                            /*rta: datacon[b].RTA,
-                                            scheme: datacon[b].SCHEME,
-                                            pan: datacon[b].PAN,
-                                            folio: datacon[b].FOLIO,
-                                            name: datacon[b].NAME*/
-                                            datacon: datacon
-                                        }
-                                    ).then(function (result) {
+//                                         {
+//                                             /*rta: datacon[b].RTA,
+//                                             scheme: datacon[b].SCHEME,
+//                                             pan: datacon[b].PAN,
+//                                             folio: datacon[b].FOLIO,
+//                                             name: datacon[b].NAME*/
+//                                             datacon: datacon
+//                                         }
+//                                     ).then(function (result) {
                                        
-                                        lastarray.push(result.data);
+//                                         lastarray.push(result.data);
+				      portfolioApi(datacon, result => {
+                                      lastarray.push(result);
                                       // if (b === lastarray.length) {
                                             
                                             for (var j = 0; j < lastarray.length; j++) {
