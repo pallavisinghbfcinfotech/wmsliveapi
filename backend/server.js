@@ -507,13 +507,15 @@ app.post("/api/snapshot", function (req, res) {
                                
                                 var dataarr = [];var lastarray = []; 
                                 datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
-                                Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
-                                    {
-                                            datacon:datacon
-                                        }
-                                    ).then(function (result) {
+//                                 Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
+//                                     {
+//                                             datacon:datacon
+//                                         }
+//                                     ).then(function (result) {
                                      
-                                        lastarray.push(result.data);
+//                                         lastarray.push(result.data);
+				    portfolioApi(datacon, result => {
+                                      lastarray.push(result);
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
@@ -910,13 +912,15 @@ app.post("/api/snapshot", function (req, res) {
                                     )(Object.create(null))
                                 );
                                 var equitytotal = 0;var debttotal = 0;var goldtotal=0;var equitydebtgoldtotal=0;
-                                 Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
-                                        {
-                                            datacon:datacon
-                                        }
-                                    ).then(function (result) {
+//                                  Axios.post('https://wmsliveapi.herokuapp.com/api/portfolio_api_new',
+//                                         {
+//                                             datacon:datacon
+//                                         }
+//                                     ).then(function (result) {
 
-                                        lastarray.push(result.data);
+//                                         lastarray.push(result.data);
+				    portfolioApi(datacon, result => {
+                                      lastarray.push(result);
                                             for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
