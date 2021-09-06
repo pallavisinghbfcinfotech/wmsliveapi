@@ -268,148 +268,148 @@ var temp22=0; var temp33 = 0;var cagr=0;
 
 
 const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
-try {
-    let match = data.KARVY.map((val) => {
-        return { FUNDDESC: val.SCHEME, PAN1: val.PAN, TD_ACNO: val.FOLIO, INVNAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
-    })
-    const pipeline1 = [  //trans_karvy   
-            { $match: { $or: match }},
-            { $group: { _id: { TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_NAV: "$TD_NAV", TD_TRTYPE: "$TD_TRTYPE", NAVDATE: "$NAVDATE", SCHEMEISIN: "$SCHEMEISIN" , TD_UNITS:"$TD_UNITS" , TD_AMT: "$TD_AMT",ASSETTYPE:"$ASSETTYPE" } } },
-            { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-            { $unwind: "$nav" },
-            { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.NAVDATE" } }, ISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: "$_id.TD_UNITS" , AMOUNT: "$_id.TD_AMT",TYPE:"$_id.ASSETTYPE" }  },
-            { $sort: { SCHEME: -1 } }
-        ]
-    transk.aggregate(pipeline1, (err, karvy) => {
-        var datacon1 = karvy;
-        for (var i = 0; i < datacon1.length; i++) {
-                if (datacon1[i]['NATURE'] === "Redemption" || datacon1[i]['NATURE'] === "RED" ||
-                    datacon1[i]['NATURE'] === "SIPR" || datacon1[i]['NATURE'] === "Full Redemption" ||
-                    datacon1[i]['NATURE'] === "Partial Redemption" || datacon1[i]['NATURE'] === "Lateral Shift Out" ||
-                    datacon1[i]['NATURE'] === "Switchout" || datacon1[i]['NATURE'] === "Transfer-Out" ||
-                    datacon1[i]['NATURE'] === "Transmission Out" || datacon1[i]['NATURE'] === "Switch Over Out" ||
-                    datacon1[i]['NATURE'] === "LTOP" || datacon1[i]['NATURE'] === "LTOF" || datacon1[i]['NATURE'] === "FULR" ||
-                    datacon1[i]['NATURE'] === "Partial Switch Out" || datacon1[i]['NATURE'] === "Full Switch Out" ||
-                    datacon1[i]['NATURE'] === "IPOR" || datacon1[i]['NATURE'] === "FUL" ||
-                    datacon1[i]['NATURE'] === "STPO" || datacon1[i]['NATURE'] === "SWOF" ||
-                    datacon1[i]['NATURE'] === "SWD") {
-                    datacon1[i]['NATURE'] = "Switch Out";
-                }
-                if (datacon1[i]['NATURE'].match(/Systematic Investment.*/) ||
-                    datacon1[i]['NATURE'] === "SIN" ||
-                    datacon1[i]['NATURE'].match(/Systematic - Instalment.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic - To.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic-NSE.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic Physical.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic-Normal.*/) ||
-                    datacon1[i]['NATURE'].match(/Systematic (ECS).*/)) {
-                    datacon1[i]['NATURE'] = "SIP";
-                }
-                if (datacon1[i]['NATURE'] === "ADDPUR" || datacon1[i]['NATURE'] === "Additional Purchase" || datacon1[i]['NATURE'] === "NEW" || datacon1[i]['NATURE'] === "ADD") {
-                    datacon1[i]['NATURE'] = "Purchase";
-                }
-                if (datacon1[i]['TYPE'] === "Equity(G)" || datacon1[i]['TYPE'] === "EQUITY FUND" || datacon1[i]['TYPE'] === "EQUITY FUN" || datacon1[i]['TYPE'] === "EQUITY-MF") {
-                    datacon1[i]['TYPE'] = "EQUITY";
-                }else if (datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "LIQUID" ) {
-                    datacon1[i]['TYPE'] = "DEBT";
-                }else{
-                    datacon1[i]['TYPE'] = "GOLD";
-                }
+  try {
+      let match = data.KARVY.map((val) => {
+          return { FUNDDESC: val.SCHEME, PAN1: val.PAN, TD_ACNO: val.FOLIO, INVNAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
+      })
+      const pipeline1 = [  //trans_karvy   
+              { $match: { $or: match }},
+              { $group: { _id: { TD_ACNO: "$TD_ACNO", FUNDDESC: "$FUNDDESC", TD_NAV: "$TD_NAV", TD_TRTYPE: "$TD_TRTYPE", NAVDATE: "$NAVDATE", SCHEMEISIN: "$SCHEMEISIN" , TD_UNITS:"$TD_UNITS" , TD_AMT: "$TD_AMT",ASSETTYPE:"$ASSETTYPE",TD_TRNO:"$TD_TRNO" } } },
+              { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+              { $unwind: "$nav" },
+              { $project: { _id: 0, FOLIO: "$_id.TD_ACNO", SCHEME: "$_id.FUNDDESC", TD_NAV: "$_id.TD_NAV", NATURE: "$_id.TD_TRTYPE", TD_TRDT: { $dateToString: { format: "%d-%m-%Y", date: "$_id.NAVDATE" } }, ISIN: "$_id.SCHEMEISIN", cnav: "$nav.NetAssetValue", navdate: "$nav.Date", UNITS: "$_id.TD_UNITS" , AMOUNT: "$_id.TD_AMT",TYPE:"$_id.ASSETTYPE",TRXNNO:"$_id.TD_TRNO" }  },
+              { $sort: { SCHEME: -1 } }
+          ]
+      transk.aggregate(pipeline1, (err, karvy) => {
+          var datacon1 = karvy;
+          for (var i = 0; i < datacon1.length; i++) {
+                  if (datacon1[i]['NATURE'] === "Redemption" || datacon1[i]['NATURE'] === "RED" ||
+                      datacon1[i]['NATURE'] === "SIPR" || datacon1[i]['NATURE'] === "Full Redemption" ||
+                      datacon1[i]['NATURE'] === "Partial Redemption" || datacon1[i]['NATURE'] === "Lateral Shift Out" ||
+                      datacon1[i]['NATURE'] === "Switchout" || datacon1[i]['NATURE'] === "Transfer-Out" ||
+                      datacon1[i]['NATURE'] === "Transmission Out" || datacon1[i]['NATURE'] === "Switch Over Out" ||
+                      datacon1[i]['NATURE'] === "LTOP" || datacon1[i]['NATURE'] === "LTOF" || datacon1[i]['NATURE'] === "FULR" ||
+                      datacon1[i]['NATURE'] === "Partial Switch Out" || datacon1[i]['NATURE'] === "Full Switch Out" ||
+                      datacon1[i]['NATURE'] === "IPOR" || datacon1[i]['NATURE'] === "FUL" ||
+                      datacon1[i]['NATURE'] === "STPO" || datacon1[i]['NATURE'] === "SWOF" ||
+                      datacon1[i]['NATURE'] === "SWD") {
+                      datacon1[i]['NATURE'] = "Switch Out";
+                  }
+                  if (datacon1[i]['NATURE'].match(/Systematic Investment.*/) ||
+                      datacon1[i]['NATURE'] === "SIN" ||
+                      datacon1[i]['NATURE'].match(/Systematic - Instalment.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic - To.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic-NSE.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic Physical.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic-Normal.*/) ||
+                      datacon1[i]['NATURE'].match(/Systematic (ECS).*/)) {
+                      datacon1[i]['NATURE'] = "SIP";
+                  }
+                  if (datacon1[i]['NATURE'] === "ADDPUR" || datacon1[i]['NATURE'] === "Additional Purchase" || datacon1[i]['NATURE'] === "NEW" || datacon1[i]['NATURE'] === "ADD") {
+                      datacon1[i]['NATURE'] = "Purchase";
+                  }
+                  if (datacon1[i]['TYPE'] === "Equity(S)" ||datacon1[i]['TYPE'] === "Equity(G)" || datacon1[i]['TYPE'] === "EQUITY FUND" || datacon1[i]['TYPE'] === "EQUITY FUN" || datacon1[i]['TYPE'] === "EQUITY-MF" || datacon1[i]['TYPE'] === "Balanced" || datacon1[i]['TYPE'] === "Cash" || datacon1[i]['TYPE'] === "Ultra Liquid" || datacon1[i]['TYPE'] === "EQUITY" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "Equity Fund" || datacon1[i]['TYPE'] === "Equity") {
+                      datacon1[i]['TYPE'] = "EQUITY";
+                  }else if (datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT") {
+                      datacon1[i]['TYPE'] = "DEBT";
+                  }else{
+                      datacon1[i]['TYPE'] = "GOLD";
+                  }
+              }
+              datacon1 = datacon1.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);
+              if(data.CAMS != undefined){
+              let camsMatch = data.CAMS.map((val) => {
+                  return { SCHEME: val.SCHEME, PAN: val.PAN, FOLIO_NO: val.FOLIO, INV_NAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
+              })
+              const pipeline2 = [  //trans_cams
+                  { $match: {$or: camsMatch} },
+                  { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", PURPRICE: "$PURPRICE", TRXN_TYPE_: "$TRXN_TYPE_", TRADDATE: "$TRADDATE", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] } , UNITS: "$UNITS" , AMOUNT:  "$AMOUNT",SCHEME_TYP:"$SCHEME_TYP",TRXNNO:"$TRXNNO" }  } },
+                  {
+                      $lookup:
+                      {
+                          from: "products",
+                          let: { ccc: "$_id.code", amc: "$_id.AMC_CODE" },
+                          pipeline: [
+                              {
+                                  $match:
+                                  {
+                                      $expr:
+                                      {
+                                          $and:
+                                          [
+                                              { $eq: ["$PRODUCT_CODE", "$$ccc"] },
+                                              { $eq: ["$AMC_CODE", "$$amc"] }
+                                          ]
+                                      }
+                                  }
+                              },
+                              { $project: { _id: 0 } }
+                          ],
+                          as: "products"
+                      }
+                  },
+      
+                  { $unwind: "$products" },
+                  { $group: { _id: { FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", PURPRICE: "$_id.PURPRICE", TRXN_TYPE_: "$_id.TRXN_TYPE_", TRADDATE: "$_id.TRADDATE", ISIN: "$products.ISIN" , UNITS: "$_id.UNITS", AMOUNT: "$_id.AMOUNT" ,SCHEME_TYP:"$_id.SCHEME_TYP",TRXNNO:"$_id.TRXNNO"} } },
+                  { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
+                  { $unwind: "$nav" },
+                  { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", TD_NAV: "$_id.PURPRICE", NATURE: "$_id.TRXN_TYPE_", TD_TRDT: { $dateToString: { format: "%m/%d/%Y", date: "$_id.TRADDATE" } }, ISIN: "$products.ISIN", cnav: "$nav.NetAssetValue", navdate:"$nav.Date", UNITS:"$_id.UNITS",AMOUNT: "$_id.AMOUNT",TYPE:"$_id.SCHEME_TYP",TRXNNO:"$_id.TRXNNO"  } },
+                  { $sort: { SCHEME: -1 } }
+              ]
+              transc.aggregate(pipeline2, (err, cams) => {
+                  var datacon2 = cams;
+                  for (var i = 0; i < datacon2.length; i++) {
+                      if (datacon2[i]['NATURE'] === "Redemption" || datacon2[i]['NATURE'] === "R" || datacon2[i]['NATURE'] === "RED" ||
+                          datacon2[i]['NATURE'] === "SIPR" || datacon2[i]['NATURE'] === "Full Redemption" ||
+                          datacon2[i]['NATURE'] === "Partial Redemption" || datacon2[i]['NATURE'] === "Lateral Shift Out" ||
+                          datacon2[i]['NATURE'] === "Switchout" || datacon2[i]['NATURE'] === "Transfer-Out" ||
+                          datacon2[i]['NATURE'] === "Transmission Out" || datacon2[i]['NATURE'] === "Switch Over Out" ||
+                          datacon2[i]['NATURE'] === "LTOP" || datacon2[i]['NATURE'] === "LTOF" || datacon2[i]['NATURE'] === "FULR" ||
+                          datacon2[i]['NATURE'] === "Partial Switch Out" || datacon2[i]['NATURE'] === "Full Switch Out" ||
+                          datacon2[i]['NATURE'] === "IPOR" || datacon2[i]['NATURE'] === "FUL" ||
+                          datacon2[i]['NATURE'] === "STPO" || datacon2[i]['NATURE'] === "SWOF" ||
+                          datacon2[i]['NATURE'] === "SWD") {
+                          datacon2[i]['NATURE'] = "Switch Out";
+                      }
+                      if (datacon2[i]['NATURE'].match(/Systematic Investment.*/) ||
+                          datacon2[i]['NATURE'] === "SIN" ||
+                          datacon2[i]['NATURE'].match(/Systematic - Instalment.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic - To.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic-NSE.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic Physical.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic-Normal.*/) ||
+                          datacon2[i]['NATURE'].match(/Systematic (ECS).*/)) {
+                          datacon2[i]['NATURE'] = "SIP";
+                      }
+                      if (datacon2[i]['NATURE'] === "ADDPUR" || datacon2[i]['NATURE'] === "Additional Purchase" || datacon2[i]['NATURE'] === "NEW" || datacon2[i]['NATURE'] === "ADD") {
+                          datacon2[i]['NATURE'] = "Purchase";
+                      }
+                      if (datacon2[i]['TYPE'] === "Equity(S)" ||datacon2[i]['TYPE'] === "Equity(G)" || datacon2[i]['TYPE'] === "EQUITY FUND" || datacon2[i]['TYPE'] === "EQUITY FUN" || datacon2[i]['TYPE'] === "EQUITY-MF" || datacon2[i]['TYPE'] === "Balanced" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Ultra Liquid" || datacon2[i]['TYPE'] === "EQUITY" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "Equity Fund" || datacon2[i]['TYPE'] === "Equity") {
+                          datacon2[i]['TYPE'] = "EQUITY";
+                      }else if (datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT") {
+                          datacon2[i]['TYPE'] = "DEBT";
+                      }else{
+                          datacon2[i]['TYPE'] = "GOLD";
+                      }
+                  }
+                  datacon2 = datacon2.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1); 
+                  var datacon = datacon1.concat(datacon2)           
+                  cb(datacon);
+              });
+  
+            }else{
+              var datacon = datacon1;           
+              cb(datacon);
             }
-            datacon1 = datacon1.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);
-            if(data.CAMS != undefined){
-            let camsMatch = data.CAMS.map((val) => {
-                return { SCHEME: val.SCHEME, PAN: val.PAN, FOLIO_NO: val.FOLIO, INV_NAME: { $regex: `^${val.NAME}.*`, $options: 'i' } }
-            })
-            const pipeline2 = [  //trans_cams
-                { $match: {$or: camsMatch} },
-                { $group: { _id: { FOLIO_NO: "$FOLIO_NO", SCHEME: "$SCHEME", PURPRICE: "$PURPRICE", TRXN_TYPE_: "$TRXN_TYPE_", TRADDATE: "$TRADDATE", AMC_CODE: "$AMC_CODE", PRODCODE: "$PRODCODE", code: { $substr: ["$PRODCODE", { $strLenCP: "$AMC_CODE" }, -1] } , UNITS: "$UNITS" , AMOUNT:  "$AMOUNT",SCHEME_TYP:"$SCHEME_TYP" }  } },
-                {
-                    $lookup:
-                    {
-                        from: "products",
-                        let: { ccc: "$_id.code", amc: "$_id.AMC_CODE" },
-                        pipeline: [
-                            {
-                                $match:
-                                {
-                                    $expr:
-                                    {
-                                        $and:
-                                        [
-                                            { $eq: ["$PRODUCT_CODE", "$$ccc"] },
-                                            { $eq: ["$AMC_CODE", "$$amc"] }
-                                        ]
-                                    }
-                                }
-                            },
-                            { $project: { _id: 0 } }
-                        ],
-                        as: "products"
-                    }
-                },
-    
-                { $unwind: "$products" },
-                { $group: { _id: { FOLIO_NO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", PURPRICE: "$_id.PURPRICE", TRXN_TYPE_: "$_id.TRXN_TYPE_", TRADDATE: "$_id.TRADDATE", ISIN: "$products.ISIN" , UNITS: "$_id.UNITS", AMOUNT: "$_id.AMOUNT" ,SCHEME_TYP:"$_id.SCHEME_TYP"} } },
-                { $lookup: { from: 'cams_nav', localField: '_id.ISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
-                { $unwind: "$nav" },
-                { $project: { _id: 0, FOLIO: "$_id.FOLIO_NO", SCHEME: "$_id.SCHEME", TD_NAV: "$_id.PURPRICE", NATURE: "$_id.TRXN_TYPE_", TD_TRDT: { $dateToString: { format: "%m/%d/%Y", date: "$_id.TRADDATE" } }, ISIN: "$products.ISIN", cnav: "$nav.NetAssetValue", navdate:"$nav.Date", UNITS:"$_id.UNITS",AMOUNT: "$_id.AMOUNT",TYPE:"$_id.SCHEME_TYP"  } },
-                { $sort: { SCHEME: -1 } }
-            ]
-            transc.aggregate(pipeline2, (err, cams) => {
-                var datacon2 = cams;
-                for (var i = 0; i < datacon2.length; i++) {
-                    if (datacon2[i]['NATURE'] === "Redemption" || datacon2[i]['NATURE'] === "RED" ||
-                        datacon2[i]['NATURE'] === "SIPR" || datacon2[i]['NATURE'] === "Full Redemption" ||
-                        datacon2[i]['NATURE'] === "Partial Redemption" || datacon2[i]['NATURE'] === "Lateral Shift Out" ||
-                        datacon2[i]['NATURE'] === "Switchout" || datacon2[i]['NATURE'] === "Transfer-Out" ||
-                        datacon2[i]['NATURE'] === "Transmission Out" || datacon2[i]['NATURE'] === "Switch Over Out" ||
-                        datacon2[i]['NATURE'] === "LTOP" || datacon2[i]['NATURE'] === "LTOF" || datacon2[i]['NATURE'] === "FULR" ||
-                        datacon2[i]['NATURE'] === "Partial Switch Out" || datacon2[i]['NATURE'] === "Full Switch Out" ||
-                        datacon2[i]['NATURE'] === "IPOR" || datacon2[i]['NATURE'] === "FUL" ||
-                        datacon2[i]['NATURE'] === "STPO" || datacon2[i]['NATURE'] === "SWOF" ||
-                        datacon2[i]['NATURE'] === "SWD") {
-                        datacon2[i]['NATURE'] = "Switch Out";
-                    }
-                    if (datacon2[i]['NATURE'].match(/Systematic Investment.*/) ||
-                        datacon2[i]['NATURE'] === "SIN" ||
-                        datacon2[i]['NATURE'].match(/Systematic - Instalment.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic - To.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic-NSE.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic Physical.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic-Normal.*/) ||
-                        datacon2[i]['NATURE'].match(/Systematic (ECS).*/)) {
-                        datacon2[i]['NATURE'] = "SIP";
-                    }
-                    if (datacon2[i]['NATURE'] === "ADDPUR" || datacon2[i]['NATURE'] === "Additional Purchase" || datacon2[i]['NATURE'] === "NEW" || datacon2[i]['NATURE'] === "ADD") {
-                        datacon2[i]['NATURE'] = "Purchase";
-                    }
-                    if (datacon2[i]['TYPE'] === "Equity(G)" || datacon2[i]['TYPE'] === "EQUITY FUND" || datacon2[i]['TYPE'] === "EQUITY FUN" || datacon2[i]['TYPE'] === "EQUITY-MF") {
-                        datacon2[i]['TYPE'] = "EQUITY";
-                    }else if (datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "LIQUID" ) {
-                        datacon2[i]['TYPE'] = "DEBT";
-                    }else{
-                        datacon2[i]['TYPE'] = "GOLD";
-                    }
-                }
-                datacon2 = datacon2.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1); 
-                var datacon = datacon1.concat(datacon2)           
-                cb(datacon);
-            });
-
-          }else{
-            var datacon = datacon1;           
-            cb(datacon);
-          }
-        });
- 
-} catch (err) {
-    console.log(err)
-}   
-    
-}
+          });
+   
+  } catch (err) {
+      console.log(err)
+  }   
+      
+  }
 
 
 app.post("/api/snapshot", function (req, res) {
