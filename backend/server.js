@@ -309,13 +309,12 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                   if (datacon1[i]['NATURE'] === "ADDPUR" || datacon1[i]['NATURE'] === "Additional Purchase" || datacon1[i]['NATURE'] === "NEW" || datacon1[i]['NATURE'] === "ADD") {
                       datacon1[i]['NATURE'] = "Purchase";
                   }
-                  if (datacon1[i]['TYPE'] === "Equity(S)" ||datacon1[i]['TYPE'] === "Equity(G)" || datacon1[i]['TYPE'] === "EQUITY FUND" || datacon1[i]['TYPE'] === "EQUITY FUN" || datacon1[i]['TYPE'] === "EQUITY-MF" || datacon1[i]['TYPE'] === "Balanced" || datacon1[i]['TYPE'] === "Cash" || datacon1[i]['TYPE'] === "Ultra Liquid" || datacon1[i]['TYPE'] === "EQUITY" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "Equity Fund" || datacon1[i]['TYPE'] === "Equity") {
+                  if(datacon1[i]['TYPE'] === "Balanced" || datacon1[i]['TYPE'] === "Equity(S)" ||datacon1[i]['TYPE'] === "Equity(G)" || datacon1[i]['TYPE'] === "EQUITY FUND" || datacon1[i]['TYPE'] === "EQUITY FUN" || datacon1[i]['TYPE'] === "EQUITY-MF" || datacon1[i]['TYPE'] === "Balanced"|| datacon1[i]['TYPE'] === "EQUITY"  || datacon1[i]['TYPE'] === "Equity Fund" || datacon1[i]['TYPE'] === "Equity") {
                       datacon1[i]['TYPE'] = "EQUITY";
-                  }else if (datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT") {
-                      datacon1[i]['TYPE'] = "DEBT";
-                  }else{
-                      datacon1[i]['TYPE'] = "GOLD";
                   }
+                  if(datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "INCOME FUND" || datacon1[i]['TYPE'] === "GILT FUND" || datacon1[i]['TYPE'] === "Cash" || datacon1[i]['TYPE'] === "Bond" || datacon1[i]['TYPE'] === "Ultra Liquid" ) {
+                    datacon1[i]['TYPE'] = "DEBT";
+                }
               }
               datacon1 = datacon1.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);
               if(data.CAMS != undefined){
@@ -386,13 +385,12 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                       if (datacon2[i]['NATURE'] === "ADDPUR" || datacon2[i]['NATURE'] === "Additional Purchase" || datacon2[i]['NATURE'] === "NEW" || datacon2[i]['NATURE'] === "ADD") {
                           datacon2[i]['NATURE'] = "Purchase";
                       }
-                      if (datacon2[i]['TYPE'] === "Equity(S)" ||datacon2[i]['TYPE'] === "Equity(G)" || datacon2[i]['TYPE'] === "EQUITY FUND" || datacon2[i]['TYPE'] === "EQUITY FUN" || datacon2[i]['TYPE'] === "EQUITY-MF" || datacon2[i]['TYPE'] === "Balanced" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Ultra Liquid" || datacon2[i]['TYPE'] === "EQUITY" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "Equity Fund" || datacon2[i]['TYPE'] === "Equity") {
-                          datacon2[i]['TYPE'] = "EQUITY";
-                      }else if (datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT") {
-                          datacon2[i]['TYPE'] = "DEBT";
-                      }else{
-                          datacon2[i]['TYPE'] = "GOLD";
-                      }
+                      if(datacon2[i]['TYPE'] === "Balanced" || datacon2[i]['TYPE'] === "Equity(S)" ||datacon2[i]['TYPE'] === "Equity(G)" || datacon2[i]['TYPE'] === "EQUITY FUND" || datacon2[i]['TYPE'] === "EQUITY FUN" || datacon2[i]['TYPE'] === "EQUITY-MF" || datacon2[i]['TYPE'] === "Balanced"|| datacon2[i]['TYPE'] === "EQUITY"  || datacon2[i]['TYPE'] === "Equity Fund" || datacon2[i]['TYPE'] === "Equity") {
+                        datacon2[i]['TYPE'] = "EQUITY";
+                    }
+                    if(datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon2[i]['TYPE'] === "DEBT" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "INCOME FUND" || datacon2[i]['TYPE'] === "GILT FUND" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Bond" || datacon2[i]['TYPE'] === "Ultra Liquid" ) {
+                            datacon2[i]['TYPE'] = "DEBT";
+                        }
                   }
                   datacon2 = datacon2.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1); 
                   var datacon = datacon1.concat(datacon2)           
@@ -410,7 +408,6 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
   }   
       
   }
-
 
 app.post("/api/snapshot", function (req, res) {
     try {
