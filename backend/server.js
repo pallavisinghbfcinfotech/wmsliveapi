@@ -2291,8 +2291,6 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
          ]
          transc.aggregate(pipeline1, (err, data1) => {
             transk.aggregate(pipeline2, (err, data2) => {
-              var i = 0;
-                    if (data2.length != 0) {
                         if (err) {
                             res.send(err);
                         }
@@ -2304,10 +2302,6 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                     data: data2
                                 }
                                 let merged = data1.concat(data2);
-                                resdata = {
-                                    status: 200,
-                                    message: 'Successful',
-                                }
                                 var removeduplicates = Array.from(new Set(merged));
                                 datacon = removeduplicates.map(JSON.stringify)
                                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -2572,7 +2566,6 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                 }
                             }
                         }
-                    }
             });
         })
       }
