@@ -28,8 +28,6 @@ const options = {
     // If not connected, return errors immediately rather than waiting for reconnect
     bufferMaxEntries: 0
   };
-
-//  console.log("I am mongodb", db);
 mongoose.connect(mongodbUrl, {
 	useNewUrlParser:true,
 	useUnifiedTopology: true,
@@ -46,27 +44,16 @@ mongoose.connect(mongodbUrl, {
         // If not connected, return errors immediately rather than waiting for reconnect
 	bufferMaxEntries: 0
 }).catch(error => console.log(error.reason));
-
-console.log("Test data ",mongoose.collection);
-
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-//app.use(timeout('500s'));
 app.use(bodyParser());
-// app.use(haltOnTimedout);
-// app.use(cookieParser());
-// app.use(haltOnTimedout);
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
-
-
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to WMS Api application." });
 });
-
 
 const navcams = new Schema({
     SchemeCode: { type: String },
@@ -76,7 +63,6 @@ const navcams = new Schema({
     NetAssetValue: { type: Number },
     Date: { type: Date },
 }, { versionKey: false });
-
 
 const productdata = new Schema({
     id: { type: String },
@@ -315,6 +301,9 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                   }
                   if(datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "INCOME FUND" || datacon1[i]['TYPE'] === "GILT FUND" || datacon1[i]['TYPE'] === "Cash" || datacon1[i]['TYPE'] === "Bond" || datacon1[i]['TYPE'] === "Ultra Liquid" ) {
                     datacon1[i]['TYPE'] = "DEBT";
+                  }
+		  if(datacon1[i]['TYPE'] === "Gold FOF) {
+                    datacon1[i]['TYPE'] = "GOLD";
                 }
               }
               datacon1 = datacon1.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1);
@@ -393,6 +382,9 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                     if(datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon2[i]['TYPE'] === "DEBT" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "INCOME FUND" || datacon2[i]['TYPE'] === "GILT FUND" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Bond" || datacon2[i]['TYPE'] === "Ultra Liquid" ) {
                             datacon2[i]['TYPE'] = "DEBT";
                         }
+		    if(datacon2[i]['TYPE'] === "Gold FOF) {
+                    datacon2[i]['TYPE'] = "GOLD";
+                       }
                   }
                   datacon2 = datacon2.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1); 
                   var datacon = datacon1.concat(datacon2)           
@@ -479,6 +471,9 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                       if(datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon2[i]['TYPE'] === "DEBT" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "INCOME FUND" || datacon2[i]['TYPE'] === "GILT FUND" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Bond" || datacon2[i]['TYPE'] === "Ultra Liquid" ) {
                               datacon2[i]['TYPE'] = "DEBT";
                           }
+		         if(datacon2[i]['TYPE'] === "Gold FOF) {
+                              datacon2[i]['TYPE'] = "GOLD";
+                            }
                     }
                     datacon2 = datacon2.sort((a, b) => (a.SCHEME > b.SCHEME) ? 1 : -1); 
                     var datacon = datacon2     
