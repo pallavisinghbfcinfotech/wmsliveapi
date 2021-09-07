@@ -2227,21 +2227,23 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
             }
             res.json(resdata);
             return resdata;
-        }else if (req.body.pan === "") {
+        } else {
+             if (req.body.guard_pan === "") {
+                 if (req.body.pan === "") {
             resdata = {
                 status: 400,
                 message: 'Please enter pan',
             }
             res.json(resdata);
             return resdata;
-        } else if (!regex.test(req.body.pan)) {
+        }else if (!regex.test(req.body.pan)) {
             resdata = {
                 status: 400,
                 message: 'Please enter valid pan',
             }
             res.json(resdata);
             return resdata;
-       } else {
+        }else{
         var dataarr = [];var lastarray = []; let newarray = [];var sum11=[];var sum22=[];
         pipeline1 = [  //trans_cams
              { $match: { PAN: req.body.pan,INV_NAME: { $regex: `^${req.body.name}.*`, $options: 'i' } } },
@@ -2287,21 +2289,23 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
              { $unwind: "$karvy" },
              { $lookup: { from: 'cams_nav', localField: '_id.SCHEMEISIN', foreignField: 'ISINDivPayoutISINGrowth', as: 'nav' } },
              { $unwind: "$nav" },
-             { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG" ,PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.MODEOFHOLD",ISIN:"$_id.SCHEMEISIN",SIP_DATES:"$products.SIP_DATES",CNAV:"$nav.NetAssetValue" } }
+             { $project: { _id: 0, NAME: "$_id.INVNAME",AMC:"$products.AMC_CODE" ,PCODE:"$products.PRODUCT_CODE" ,REINVEST:"$products.REINVEST_TAG",ISIN:"$products.SCHEMEISIN",PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY",JTNAME1:"$karvy.JTNAME1",JTNAME2:"$karvy.JTNAME2",JTPAN1:"$karvy.PAN2",JTPAN2:"$karvy.PAN3",MODE:"$karvy.MODEOFHOLD",SIP_DATES:"$products.SIP_DATES",CNAV:"$nav.NetAssetValue" } }
          ]
          transc.aggregate(pipeline1, (err, data1) => {
+            console.log("data1=",data1)
             transk.aggregate(pipeline2, (err, data2) => {
                         if (err) {
                             res.send(err);
                         }
                         else {
-                            if (data1.length != 0 || data2.length != 0 ) {
+                            if (data1 != 0 || data2 != 0 ) {
                                 resdata = {
                                     status: 200,
                                     message: 'Successfull',
                                     data: data2
                                 }
                                 let merged = data1.concat(data2);
+                               
                                 var removeduplicates = Array.from(new Set(merged));
                                 datacon = removeduplicates.map(JSON.stringify)
                                     .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
@@ -2315,10 +2319,9 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                         (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
                                     )(Object.create(null))
                                 );
-                               
-                                 portfolioApi(datacon, result => {
-                                      lastarray.push(result);
-                                        for (var j = 0; j < lastarray.length; j++) {
+                                portfolioApi(datacon, result => {
+                                    lastarray.push(result);
+                                            for (var j = 0; j < lastarray.length; j++) {
                                                 for (var k = 0; k < lastarray[j].length; k++) {
                                                     dataarr.push(lastarray[j][k]);
                                                 }
@@ -2339,6 +2342,8 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                 dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
                                                 var scheme="";var name="";var pan="";
                                                     for (var i = 0; i < dataarr.length; i++) {
+                                                      
+                                                      
                                                         if (datacon[a].FOLIO === dataarr[i].FOLIO && datacon[a].SCHEME === dataarr[i].SCHEME) {
                                                            if (Math.sign(dataarr[i].UNITS) != -1) {
                                                                 if (dataarr[i].NATURE === "Switch Out")
@@ -2404,7 +2409,8 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                                 temp1 = dataarr[i].UNITS;
                                                                 temp2 = temp1 + temp2;
                                                                 navrate = dataarr[i].TD_NAV;
-                                                          
+                                                                
+
                                                             } else {
 
                                                                 unit = "-" + dataarr[i].UNITS
@@ -2455,7 +2461,10 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                                                     sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]);
                                                                                   
                                                                                 } 
-                                                                              }
+                                                                              
+                                                                              
+                                                                            }
+
                                                                         } else {
 
                                                                             if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0 || isNaN(alldays[p]) || temp4 === 0) {
@@ -2504,7 +2513,8 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                         pan = datacon[a].PAN;
                                                         
                                                     } //dataarr inner loop
-                                                  temp22 = 0; temp33 = 0;var temp222=0;
+                                                  //  console.log(scheme,"--",name,"--",pan)
+                                                   temp22 = 0; temp33 = 0;var temp222=0;
 
                                                     for (var k = 0; k < arrpurchase.length; k++) {
                                                         temp33 = Math.round(arrpurchase[k]);
@@ -2552,13 +2562,19 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     cost = tot_cost[p]+ cost;
                                                     totgain = tot_gain[p] +totgain;
                                                 }
-						resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :sumcagr.toFixed(1)} } ;
-                                                 res.json(resdata);
+                                                
+                                                
+                                                resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :sumcagr.toFixed(1)} } ;
+                                                
+                                                res.json(resdata);
                                             
                                             } else {
                                                 console.log("purchase=", "Data Not Found!")
                                             }
+                                       // }
                                     })
+                              //  }
+
                             } else {
                                 resdata = {
                                     status: 400,
@@ -2566,8 +2582,324 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                 }
                             }
                         }
+              //  });
             });
         })
+    }
+    }else{
+        var arr1=[];var arr2=[]; var dataarr = [];var lastarray = []; let newarray = [];var sum11=[];var sum22=[];
+        folioc.find({GUARD_PAN:req.body.guard_pan}).distinct("FOLIOCHK", function (err, member1) {
+            foliok.find({GUARDPANNO:req.body.guard_pan}).distinct("ACNO", function (err, member2) {
+                var alldata = member1.concat(member2);
+                if(alldata.length !=0){
+                for (var j = 0; j < alldata.length; j++) {
+                    arr1.push({ FOLIO_NO: alldata[j] });
+                     arr2.push({TD_ACNO:alldata[j]});
+                }
+            }
+            
+                var strFolio1 = { $or: arr1 };
+                var strFolio2 = {$or:arr2};
+                console.log(strFolio1)
+    pipeline1 = [  //trans_karvy
+        { $match: strFolio2 },
+        { $group: { _id: { INVNAME: { "$toUpper": ["$INVNAME"] }, PAN1: "$PAN1", FUNDDESC: "$FUNDDESC", TD_ACNO: "$TD_ACNO" } } },
+        { $project: { _id: 0, NAME: "$_id.INVNAME", PAN: "$_id.PAN1", SCHEME: "$_id.FUNDDESC", FOLIO: "$_id.TD_ACNO", RTA: "KARVY" } },
+        { $sort: { NAME: 1 } }
+    ]
+    pipeline2 = [  //trans_cams
+        { $match: strFolio1 },
+        { $group: { _id: {  INV_NAME: { "$toUpper": ["$INV_NAME"] }, PAN: "$PAN", SCHEME: "$SCHEME", FOLIO_NO: "$FOLIO_NO" } } },
+        { $project: { _id: 0, NAME: "$_id.INV_NAME", PAN: "$_id.PAN", SCHEME: "$_id.SCHEME", FOLIO: "$_id.FOLIO_NO", RTA: "CAMS" } },
+         { $sort: { NAME: 1 } }
+     ]
+     transk.aggregate(pipeline1, (err, data1) => {
+      transc.aggregate(pipeline2, (err, data2) => {
+          
+        if (data1.length != 0 || data2.length != 0 ) {
+            resdata = {
+                status: 200,
+                message: 'Successfull',
+                data: data2
+            }
+            let merged = data1.concat(data2);
+          
+           var removeduplicates = Array.from(new Set(merged));
+            datacon = removeduplicates.map(JSON.stringify)
+                .reverse() // convert to JSON string the array content, then reverse it (to check from end to begining)
+                .filter(function (item, index, arr) {
+                    return arr.indexOf(item, index + 1) === -1;
+                }) // check if there is any occurence of the item in whole array
+                .reverse()
+                .map(JSON.parse);
+
+            datacon = datacon.filter(
+                (temp => a =>
+                    (k => !temp[k] && (temp[k] = true))(a.SCHEME + '|' + a.FOLIO)
+                )(Object.create(null))
+            );
+            var dataarr = [];var lastarray = []; 
+            datacon = datacon.sort((a, b) => (a.NAME > b.NAME) ? 1 : -1);
+            portfolioApi(datacon, result => {
+                lastarray.push(result);
+                        for (var j = 0; j < lastarray.length; j++) {
+                            for (var k = 0; k < lastarray[j].length; k++) {
+                                dataarr.push(lastarray[j][k]);
+                            }
+                        }
+                        var amount = 0; var date1 = ""; var date2 = "";
+                         var alldays = []; var navrate = 0; 
+                         var purchase = [];var temp44 = 0;
+                        var cnav = 0; var temp222 = 0; var finalarr = [];
+                        var portfolio_data=[];var tot_mkt_value=[];
+                        var tot_gain=[];var tot_cost=[]; var tot_cagr=[];var type="";
+                        if (dataarr != null && dataarr.length > 0) {
+                            for (var a = 0; a < datacon.length; a++) {
+                                var unit = 0; var arrpurchase = []; var arrunit = [];
+                                var temp4 = 0; var temp1, temp2 = 0; var temp3 = 0;
+                                var cv = 0; var sum1 = []; var sum2 = []; 
+                                var balance = 0; var days = 0; var arrdays = [];
+                                var currentval = 0;var gain=0;
+                            dataarr = dataarr.sort((a, b) => new Date(a.TD_TRDT.split("-").reverse().join("/")).getTime() - new Date(b.TD_TRDT.split("-").reverse().join("/")).getTime());
+                            var scheme="";var name="";var pan="";
+                                for (var i = 0; i < dataarr.length; i++) {
+                                  
+                                  
+                                    if (datacon[a].FOLIO === dataarr[i].FOLIO && datacon[a].SCHEME === dataarr[i].SCHEME) {
+                                       if (Math.sign(dataarr[i].UNITS) != -1) {
+                                            if (dataarr[i].NATURE === "Switch Out")
+                                                for (var jj = 0; jj < arrunit.length; jj++) {
+
+                                                    if (arrunit[jj] === 0)
+                                                        arrunit.shift();
+                                                    if (arrpurchase[jj] === 0)
+                                                        arrpurchase.shift();
+                                                    if (arrdays[jj] === 0)
+                                                        arrdays.shift();
+                                                    if (alldays[jj] === 0)
+                                                        alldays.shift();
+                                                    if (sum1[jj] === 0)
+                                                        sum1.shift();
+                                                    if (sum2[jj] === 0)
+                                                        sum2.shift();
+                                                }
+                                        }
+
+                                        if (dataarr[i].NATURE != 'Switch Out' && dataarr[i].UNITS != 0) {
+
+                                            unit = dataarr[i].UNITS
+                                            amount = dataarr[i].AMOUNT;
+                                            var date = dataarr[i].TD_TRDT;
+                                            var navdate = dataarr[i].navdate;
+
+                                            var d = new Date(date.split("-").reverse().join("-"));
+                                            var dd = d.getDate();
+                                            var mm = d.getMonth() + 1;
+                                            var yy = d.getFullYear();
+                                            var newdate = mm + "/" + dd + "/" + yy;
+
+
+                                            var navd = new Date(navdate);
+                                            var navdd = navd.getDate();
+                                            var navmm = navd.getMonth() + 1;
+                                            var navyy = navd.getFullYear();
+                                            var newnavdate = navmm + "/" + navdd + "/" + navyy;
+                                            date1 = new Date(newdate);
+                                            date2 = new Date(newnavdate);
+                                            days = moment(date2).diff(moment(date1), 'days');
+                                            arrunit.push(dataarr[i].UNITS);
+                                            arrpurchase.push(Math.round(dataarr[i].UNITS * dataarr[i].TD_NAV));
+
+                                            //sum1(purchase cost*days*cagr)
+                                            if (days === 0 && isNaN(days)) {
+                                                sum1.push(0);
+                                                arrdays.push(0);
+                                                alldays.push(0);
+                                                sum2.push(0);
+                                            } else {
+                                                arrdays.push(parseFloat(days) * dataarr[i].UNITS * parseFloat(dataarr[i].TD_NAV));
+
+                                                alldays.push(parseFloat(days));
+
+                                                sum1.push(parseFloat(dataarr[i].UNITS * dataarr[i].TD_NAV) * parseFloat(days) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[i].cnav * dataarr[i].UNITS) / (dataarr[i].UNITS * dataarr[i].TD_NAV)), parseFloat(1 / parseFloat(days / 365)))) - 1) * 100));
+
+                                                sum2.push(parseFloat(dataarr[i].UNITS * dataarr[i].TD_NAV) * parseFloat(days));
+
+                                            }
+
+                                            temp1 = dataarr[i].UNITS;
+                                            temp2 = temp1 + temp2;
+                                            navrate = dataarr[i].TD_NAV;
+                                            
+
+                                        } else {
+
+                                            unit = "-" + dataarr[i].UNITS
+                                            amount = "-" + dataarr[i].AMOUNT
+                                            if (temp4 != "" && temp4 != 0) {
+                                                arrunit.splice(0, 0, temp4);
+                                            }
+                                            temp2 = dataarr[i].UNITS;
+                                           for (var p = 0; p < arrunit.length; p++) {
+                                                temp3 = arrunit[p];
+                                                arrunit[p] = 0;
+
+                                                if (temp2 > temp3) {
+                                                    arrpurchase[p] = 0;
+                                                    arrdays[p] = 0;
+                                                    alldays[p] = 0;
+                                                    sum1[p] = 0;
+                                                    sum2[p] = 0;
+                                                     temp2 = parseFloat(temp2) - parseFloat(temp3);
+
+                                                } else {
+                                                    temp4 = parseFloat(temp3) - parseFloat(temp2);
+                                                    temp4 =parseFloat(temp4.toFixed(3));
+                                                    var len = dataarr.length - 1;
+                                                    if(dataarr[len].NATURE === "SIP" || dataarr[len].NATURE === "Purchase" || dataarr[len].NATURE === "Switch In") {
+                                                        if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0 || isNaN(alldays[p]) || temp4 === 0) {
+                                                            arrpurchase[p] = 0;
+                                                            
+                                                            arrdays[p] = 0;
+                                                            alldays[p] = 0;
+                                                            sum1[p] = 0;
+                                                            sum2[p] = 0;
+                                                        } else {
+                                                            if (temp4 < 0) {
+                                                                arrpurchase[p] = 0;
+                                                                arrdays[p] =0;
+                                                                alldays[p] =0;
+                                                                sum1[p] =0;
+                                                                sum2[p] =0;
+                                                            } else {
+                                                                if (dataarr[i + 1].NATURE != 'Switch Out') {
+                                                                    arrpurchase[p] = Math.round(temp4 * parseFloat(dataarr[p].TD_NAV));
+                                                                } else {
+                                                                    break;
+                                                                }
+                                                                arrdays[p] = parseFloat(alldays[p]) * parseFloat(temp4) * parseFloat(dataarr[p].TD_NAV);
+                                                                sum1[p] = parseFloat(temp4 * dataarr[p].TD_NAV) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
+                                                                sum2[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]);
+                                                              
+                                                            } 
+                                                          
+                                                          
+                                                        }
+
+                                                    } else {
+
+                                                        if (arrdays[p] === 0 || arrdays[p] === "undefined" || isNaN(arrdays[p]) || alldays[p] === 0 || isNaN(alldays[p]) || temp4 === 0) {
+                                                            arrpurchase[p] = 0;
+                                                            
+                                                            arrdays[p] = 0;
+                                                            alldays[p] = 0;
+                                                            sum1[p] = 0;
+                                                            sum2[p] = 0;
+                                                        } else {
+                                                            if (temp4 < 0) {
+                                                                arrpurchase[p] = 0;
+                                                                arrdays[p] =0;
+                                                                alldays[p] =0;
+                                                                sum1[p] =0;
+                                                                sum2[p] =0;
+                                                            } else {
+                                                                arrpurchase[p] = Math.round(temp4 * parseFloat(dataarr[p].TD_NAV));
+
+                                                                arrdays[p] = parseFloat(alldays[p]) * temp4 * parseFloat(dataarr[p].TD_NAV);
+                                                                sum1[p] = parseFloat(temp4 * parseFloat(dataarr[p].TD_NAV)) * parseFloat(alldays[p]) * parseFloat((parseFloat(Math.pow(parseFloat((dataarr[p].cnav * temp4) / (temp4 * parseFloat(dataarr[p].TD_NAV))), parseFloat(1 / parseFloat(alldays[p] / 365)))) - 1) * 100);
+                                                                sum2[p] = parseFloat(temp4.toFixed(3)) * parseFloat(dataarr[p].TD_NAV) * parseFloat(alldays[p])
+                                                               
+                                                            }
+                                                         }
+                                                    }
+                                                   
+                                                    break;
+                                                }
+                                            }
+
+                                        }//else condition equal switch
+
+                                        balance = parseFloat(unit) +parseFloat(balance);
+
+                                        cnav = dataarr[i].cnav;
+                                        if (cnav === "" || cnav === undefined || isNaN(balance) || isNaN(cnav)) {
+                                            balance = 0;
+                                            cnav = 0;
+                                        }
+                                        currentval = cnav * balance
+                                        type =dataarr[i].TYPE;
+                                    }//if match two scheme and folio array 
+                                    scheme = datacon[a].SCHEME;
+                                    name = datacon[a].NAME;
+                                    pan = datacon[a].PAN;
+                                    
+                                } //dataarr inner loop
+                              //  console.log(scheme,"--",name,"--",pan)
+                               temp22 = 0; temp33 = 0;var temp222=0;
+
+                                for (var k = 0; k < arrpurchase.length; k++) {
+                                    temp33 = Math.round(arrpurchase[k]);
+                                    temp22 = temp33 + temp22;
+                                    temp222 = Math.round(arrdays[k]) + temp222;
+                                }
+                                days= temp222/temp22;
+                                var sum1all = 0; var sum2all = 0;
+                                
+                                for (var kk = 0; kk < sum1.length; kk++) {
+                                    sum1all = sum1[kk] + sum1all;
+                                }
+                                for (var kkk = 0; kkk < sum2.length; kkk++) {
+                                    sum2all = sum2[kkk] + sum2all;
+                                }
+                               
+                                var cagr = sum1all/sum2all;
+                                var absreturn =(((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100).toFixed(2);
+                                gain = Math.round(currentval)-temp22;
+                               
+                                if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days) ) {
+                                   
+                                } else {
+                                    tot_mkt_value.push(Math.round(currentval));
+                                    tot_cost.push(temp22);
+                                    tot_gain.push(gain);
+                                purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,jh1_name:datacon[a].JTNAME1,jh1_pan:datacon[a].JTPAN1,jh2_name:datacon[a].JTNAME2,jh2_pan:datacon[a].JTPAN2,holder_nature:datacon[a].MODE,isin:datacon[a].ISIN,sip_dates:datacon[a].SIP_DATES,amc:datacon[a].AMC,nav:datacon[a].CNAV,absolute_return:absreturn,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
+                                }                  
+                            } // datascheme first loop
+                            for(var r=0;r<purchase.length;r++){
+                                sum11.push(purchase[r].purchase_cost * purchase[r].avg_days * purchase[r].cagr);
+                                 sum22.push(purchase[r].purchase_cost * purchase[r].avg_days);
+                           }
+                            sum1all =0;sum2all =0;
+                            for (var kk = 0; kk < sum11.length; kk++) {
+                                sum1all = sum11[kk] + sum1all;
+                            }
+                            for (var kkk = 0; kkk < sum22.length; kkk++) {
+                                sum2all = sum22[kkk] + sum2all;
+                            }
+                            var sumcagr = sum1all/sum2all;
+                            var mkt = 0; var cost = 0;var totgain=0;
+                            for (var p = 0; p < tot_mkt_value.length; p++) {
+                                mkt = tot_mkt_value[p] + mkt;
+                                cost = tot_cost[p]+ cost;
+                                totgain = tot_gain[p] +totgain;
+                            }
+                            
+                            
+                            resdata.data = { portfolio_data:purchase,final_values:{tot_mkt_value:mkt,tot_cost: cost, tot_gain: totgain,tot_cagr :sumcagr.toFixed(1)} } ;
+                            
+                            res.json(resdata);
+                        
+                        } else {
+                            console.log("purchase=", "Data Not Found!")
+                        }
+                   // }
+                })
+                }
+       })
+      })
+            });
+        });
+    }
       }
    
     } catch (err) {
