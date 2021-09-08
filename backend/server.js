@@ -2614,7 +2614,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     var absreturn =(((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100).toFixed(2);
                                                     gain = Math.round(currentval)-temp22;
                                                    
-                                                    if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days) || currentval === 0  ) {
+                                                    if (currentval === 0 || isNaN(cv) || currentval < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days)) {
                                                        
                                                     } else {
                                                         tot_mkt_value.push(Math.round(currentval));
