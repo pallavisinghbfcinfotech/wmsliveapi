@@ -2618,6 +2618,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                        
                                                     } else {
 							      if(currentval != 0){
+								      console.log("cv=",currentval);
                                                         tot_mkt_value.push(Math.round(currentval));
                                                         tot_cost.push(temp22);
                                                         tot_gain.push(gain);
