@@ -302,7 +302,7 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                   if(datacon1[i]['TYPE'] === "DEBT FUND" || datacon1[i]['TYPE'] === "LIQUID" || datacon1[i]['TYPE'] === "DEBT" || datacon1[i]['TYPE'] === "LIQUID FUND" || datacon1[i]['TYPE'] === "INCOME FUND" || datacon1[i]['TYPE'] === "GILT FUND" || datacon1[i]['TYPE'] === "Cash" || datacon1[i]['TYPE'] === "Bond" || datacon1[i]['TYPE'] === "Ultra Liquid" ) {
                     datacon1[i]['TYPE'] = "DEBT";
                   }
-		  if(datacon1[i]['TYPE'] === "Gold FOF) {
+		  if(datacon1[i]['TYPE'] === "Gold FOF") {
                     datacon1[i]['TYPE'] = "GOLD";
                 }
               }
@@ -382,7 +382,7 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                     if(datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon2[i]['TYPE'] === "DEBT" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "INCOME FUND" || datacon2[i]['TYPE'] === "GILT FUND" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Bond" || datacon2[i]['TYPE'] === "Ultra Liquid" ) {
                             datacon2[i]['TYPE'] = "DEBT";
                         }
-		    if(datacon2[i]['TYPE'] === "Gold FOF) {
+		    if(datacon2[i]['TYPE'] === "Gold FOF") {
                     datacon2[i]['TYPE'] = "GOLD";
                        }
                   }
@@ -471,7 +471,7 @@ const portfolioApi = (datacon, cb) => {const data = _.groupBy(datacon, "RTA");
                       if(datacon2[i]['TYPE'] === "DEBT FUND" || datacon2[i]['TYPE'] === "LIQUID" || datacon2[i]['TYPE'] === "DEBT" || datacon2[i]['TYPE'] === "LIQUID FUND" || datacon2[i]['TYPE'] === "INCOME FUND" || datacon2[i]['TYPE'] === "GILT FUND" || datacon2[i]['TYPE'] === "Cash" || datacon2[i]['TYPE'] === "Bond" || datacon2[i]['TYPE'] === "Ultra Liquid" ) {
                               datacon2[i]['TYPE'] = "DEBT";
                           }
-		         if(datacon2[i]['TYPE'] === "Gold FOF) {
+		         if(datacon2[i]['TYPE'] === "Gold FOF") {
                               datacon2[i]['TYPE'] = "GOLD";
                             }
                     }
@@ -2614,7 +2614,7 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     var absreturn =(((parseFloat(currentval) - parseFloat(temp22)) / parseFloat(temp22)) * 100).toFixed(2);
                                                     gain = Math.round(currentval)-temp22;
                                                    
-                                                    if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days) ) {
+                                                    if ( isNaN(cv) || cv < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days) || currentval === 0  ) {
                                                        
                                                     } else {
                                                         tot_mkt_value.push(Math.round(currentval));
