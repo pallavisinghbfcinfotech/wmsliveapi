@@ -2617,11 +2617,13 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     if (currentval === 0 || isNaN(cv) || currentval < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days)) {
                                                        
                                                     } else {
+							      if(currentval != 0){
                                                         tot_mkt_value.push(Math.round(currentval));
                                                         tot_cost.push(temp22);
                                                         tot_gain.push(gain);
                                                     purchase.push({name:datacon[a].NAME,pan:datacon[a].PAN,scheme:datacon[a].SCHEME,folio:datacon[a].FOLIO,jh1_name:datacon[a].JTNAME1,jh1_pan:datacon[a].JTPAN1,jh2_name:datacon[a].JTNAME2,jh2_pan:datacon[a].JTPAN2,holder_nature:datacon[a].MODE,isin:datacon[a].ISIN,sip_dates:datacon[a].SIP_DATES,amc:datacon[a].AMC,nav:datacon[a].CNAV,absolute_return:absreturn,product_code:datacon[a].PCODE,reinvest:datacon[a].REINVEST,unit:balance.toFixed(3),purchase_cost:temp22,mkt_value:Math.round(currentval),gain:gain,cagr:cagr.toFixed(1),avg_days:Math.round(days),type:type});  
-                                                    }                  
+							      }
+							      }                  
                                                 } // datascheme first loop
                                                 for(var r=0;r<purchase.length;r++){
                                                     sum11.push(purchase[r].purchase_cost * purchase[r].avg_days * purchase[r].cagr);
