@@ -2617,8 +2617,8 @@ app.post("/api/portfolio_detailapi_data", function (req, res) {
                                                     if (currentval === 0 || isNaN(cv) || currentval < 0 || temp22===0 || balance === 0 || balance < 0 ||  days ===0 || isNaN(days)) {
                                                        
                                                     } else {
-							      if(currentval != 0){
-								      console.log("cv=",currentval);
+							      currentval = Math.round(currentval);
+                                                        if(currentval != 0){
                                                         tot_mkt_value.push(Math.round(currentval));
                                                         tot_cost.push(temp22);
                                                         tot_gain.push(gain);
